@@ -1,21 +1,27 @@
 # CONEXION pyw
 import pyodbc
+import pymysql
 
-server='192.168.9.221'
-dbname='SisMetPrec'
-user='sa'
-password='Sistemas123*'
+server1='192.168.9.221'
+dbname1='SisMetPrec'
+user1='sa'
+password1='Sistemas123*'
 
 try:
-    connection = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL server}; SERVER='+server+';DATABASE='+dbname+';UID='+user+';PWD='+password)
-    print('connection succes')
+    SQLServerConnection = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL server}; SERVER='+server1+';DATABASE='+dbname1+';UID='+user1+';PWD='+password1)
 except:
     print ('error to try connect the database')
 
+try:
+    MySQLConnection = pymysql.connect(host="localhost",user="root",passwd="",database="test" )
+except:
+    print ('error to try connect the database')
+cursormysql = MySQLConnection.cursor()
+
 # CONSULTAS
 
-cursor = connection.cursor()
-cursor.execute('''SELECT 
+cursorsqlsrv = SQLServerConnection.cursor()
+cursorsqlsrv.execute('''SELECT 
     DesBpr as descBl,
     MarBpr as marc,
     ModBpr as modl,
@@ -37,10 +43,12 @@ cursor.execute('''SELECT
 	fec_proxBpr as fecProxCal
 	FROM Balxpro  WHERE est_esc LIKE 'PR';''')
 
-table = cursor.fetchone()
-while table:
-    print(table)
-    table = cursor.fetchone()
+data = cursorsqlsrv.fetchall()
+# print (data)
 
-cursor.close()
-connection.close()
+
+
+
+
+MySQLConnection.close()
+SQLServerConnection.close()
