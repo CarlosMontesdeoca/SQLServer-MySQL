@@ -68,17 +68,22 @@ for codtb in data1:
         if balxpro[0] == 'III':
             querryExcCad = f"SELECT * FROM ExecII_Cab WHERE IdeComBpr LIKE '{codtb[0]}' ORDER BY PrbEii ASC"
             querryExcDet = f"SELECT * FROM ExecII_Det WHERE CodEii_c LIKE '{codtb[0]}%' ORDER BY RIGHT(CodEii_c,1) ASC"
-        #     querryRepet = "SELECT * FROM RepetIII_Cab C JOIN RepetIII_Det D on C.IdeCom
+
+            querryRepet = f"SELECT * FROM RepetIII_Cab C JOIN RepetIII_Det D ON C.IdeComBpr = D.CodRiii_C WHERE C.IdeComBpr LIKE '{codtb[0]}'"
         # Bpr = D.CodRiii_C WHERE C.IdeComBpr LIKE '" + codtb[0] + "'"
         #     # cursorsqlsrv.execute()
         elif balxpro[0] =='II':
             querryExcCad = f"SELECT * FROM ExecII_Cab WHERE IdeComBpr LIKE '{codtb[0]}' ORDER BY PrbEii ASC"
             querryExcDet = f"SELECT * FROM ExecII_Det WHERE CodEii_c LIKE '{codtb[0]}%' ORDER BY RIGHT(CodEii_c,1) ASC"
+
+            querryRepet = f"SELECT * FROM RepetII_Cab C JOIN RepetII_Det D ON C.IdeComBpr = D.CodRii_C WHERE C.IdeComBpr LIKE '{codtb[0]}'"
             # querryRepet = "SELECT * FROM RepetII_Cab C JOIN RepetII_Det D on C.IdeComBpr = D.CodRii_C WHERE C.IdeComBpr LIKE '" + codtb[0] + "'"
             print('es 2')
         else:
             querryExcCad = f"SELECT * FROM ExecCam_Cab WHERE IdeComBpr LIKE '{codtb[0]}' ORDER BY PrbEii ASC"
             querryExcDet = f"SELECT * FROM ExecCam_Det WHERE CodCam_c LIKE '{codtb[0]}%' ORDER BY RIGHT(CodCam_c,1) ASC"
+
+            querryRepet = f"SELECT * FROM RepetIII_Cab C JOIN RepetIII_Det D ON C.IdeComBpr = D.CodRiii_C WHERE C.IdeComBpr LIKE '{codtb[0]}'"
             # querryRepet = "SELECT * FROM RepetIII_Cab C JOIN RepetIII_Det D on C.IdeComBpr = D.CodRiii_C WHERE C.IdeComBpr LIKE '" + codtb[0] + "'"
             print('es camionera')
         # repet = cursorsqlsrv.fetchone()
@@ -90,7 +95,6 @@ for codtb in data1:
         cursorsqlsrv.execute(querryExcDet)
         exectDet = cursorsqlsrv.fetchall()
 
-        # print( exectCad, '\n', exectDet)
         querryInsertExc = f"INSERT INTO excentests(codPro, certificate_id, intCarg, numPr, maxExec, maxErr, pos1, pos1_r, pos2, pos2_r, pos3, evl) VALUES "
         for pex in [0,1]:
             querryInsertExc = querryInsertExc + f"('{codtb[0]}',{certificate[0]},{exectCad[pex][1]},{exectCad[pex][2]},{exectDet[pex][6]},{exectDet[pex][7]},{exectDet[pex][1]},{exectDet[pex][2]},{exectDet[pex][3]},{exectDet[pex][4]},{exectDet[pex][5]},'{exectCad[pex][4]}' ),"
@@ -101,6 +105,16 @@ for codtb in data1:
             print (f"  ==> SUCCESSFULLY LOADED ECCENTRICITY TEST DATA ✅")
         except:
             print ("  ==> ERROR LADING ECCENTRICITY TEST DATA ⚠")
+
+        cursorsqlsrv.execute(querryRepet)
+        repet = cursorsqlsrv.fetchone()
+
+        try:
+            cursormysql.execute(f"INSERT INTO repeatests(codPro,certificate_id,intCarg,maxDif,maxErr,lec1,lec1_0,lec2,lec2_0,lec3,lec3_0,evl) VALUES ('{codtb[0]}',{certificate[0]},{repet[1]},{repet[2]},{repet[3]},{repet[7]},{repet[8]},{repet[9]},{repet[10]},{repet[11]},{repet[12]},'{repet[4]}')")
+            MySQLConnection.commit()  # ingreso de valores a la tabla certificates MySQL
+            print (f"  ==> SUCCESSFULLY LOADED REPETIBILITY TEST DATA ✅")
+        except:
+            print ("  ==> ERROR LADING REPEATABILITY TEST DATA ⚠")
     
         # # Select the updated row and print the updated column value
         # sqlSelectUpdated   = "SELECT * FROM certificates WHERE codPro LIKE '" + codtb[0] + "'"
