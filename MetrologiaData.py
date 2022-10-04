@@ -1,4 +1,5 @@
 # CONEXION pyw
+from ssl import cert_time_to_seconds
 import pyodbc
 import pymysql
 
@@ -26,7 +27,7 @@ data1 = cursorsqlsrv.fetchall()
 
 
 cursormysql = MySQLConnection.cursor()
-cursormysql.execute('''SELECT codPro FROM certificates WHERE est LIKE 'P';''')
+cursormysql.execute("SELECT codPro FROM certificates WHERE est LIKE 'P'")
 # cursormysql.execute('''SELECT * FROM certificates WHERE est LIKE 'P';''')
 
 data2 = cursormysql.fetchall()
@@ -38,17 +39,20 @@ print(data2)
 
 for codtb in data1:
     # print (codtb[0])
-    querry = "SELECT * FROM certificates WHERE est LIKE 'P' AND codPro LIKE '" + codtb[0] + "';"
+    querry = f"SELECT * FROM certificates WHERE est LIKE 'P' AND codPro LIKE '{codtb[0]}'"
     cursormysql.execute(querry)
-    certificate = cursormysql.fetchall()
+    certificate = cursormysql.fetchone()
+    print(certificate)
 
     if certificate:  ## SI  HAY DATOS POR LO QUE SE ENVIARAN LOS DATOS PRIMARIOS
 
-        cursorsqlsrv.execute("""SELECT ClaBpr,DesBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,IdeComBpr, UbiBpr, BalLimpBpr, AjuBpr, IRVBpr, ObsVBpr,CapCalBpr, RecPorCliBpr,fec_cal,fec_proxBpr FROM Balxpro  WHERE ideComBpr LIKE '""" + codtb[0] + "'")
+        cursorsqlsrv.execute(f"SELECT ClaBpr,DesBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,IdeComBpr, UbiBpr, BalLimpBpr, AjuBpr, IRVBpr, ObsVBpr,CapCalBpr, RecPorCliBpr,fec_cal,fec_proxBpr FROM Balxpro  WHERE ideComBpr LIKE '{codtb[0]}'")
         balxpro = cursorsqlsrv.fetchone()  # se obtiene los datos de balxpro  esto se envia a certificados
         
-        cursormysql.execute(f"UPDATE certificates SET ubi = '{balxpro[11].upper()}', luCal = '{balxpro[11].upper()}', est = 'RH', evlBal1 = '{balxpro[12]}', evlBal2 = '{balxpro[13]}', evlBal3 = '{balxpro[14]}', obs = '{balxpro[15].upper()}', uso = '{balxpro[16]}', recPor = '{balxpro[17].upper()}', fecCal = '{balxpro[18]}', fecProxCal = '{balxpro[19]}'  WHERE codPro LIKE '{codtb[0]}'")
-        MySQLConnection.commit()  # ingreso de valores a la tabla certificates MySQL
+        cursormysql.execute(f"UPDATE balances SET descBl = '{balxpro[1].upper()}', marc = '{balxpro[2].upper()}', modl = '{balxpro[3].upper()}', ser = '{balxpro[4].upper()}', maxCap = {balxpro[5]}, usCap = {balxpro[6]}, div_e = {balxpro[7]}, div_d = {balxpro[8]}, rang = {balxpro[9]} WHERE id LIKE {certificate[2]}")
+        MySQLConnection.commit()  # actualizacion de balanza calibrada MySQL
+
+
         # if balxpro[0] == 'III':
         #     querryRepet = "SELECT * FROM RepetIII_Cab C JOIN RepetIII_Det D on C.IdeComBpr = D.CodRiii_C WHERE C.IdeComBpr LIKE '" + codtb[0] + "'"
         #     # cursorsqlsrv.execute()
