@@ -21,27 +21,6 @@ except:
 
 cursorsqlsrv = SQLServerConnection.cursor()
 cursorsqlsrv.execute('''SELECT IdeComBpr FROM Balxpro  WHERE est_esc LIKE 'PR';''')
-cursorsqlsrv.execute('''SELECT 
-#     DesBpr as descBl,
-#     MarBpr as marc,
-#     ModBpr as modl,
-#     SerBpr as ser,
-#     CapMaxBpr as maxCap,
-#     CapUsoBpr as usCap,
-#     DivEscBpr as  div_e,
-#     DivEsc_dBpr as dev_d,
-#     RanBpr as rang,
-#     IdeComBpr as codPro, 
-#     UbiBpr as ubi, 
-#     BalLimpBpr as evlBal1, 
-#     AjuBpr as evlBal2, 
-#     IRVBpr as evlBal3, 
-#     ObsVBpr as obs,
-#     CapCalBpr as uso, 
-#     RecPorCliBpr as recPor,
-# 	fec_cal as fecCal,
-# 	fec_proxBpr as fecProxCal
-# 	FROM Balxpro  WHERE est_esc LIKE 'PR';''')
 
 data1 = cursorsqlsrv.fetchall()
 
@@ -63,31 +42,46 @@ for codtb in data1:
     cursormysql.execute(querry)
     certificate = cursormysql.fetchall()
 
-    if certificate:
-        updateStatement = "UPDATE certificates SET est = 'X' WHERE codPro LIKE '" + codtb[0] + "'"
-        cursormysql.execute(updateStatement) 
-        MySQLConnection.commit()
-        
-        # Select the updated row and print the updated column value
-        sqlSelectUpdated   = "SELECT * FROM certificates WHERE codPro LIKE '" + codtb[0] + "'"
+    if certificate:  ## SI  HAY DATOS POR LO QUE SE ENVIARAN LOS DATOS PRIMARIOS
 
-        # Execute the SQL SELECT query
-        cursormysql.execute(sqlSelectUpdated)
+        cursorsqlsrv.execute("""SELECT ClaBpr,DesBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,IdeComBpr, UbiBpr, BalLimpBpr, AjuBpr, IRVBpr, ObsVBpr,CapCalBpr, RecPorCliBpr,fec_cal,fec_proxBpr FROM Balxpro  WHERE ideComBpr LIKE '""" + codtb[0] + "'")
+        balxpro = cursorsqlsrv.fetchone()  # se obtiene los datos de balxpro  esto se envia a certificados
+        
+        cursormysql.execute(f"UPDATE certificates SET ubi = '{balxpro[11].upper()}', luCal = '{balxpro[11].upper()}', est = 'RH', evlBal1 = '{balxpro[12]}', evlBal2 = '{balxpro[13]}', evlBal3 = '{balxpro[14]}', obs = '{balxpro[15].upper()}', uso = '{balxpro[16]}', recPor = '{balxpro[17].upper()}', fecCal = '{balxpro[18]}', fecProxCal = '{balxpro[19]}'  WHERE codPro LIKE '{codtb[0]}'")
+        MySQLConnection.commit()  # ingreso de valores a la tabla certificates MySQL
+        # if balxpro[0] == 'III':
+        #     querryRepet = "SELECT * FROM RepetIII_Cab C JOIN RepetIII_Det D on C.IdeComBpr = D.CodRiii_C WHERE C.IdeComBpr LIKE '" + codtb[0] + "'"
+        #     # cursorsqlsrv.execute()
+        #     print('es 3')
+        # elif balxpro[0] =='II':
+        #     querryRepet = "SELECT * FROM RepetII_Cab C JOIN RepetII_Det D on C.IdeComBpr = D.CodRii_C WHERE C.IdeComBpr LIKE '" + codtb[0] + "'"
+        #     print('es 2')
+        # else:
+        #     querryRepet = "SELECT * FROM RepetIII_Cab C JOIN RepetIII_Det D on C.IdeComBpr = D.CodRiii_C WHERE C.IdeComBpr LIKE '" + codtb[0] + "'"
+        #     print('es camionera')
+        # repet = cursorsqlsrv.fetchone()
+        # print(repet)
+    
+        # # Select the updated row and print the updated column value
+        # sqlSelectUpdated   = "SELECT * FROM certificates WHERE codPro LIKE '" + codtb[0] + "'"
+
+        # # Execute the SQL SELECT query
+        # cursormysql.execute(sqlSelectUpdated)
 
         # Fetch the updated row
-        updatedRow = cursormysql.fetchall()
+        # updatedRow = cursormysql.fetchall()
 
         # Print the updated row...
 
-        for column in updatedRow:
+        # for column in updatedRow:
 
-            print(column)  
+        #     print(column)  
 
         # cursormysql.execute("UPDATE certificates SET est = 'X' WHERE codPro LIKE '" + codtb[0] + "';")
         # updatecert = cursormysql.fetchall()
         # print ('llegaron datos')
     else : 
-        print (' no hay datos')
+        print (codtb[0] + ':  no hay datos')
     # for coddb in data2:
     #     if codtb[0] == coddb[0]:
     #         print( 'llegaron datos' )
