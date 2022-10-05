@@ -29,7 +29,7 @@ cursormysql = MySQLConnection.cursor()
 print('SEARCHING PENDING DATA....')
 cursorsqlsrv.execute('''SELECT IdeComBpr FROM Balxpro  WHERE est_esc LIKE 'PR';''')
 data1 = cursorsqlsrv.fetchall()
-print('=========================================================================')
+print( data1, '=========================================================================')
 
 print('CHECKING.......')
 for codtb in data1:
@@ -44,7 +44,7 @@ for codtb in data1:
         
         # se obtiene los datos de balxpro  esto se envia a certificados
         try:
-            cursormysql.execute(f"UPDATE certificates SET ubi = '{balxpro[11].upper()}', luCal = '{balxpro[11].upper()}', est = 'P', evlBal1 = '{balxpro[12]}', evlBal2 = '{balxpro[13]}', evlBal3 = '{balxpro[14]}', obs = '{balxpro[15].upper()}', uso = '{balxpro[16]}', recPor = '{balxpro[17].upper()}', fecCal = '{balxpro[18]}', fecProxCal = '{balxpro[19]}'  WHERE codPro LIKE '{codtb[0]}'")
+            cursormysql.execute(f"UPDATE certificates SET ubi = '{balxpro[11].upper()}', luCal = '{balxpro[11].upper()}', est = 'RH', evlBal1 = '{balxpro[12]}', evlBal2 = '{balxpro[13]}', evlBal3 = '{balxpro[14]}', obs = '{balxpro[15].upper()}', uso = '{balxpro[16]}', recPor = '{balxpro[17].upper()}', fecCal = '{balxpro[18]}', fecProxCal = '{balxpro[19]}', frmt = 12, motr = 11  WHERE codPro LIKE '{codtb[0]}'")
             MySQLConnection.commit()  # ingreso de valores a la tabla certificates MySQL
             print (f"  ==> SUCCESSFULLY LOADED CERTIFICATE DATA ✅")
         except:
@@ -58,36 +58,37 @@ for codtb in data1:
         except:
             print ("  ==> ERROR LADING BALANCE DATA ⚠")
         
-        ####### -------------- INSERTA LOS DATOS DE LAS PRUEBAS DE CALIBRACION ------------------------------#######
+        ###_____________________________________________________AMBIENTALES________________________________________________________________________###
+        cursorsqlsrv.execute(f"SELECT * FROM Ambientales WHERE IdeComBpr LIKE '{codtb[0]}'")
+        envir = cursorsqlsrv.fetchone() 
+        
+        try:
+            cursormysql.execute(f"INSERT INTO enviroments(codPro,certificate_id,tempIn,tempFn,humIn,humFn)VALUES('{codtb[0]}',{certificate[0]},{envir[1]},{envir[2]},{envir[3]},{envir[4]})")
+            MySQLConnection.commit()  # actualizacion de balanza calibrada MySQL
+            print (f"  ==> SUCCESSFULLY LOADED ENVIROMENTALS DATA ✅")
 
-        ## OBTENER PRUEBAS DE EXENTRICIDAD ....
-        # cursorsqlsrv.execute()
-        # exect = cursorsqlsrv.fetchone()
-        # print(exect)
+        except:
+            print ("  ==> ERROR LADING BALANCE DATA ⚠") 
+
+        ####### -------------- INSERTA LOS DATOS DE LAS PRUEBAS DE CALIBRACION ------------------------------#######
         
         if balxpro[0] == 'III':
             querryExcCad = f"SELECT * FROM ExecII_Cab WHERE IdeComBpr LIKE '{codtb[0]}' ORDER BY PrbEii ASC"
             querryExcDet = f"SELECT * FROM ExecII_Det WHERE CodEii_c LIKE '{codtb[0]}%' ORDER BY RIGHT(CodEii_c,1) ASC"
 
             querryRepet = f"SELECT * FROM RepetIII_Cab C JOIN RepetIII_Det D ON C.IdeComBpr = D.CodRiii_C WHERE C.IdeComBpr LIKE '{codtb[0]}'"
-        # Bpr = D.CodRiii_C WHERE C.IdeComBpr LIKE '" + codtb[0] + "'"
-        #     # cursorsqlsrv.execute()
         elif balxpro[0] =='II':
             querryExcCad = f"SELECT * FROM ExecII_Cab WHERE IdeComBpr LIKE '{codtb[0]}' ORDER BY PrbEii ASC"
             querryExcDet = f"SELECT * FROM ExecII_Det WHERE CodEii_c LIKE '{codtb[0]}%' ORDER BY RIGHT(CodEii_c,1) ASC"
 
             querryRepet = f"SELECT * FROM RepetII_Cab C JOIN RepetII_Det D ON C.IdeComBpr = D.CodRii_C WHERE C.IdeComBpr LIKE '{codtb[0]}'"
-            # querryRepet = "SELECT * FROM RepetII_Cab C JOIN RepetII_Det D on C.IdeComBpr = D.CodRii_C WHERE C.IdeComBpr LIKE '" + codtb[0] + "'"
             print('es 2')
         else:
             querryExcCad = f"SELECT * FROM ExecCam_Cab WHERE IdeComBpr LIKE '{codtb[0]}' ORDER BY PrbEii ASC"
             querryExcDet = f"SELECT * FROM ExecCam_Det WHERE CodCam_c LIKE '{codtb[0]}%' ORDER BY RIGHT(CodCam_c,1) ASC"
 
             querryRepet = f"SELECT * FROM RepetIII_Cab C JOIN RepetIII_Det D ON C.IdeComBpr = D.CodRiii_C WHERE C.IdeComBpr LIKE '{codtb[0]}'"
-            # querryRepet = "SELECT * FROM RepetIII_Cab C JOIN RepetIII_Det D on C.IdeComBpr = D.CodRiii_C WHERE C.IdeComBpr LIKE '" + codtb[0] + "'"
             print('es camionera')
-        # repet = cursorsqlsrv.fetchone()
-        # print(repet)
 
         cursorsqlsrv.execute(querryExcCad)
         exectCad = cursorsqlsrv.fetchall()
@@ -115,7 +116,25 @@ for codtb in data1:
             print (f"  ==> SUCCESSFULLY LOADED REPETIBILITY TEST DATA ✅")
         except:
             print ("  ==> ERROR LADING REPEATABILITY TEST DATA ⚠")
-    
+
+        cursorsqlsrv.execute(f"SELECT * FROM PCarga_Cab WHERE IdeComBpr LIKE '{codtb[0]}' ORDER BY NumPca ASC")
+        cargCad = cursorsqlsrv.fetchall()
+        cursorsqlsrv.execute(f"SELECT * FROM PCarga_Det WHERE CodPca_C LIKE '{codtb[0]}%' ORDER BY RIGHT(CodPca_C,1) ASC")
+        cargDet = cursorsqlsrv.fetchall()
+
+        querryInsertCrg = f"INSERT INTO cargtests(codPro, certificate_id, numPr, intCarg, lecAsc, lecDesc, errAsc, errDesc, maxErr, evl) VALUES "
+        
+        for pcar in range(0,len(cargCad)):
+            querryInsertCrg = querryInsertCrg + f"('{codtb[0]}',{certificate[0]},{cargCad[pcar][2]},{cargCad[pcar][1]},{cargDet[pcar][1]},{cargDet[pcar][2]},{cargDet[pcar][3]},{cargDet[pcar][4]},{cargDet[pcar][5]},'{cargCad[pcar][4]}'),"
+        try:
+            cursormysql.execute(querryInsertCrg[:-1])
+            MySQLConnection.commit()  # ingreso de valores a la tabla cargtests MySQL
+            print (f"  ==> SUCCESSFULLY LOADED WEIGTH TEST DATA ✅")
+        except:
+            print ("  ==> ERROR LADING WEIGTH TEST DATA ⚠")
+            
+
+        print('======================================================= \n =======================================================')
         # # Select the updated row and print the updated column value
         # sqlSelectUpdated   = "SELECT * FROM certificates WHERE codPro LIKE '" + codtb[0] + "'"
 
@@ -134,15 +153,14 @@ for codtb in data1:
         # cursormysql.execute("UPDATE certificates SET est = 'X' WHERE codPro LIKE '" + codtb[0] + "';")
         # updatecert = cursormysql.fetchall()
         # print ('llegaron datos')
-    else : 
-        print (codtb[0] + ':  no hay datos')
-    # for coddb in data2:
-    #     if codtb[0] == coddb[0]:
-    #         print( 'llegaron datos' )
-    #         break
-    #     
+    # else : 
+    #     print (codtb[0] + ':  no hay datos')
+    # # for coddb in data2:
+    # #     if codtb[0] == coddb[0]:
+    # #         print( 'llegaron datos' )
+    # #         break
+    # #     
 
-    print('_____')
 
 MySQLConnection.close()
 SQLServerConnection.close()
