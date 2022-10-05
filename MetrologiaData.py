@@ -25,13 +25,16 @@ print('=========================================================================
 ## CUSORES DE CONSULTAS 
 cursorsqlsrv = SQLServerConnection.cursor()
 cursormysql = MySQLConnection.cursor()
+## ==============================================================
 
 print('SEARCHING PENDING DATA....')
+## selecciona los proyectos de que han recibido datos en SQL Server
 cursorsqlsrv.execute('''SELECT IdeComBpr FROM Balxpro  WHERE est_esc LIKE 'PR';''')
 data1 = cursorsqlsrv.fetchall()
 print( data1, '=========================================================================')
 
 print('CHECKING.......')
+## verifica que los proyectos de SQL server esten pendientes en MySQL para enviar datos 
 for codtb in data1:
     querry = f"SELECT * FROM certificates WHERE est LIKE 'P' AND codPro LIKE '{codtb[0]}'"
     cursormysql.execute(querry)
@@ -42,14 +45,15 @@ for codtb in data1:
         cursorsqlsrv.execute(f"SELECT ClaBpr,DesBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,IdeComBpr, UbiBpr, BalLimpBpr, AjuBpr, IRVBpr, ObsVBpr,CapCalBpr, RecPorCliBpr,fec_cal,fec_proxBpr FROM Balxpro  WHERE ideComBpr LIKE '{codtb[0]}'")
         balxpro = cursorsqlsrv.fetchone()  
         
-        # se obtiene los datos de balxpro  esto se envia a certificados
+        ## modifica los datos del certificado con los datos calculados
         try:
             cursormysql.execute(f"UPDATE certificates SET ubi = '{balxpro[11].upper()}', luCal = '{balxpro[11].upper()}', est = 'RH', evlBal1 = '{balxpro[12]}', evlBal2 = '{balxpro[13]}', evlBal3 = '{balxpro[14]}', obs = '{balxpro[15].upper()}', uso = '{balxpro[16]}', recPor = '{balxpro[17].upper()}', fecCal = '{balxpro[18]}', fecProxCal = '{balxpro[19]}', frmt = 12, motr = 11  WHERE codPro LIKE '{codtb[0]}'")
-            MySQLConnection.commit()  # ingreso de valores a la tabla certificates MySQL
+            MySQLConnection.commit()  
             print (f"  ==> SUCCESSFULLY LOADED CERTIFICATE DATA ✅")
         except:
             print ("  ==> ERROR LADING CERTIFICATE DATA ⚠")
 
+        ## modifica la informacion de la balanza.
         try:
             cursormysql.execute(f"UPDATE balances SET descBl = '{balxpro[1].upper()}', marc = '{balxpro[2].upper()}', modl = '{balxpro[3].upper()}', ser = '{balxpro[4].upper()}', maxCap = {balxpro[5]}, usCap = {balxpro[6]}, div_e = {balxpro[7]}, div_d = {balxpro[8]}, rang = {balxpro[9]} WHERE id LIKE {certificate[2]}")
             MySQLConnection.commit()  # actualizacion de balanza calibrada MySQL
@@ -62,6 +66,7 @@ for codtb in data1:
         cursorsqlsrv.execute(f"SELECT * FROM Ambientales WHERE IdeComBpr LIKE '{codtb[0]}'")
         envir = cursorsqlsrv.fetchone() 
         
+        ## creacion de datos ambientales de la balanza.
         try:
             cursormysql.execute(f"INSERT INTO enviroments(codPro,certificate_id,tempIn,tempFn,humIn,humFn)VALUES('{codtb[0]}',{certificate[0]},{envir[1]},{envir[2]},{envir[3]},{envir[4]})")
             MySQLConnection.commit()  # actualizacion de balanza calibrada MySQL
@@ -72,23 +77,30 @@ for codtb in data1:
 
         ####### -------------- INSERTA LOS DATOS DE LAS PRUEBAS DE CALIBRACION ------------------------------#######
         
-        if balxpro[0] == 'III':
+        if balxpro[0] == 'III' or balxpro[0] == 'IIII':
+            ## consulta para ver las pruebas de exentricidad
             querryExcCad = f"SELECT * FROM ExecII_Cab WHERE IdeComBpr LIKE '{codtb[0]}' ORDER BY PrbEii ASC"
             querryExcDet = f"SELECT * FROM ExecII_Det WHERE CodEii_c LIKE '{codtb[0]}%' ORDER BY RIGHT(CodEii_c,1) ASC"
 
+            querryInsertExc = f"INSERT INTO excentests(codPro, certificate_id, intCarg, numPr, maxExec, maxErr, pos1, pos1_r, pos2, pos2_r, pos3, evl) VALUES "
+            ## consulta para ver las pruebas de repetibilidad
             querryRepet = f"SELECT * FROM RepetIII_Cab C JOIN RepetIII_Det D ON C.IdeComBpr = D.CodRiii_C WHERE C.IdeComBpr LIKE '{codtb[0]}'"
-        elif balxpro[0] =='II':
+        elif balxpro[0] == 'II':
+            ## consulta para ver las pruebas de exentricidad
             querryExcCad = f"SELECT * FROM ExecII_Cab WHERE IdeComBpr LIKE '{codtb[0]}' ORDER BY PrbEii ASC"
             querryExcDet = f"SELECT * FROM ExecII_Det WHERE CodEii_c LIKE '{codtb[0]}%' ORDER BY RIGHT(CodEii_c,1) ASC"
 
+            querryInsertExc = f"INSERT INTO excentests(codPro, certificate_id, intCarg, numPr, maxExec, maxErr, pos1, pos1_r, pos2, pos2_r, pos3, evl) VALUES "
+            ## consulta para ver las pruebas de repetibilidad
             querryRepet = f"SELECT * FROM RepetII_Cab C JOIN RepetII_Det D ON C.IdeComBpr = D.CodRii_C WHERE C.IdeComBpr LIKE '{codtb[0]}'"
-            print('es 2')
-        else:
+        elif balxpro[0] == 'CAM':
+            ## consulta para ver las pruebas de exentricidad
             querryExcCad = f"SELECT * FROM ExecCam_Cab WHERE IdeComBpr LIKE '{codtb[0]}' ORDER BY PrbEii ASC"
             querryExcDet = f"SELECT * FROM ExecCam_Det WHERE CodCam_c LIKE '{codtb[0]}%' ORDER BY RIGHT(CodCam_c,1) ASC"
 
+            querryInsertExc = f"INSERT INTO excentests(codPro, certificate_id, intCarg, numPr, maxExec, maxErr, pos1, pos1_r, pos2, pos2_r, pos3, pos3_r, evl) VALUES "
+            ## consulta para ver las pruebas de repetibilidad
             querryRepet = f"SELECT * FROM RepetIII_Cab C JOIN RepetIII_Det D ON C.IdeComBpr = D.CodRiii_C WHERE C.IdeComBpr LIKE '{codtb[0]}'"
-            print('es camionera')
 
         cursorsqlsrv.execute(querryExcCad)
         exectCad = cursorsqlsrv.fetchall()
@@ -96,7 +108,7 @@ for codtb in data1:
         cursorsqlsrv.execute(querryExcDet)
         exectDet = cursorsqlsrv.fetchall()
 
-        querryInsertExc = f"INSERT INTO excentests(codPro, certificate_id, intCarg, numPr, maxExec, maxErr, pos1, pos1_r, pos2, pos2_r, pos3, evl) VALUES "
+        
         for pex in [0,1]:
             querryInsertExc = querryInsertExc + f"('{codtb[0]}',{certificate[0]},{exectCad[pex][1]},{exectCad[pex][2]},{exectDet[pex][6]},{exectDet[pex][7]},{exectDet[pex][1]},{exectDet[pex][2]},{exectDet[pex][3]},{exectDet[pex][4]},{exectDet[pex][5]},'{exectCad[pex][4]}' ),"
         
