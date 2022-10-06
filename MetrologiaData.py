@@ -1,32 +1,29 @@
 # CONEXION pyw
 import pyodbc
 import pymysql
-# import os
-# from datetime import date
+from datetime import date
 
-# #Día actual
-# today = date.today()
-
-# print(today)
-
-# file = open(f"./LogMySQL-{today}.txt", "w")
+today = date.today()
 
 server1='tcp:192.168.9.221'
 dbname1='SisMetPrec'
 user1='sa'
 password1='Sistemas123*'
 
+logs = ''
+
 try:
     SQLServerConnection = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL server}; SERVER='+server1+';DATABASE='+dbname1+';UID='+user1+';PWD='+password1)
     print (" ==> CONNECCTION SUCCESS WITH SQL SERVER")
 except:
-    # file.write("==> error to try connect the database SQL Server")
+    logs += "==> error to try connect the database SQL Server \n" 
     print ('error to try connect the database SQL Server')
 
 try:
     MySQLConnection = pymysql.connect(host="127.0.0.1",user="root",passwd="",database="test" )
     print (" ==> CONNECCTION SUCCESS WITH MYSQL")
 except:
+    logs += "==> error to try connect the database MySQL \n" 
     print ('error to try connect the database MySQL')
 
 print('=========================================================================')
@@ -61,6 +58,7 @@ for codtb in data1:
             MySQLConnection.commit()  
             print ("  ==> SUCCESSFULLY LOADED CERTIFICATE DATA ✅")
         except:
+            logs += "==> ERROR LADING CERTIFICATE DATA \n" 
             print ("  ==> ERROR LADING CERTIFICATE DATA ⚠")
 
         ## modifica la informacion de la balanza.
@@ -70,6 +68,7 @@ for codtb in data1:
             print ("  ==> SUCCESSFULLY LOADED BALANCE DATA ✅")
 
         except:
+            logs += "==> ERROR LADING BALANCE DATA \n" 
             print ("  ==> ERROR LADING BALANCE DATA ⚠")
         
         ###_____________________________________________________AMBIENTALES________________________________________________________________________###
@@ -83,7 +82,8 @@ for codtb in data1:
             print (f"  ==> SUCCESSFULLY LOADED ENVIROMENTALS DATA ✅")
 
         except:
-            print ("  ==> ERROR LADING BALANCE DATA ⚠") 
+            logs += "==> ERROR LADING ENVIROMENT DATA \n" 
+            print ("  ==> ERROR LADING ENVIROMENT DATA ⚠") 
 
         ####### -------------- INSERTA LOS DATOS DE LAS PRUEBAS DE CALIBRACION ------------------------------#######
         
@@ -131,6 +131,7 @@ for codtb in data1:
             MySQLConnection.commit() 
             print ("  ==> SUCCESSFULLY LOADED ECCENTRICITY TEST DATA ✅")
         except:
+            logs += "==> ERROR LADING ECCENTRICITY TEST DATA \n" 
             print ("  ==> ERROR LADING ECCENTRICITY TEST DATA ⚠")
 
         ## ------ Datos de Pruebas de repetibilidad
@@ -147,6 +148,7 @@ for codtb in data1:
             MySQLConnection.commit() 
             print ("  ==> SUCCESSFULLY LOADED REPETIBILITY TEST DATA ✅")
         except:
+            logs += "==> ERROR LADING REPEATABILITY TEST DATA \n" 
             print ("  ==> ERROR LADING REPEATABILITY TEST DATA ⚠")
 
         ## ------ Datos de pruebas de Carga
@@ -166,17 +168,17 @@ for codtb in data1:
             MySQLConnection.commit()  
             print ("  ==> SUCCESSFULLY LOADED WEIGTH TEST DATA ✅")
         except:
-            print ("  ==> ERROR LADING WEIGTH TEST DATA ⚠")
+            logs += "==> ERROR LADING WEIGTH TEST DATA \n" 
+            print ("  ==>  ⚠")
 
         ## ------ Datos de pruebas de Pesas
         cursorsqlsrv.execute(f"SELECT * FROM Pesxpro WHERE IdeComBpr LIKE '{codtb[0]}'")
         pesxpro = cursorsqlsrv.fetchall()  
-        cursorsqlsrv.execute(f"SELECT DISTINCT NonCerPxp FROM Pesxpro WHERE IdeComBpr LIKE '{codtb[0]}'")
+        cursorsqlsrv.execute(f"SELECT NomCer FROM Cert_Balxpro WHERE IdeComBpr LIKE '{codtb[0]}'")
         certItems = cursorsqlsrv.fetchall()  
         
         listCert = {}
         for crt in range(0,len(certItems)):
-            # print(certItems[crt][0])
             cursormysql.execute(f"SELECT id FROM cert_items WHERE nom LIKE '{certItems[crt][0]}'")
             idCert = cursormysql.fetchone()
             if idCert:
@@ -193,11 +195,19 @@ for codtb in data1:
             MySQLConnection.commit()  
             print ("  ==> SUCCESSFULLY LOADED PESXPRO TEST DATA ✅")
         except:
+            logs += "==> ERROR LADING PESXPRO TEST DATA \n" 
             print ("  ==> ERROR LADING PESXPRO TEST DATA ⚠")
 
         print(' ======================================================= \n =======================================================')  
+    if logs != '':
+        file = open(f"./LogMySQL-{today}.txt", "a")
+        file.write("=======================================================")
+        file.write(f"PROJECT: {codtb[0]}")
+        file.write(logs)
+        file.write("=======================================================")
+        file.close()
+print("DATA MIGRATION COMPLETED SUCCESSFULLY")
 
-# file.close()
 
 MySQLConnection.close()
 SQLServerConnection.close()
