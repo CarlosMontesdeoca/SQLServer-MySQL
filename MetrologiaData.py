@@ -38,6 +38,8 @@ print('SEARCHING PENDING DATA....')
 ## selecciona los proyectos de que han recibido datos en SQL Server
 cursorsqlsrv.execute('''SELECT IdeComBpr FROM Balxpro  WHERE est_esc LIKE 'PR';''')
 data1 = cursorsqlsrv.fetchall()
+
+print(data1)
 print('=========================================================================')
 
 print('CHECKING.......')
@@ -196,7 +198,6 @@ for codtb in data1:
             querryInsertPex = querryInsertPex + f"('{codtb[0]}',{listCert[pesxpro[pexs][3]]},'{pesxpro[pexs][2]}','{aux}',{pesxpro[pexs][4]}, {pesxpro[pexs][5]},{pesxpro[pexs][6]},{pesxpro[pexs][7]},{pesxpro[pexs][8]},{pesxpro[pexs][9]},{pesxpro[pexs][10]},{pesxpro[pexs][11]},{pesxpro[pexs][12]},{pesxpro[pexs][13]},{pesxpro[pexs][14]},{pesxpro[pexs][15]},{pesxpro[pexs][16]},{pesxpro[pexs][17]},{pesxpro[pexs][18]},{pesxpro[pexs][19]},{pesxpro[pexs][20]},{pesxpro[pexs][21]},{pesxpro[pexs][22]},{pesxpro[pexs][23]},{pesxpro[pexs][24]},{pesxpro[pexs][25]},{pesxpro[pexs][26]},{pesxpro[pexs][27]},{pesxpro[pexs][28]},{pesxpro[pexs][29]},{pesxpro[pexs][30]},{pesxpro[pexs][31]},{pesxpro[pexs][32]},{pesxpro[pexs][33]},{pesxpro[pexs][34]},{pesxpro[pexs][35]},{pesxpro[pexs][36]}),"
         
         try:
-            print(querryInsertPex[:-1])
             # cursormysql.execute(querryInsertPex[:-1])
             # MySQLConnection.commit()  
             print ("  ==> SUCCESSFULLY LOADED PESXPRO TEST DATA ✅")
