@@ -195,7 +195,7 @@ for codtb in data1:
         for pexs in range(0,len(pesxpro)):
             aux = pesxpro[pexs][2]
             if aux[0] == 'C':
-                aux = aux[-2].rjust(3, '0')
+                aux = aux[1:-1].rjust(3, '0')
             elif aux[0] == 'I':
                 aux = '001'
                 
