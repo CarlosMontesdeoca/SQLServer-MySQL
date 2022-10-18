@@ -67,9 +67,9 @@ for codtb in data1:
         cursormysql.execute(f"SELECT B.id, S.id FROM balances B LEFT JOIN suplements S on B.id=S.balance_id WHERE B.id LIKE {certificate[2]}")
         suplement = cursormysql.fetchone()
         if suplement[1] == None:
-            querrySupl = f"INSERT INTO suplements(balance_id, descBl, marc, modl, ser, maxCap, usCap, div_e, div_d, rang) VALUES ({suplement[0]}, '{balxpro[1].upper()}', '{balxpro[2].upper()}', '{balxpro[3].upper()}', '{balxpro[4].upper()}', {balxpro[5]}, {balxpro[6]}, {round(balxpro[7],6)}, {round(balxpro[8],6)}, {balxpro[9]})"
+            querrySupl = f"INSERT INTO suplements(balance_id, descBl, marc, modl, ser, maxCap, usCap, div_e, div_d, rang, est) VALUES ({suplement[0]}, '{balxpro[1].upper()}', '{balxpro[2].upper()}', '{balxpro[3].upper()}', '{balxpro[4].upper()}', {balxpro[5]}, {balxpro[6]}, {round(balxpro[7],6)}, {round(balxpro[8],6)}, {balxpro[9]}, 'A')"
         else:
-            querrySupl = f"UPDATE suplements SET descBl = '{balxpro[1].upper()}', marc = '{balxpro[2].upper()}', modl = '{balxpro[3].upper()}', ser = '{balxpro[4].upper()}', maxCap = {balxpro[5]}, usCap = {balxpro[6]}, div_e = {round(balxpro[7],6)}, div_d = {round(balxpro[8],6)}, rang = {balxpro[9]} WHERE id LIKE {suplement[1]}"
+            querrySupl = f"UPDATE suplements SET descBl = '{balxpro[1].upper()}', marc = '{balxpro[2].upper()}', modl = '{balxpro[3].upper()}', ser = '{balxpro[4].upper()}', maxCap = {balxpro[5]}, usCap = {balxpro[6]}, div_e = {round(balxpro[7],6)}, div_d = {round(balxpro[8],6)}, rang = {balxpro[9]}, est = 'I' WHERE id LIKE {suplement[1]}"
         try:
             cursormysql.execute(querrySupl)
             MySQLConnection.commit() 
