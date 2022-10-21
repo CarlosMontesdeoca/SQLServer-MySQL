@@ -51,7 +51,7 @@ for codtb in data1:
 
     if certificate:  ## SI  HAY DATOS POR LO QUE SE ENVIARAN LOS DATOS PRIMARIOS
         print (f"  ==> UPLOAD DATA FROM CERTIFICATE: {codtb[0]}")
-        cursorsqlsrv.execute(f"SELECT ClaBpr,DesBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,IdeComBpr, UbiBpr, BalLimpBpr, AjuBpr, IRVBpr, ObsVBpr,CapCalBpr, RecPorCliBpr,fec_cal,fec_proxBpr FROM Balxpro  WHERE ideComBpr LIKE '{codtb[0]}'")
+        cursorsqlsrv.execute(f"SELECT ClaBpr,DesBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,IdeComBpr, UbiBpr, BalLimpBpr, AjuBpr, IRVBpr, ObsVBpr, CapCalBpr, RecPorCliBpr, fec_cal, fec_proxBpr, identBpr FROM Balxpro  WHERE ideComBpr LIKE '{codtb[0]}'")
         balxpro = cursorsqlsrv.fetchone()  
         
         ## modifica los datos del certificado con los datos calculados
@@ -67,9 +67,9 @@ for codtb in data1:
         cursormysql.execute(f"SELECT B.id, S.id FROM balances B LEFT JOIN suplements S on B.id=S.balance_id WHERE B.id LIKE {certificate[2]}")
         suplement = cursormysql.fetchone()
         if suplement[1] == None:
-            querrySupl = f"INSERT INTO suplements(balance_id, descBl, marc, modl, ser, maxCap, usCap, div_e, div_d, rang, est) VALUES ({suplement[0]}, '{balxpro[1].upper()}', '{balxpro[2].upper()}', '{balxpro[3].upper()}', '{balxpro[4].upper()}', {balxpro[5]}, {balxpro[6]}, {round(balxpro[7],6)}, {round(balxpro[8],6)}, {balxpro[9]}, 'A')"
+            querrySupl = f"INSERT INTO suplements(balance_id, descBl, ident, marc, modl, ser, maxCap, usCap, div_e, div_d, rang, est) VALUES ({suplement[0]}, '{balxpro[1].upper()}', '{balxpro[11].upper()}', '{balxpro[2].upper()}', '{balxpro[3].upper()}', '{balxpro[4].upper()}', {balxpro[5]}, {balxpro[6]}, {round(balxpro[7],6)}, {round(balxpro[8],6)}, {balxpro[9]}, 'A')"
         else:
-            querrySupl = f"UPDATE suplements SET descBl = '{balxpro[1].upper()}', marc = '{balxpro[2].upper()}', modl = '{balxpro[3].upper()}', ser = '{balxpro[4].upper()}', maxCap = {balxpro[5]}, usCap = {balxpro[6]}, div_e = {round(balxpro[7],6)}, div_d = {round(balxpro[8],6)}, rang = {balxpro[9]}, est = 'I' WHERE id LIKE {suplement[1]}"
+            querrySupl = f"UPDATE suplements SET descBl = '{balxpro[1].upper()}', ident = '{balxpro[11].upper()}', marc = '{balxpro[2].upper()}', modl = '{balxpro[3].upper()}', ser = '{balxpro[4].upper()}', maxCap = {balxpro[5]}, usCap = {balxpro[6]}, div_e = {round(balxpro[7],6)}, div_d = {round(balxpro[8],6)}, rang = {balxpro[9]}, est = 'I' WHERE id LIKE {suplement[1]}"
         try:
             cursormysql.execute(querrySupl)
             MySQLConnection.commit() 
@@ -197,7 +197,7 @@ for codtb in data1:
                 except:
                     logs += "==> ERROR IN FIND CERTITEMS\n" 
                     print('  ==> ERROR IN FIND CERTITEMS ⚠')
-        querryInsertPex = "INSERT INTO cargpesxes(codPro, cert_item_id, tip, keyJ, N1, N2, N2A, N5, N10, N20, N20A, N50, N100, N200, N200A, N500, N1000, N2000, N2000A, N5000, N10000, N20000, N500000, N1000000, CrgPxp1, CrgPxp2, CrgPxp3, CrgPxp4, CrgPxp5, CrgPxp6, CrgPxp7, CrgPxp8, CrgPxp9, CrgPxp10, CrgPxp11, CrgPxp12, AjsPxp) VALUES"
+        querryInsertPex = "INSERT INTO cargpesxes(codPro, cert_item_id, tip, keyJ, N1, N2, N2A, N5, N10, N20, N20A, N50, N100, N200, N200A, N500, N1000, N2000, N2000A, N5000, N10000, N20000, N500000, N1000000, CrgPxp1, CrgPxp2, CrgPxp3, CrgPxp4, CrgPxp5, CrgPxp6, AjsPxp) VALUES"
         for pexs in range(0,len(pesxpro)):
             aux = pesxpro[pexs][2]
             if aux[0] == 'C':
@@ -205,7 +205,7 @@ for codtb in data1:
             elif aux[0] == 'I':
                 aux = '001'
                 
-            querryInsertPex = querryInsertPex + f"('{codtb[0]}',{listCert[pesxpro[pexs][3]]},'{pesxpro[pexs][2]}','{aux}',{pesxpro[pexs][4]}, {pesxpro[pexs][5]},{pesxpro[pexs][6]},{pesxpro[pexs][7]},{pesxpro[pexs][8]},{pesxpro[pexs][9]},{pesxpro[pexs][10]},{pesxpro[pexs][11]},{pesxpro[pexs][12]},{pesxpro[pexs][13]},{pesxpro[pexs][14]},{pesxpro[pexs][15]},{pesxpro[pexs][16]},{pesxpro[pexs][17]},{pesxpro[pexs][18]},{pesxpro[pexs][19]},{pesxpro[pexs][20]},{pesxpro[pexs][21]},{pesxpro[pexs][22]},{pesxpro[pexs][23]},{pesxpro[pexs][24]},{pesxpro[pexs][25]},{pesxpro[pexs][26]},{pesxpro[pexs][27]},{pesxpro[pexs][28]},{pesxpro[pexs][29]},{pesxpro[pexs][30]},{pesxpro[pexs][31]},{pesxpro[pexs][32]},{pesxpro[pexs][33]},{pesxpro[pexs][34]},{pesxpro[pexs][35]},{pesxpro[pexs][36]}),"
+            querryInsertPex = querryInsertPex + f"('{codtb[0]}',{listCert[pesxpro[pexs][3]]},'{pesxpro[pexs][2]}','{aux}',{pesxpro[pexs][4]}, {pesxpro[pexs][5]},{pesxpro[pexs][6]},{pesxpro[pexs][7]},{pesxpro[pexs][8]},{pesxpro[pexs][9]},{pesxpro[pexs][10]},{pesxpro[pexs][11]},{pesxpro[pexs][12]},{pesxpro[pexs][13]},{pesxpro[pexs][14]},{pesxpro[pexs][15]},{pesxpro[pexs][16]},{pesxpro[pexs][17]},{pesxpro[pexs][18]},{pesxpro[pexs][19]},{pesxpro[pexs][20]},{pesxpro[pexs][21]},{pesxpro[pexs][22]},{pesxpro[pexs][23]},{pesxpro[pexs][24]},{pesxpro[pexs][25]},{pesxpro[pexs][26]},{pesxpro[pexs][27]},{pesxpro[pexs][28]},{pesxpro[pexs][29]},{pesxpro[pexs][36]}),"
         
         try:
             cursormysql.execute(querryInsertPex[:-1])
