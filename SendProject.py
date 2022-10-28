@@ -28,11 +28,18 @@ cursorsqlsrv = SQLServerConnection.cursor()
 cursormysql = MySQLConnection.cursor()
 
 
-## buscar la informacion del proyecto en mysql
-cursormysql.execute(f"SELECT P.codPro, S.client_id  FROM projects P JOIN plants S ON P.plant_id=S.id WHERE P.codPro LIKE {codPro}")
+## buscar la informacion del proyecto en mysql informacion base 
+cursormysql.execute(f"SELECT P.codPro, S.client_id, M.nom FROM projects P JOIN plants S ON P.plant_id=S.id JOIN metrologists M ON P.metrologist_id=M.id WHERE P.codPro LIKE {codPro}")
 project = cursormysql.fetchone()
+# print(project)
 
-print(project)
+## busca el cliente en SisMetPrec
+# cursorsqlsrv.execute(f"SELECT * FROM Clientes WHERE CiRucCli LIKE {project[1]}")
+# client = cursorsqlsrv.fetchone()
+print(f"SELECT * FROM Clientes WHERE CiRucCli LIKE {project[1]}")
+
+##crea el registro en Identificadores 
+qeurryIdentificadores = f"INSERT INTO Identificadores(codcli, idepro) VALUES (CODCLI, {project[0]})"
 
 
 MySQLConnection.close()
