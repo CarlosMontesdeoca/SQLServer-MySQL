@@ -6,7 +6,7 @@ from datetime import date
 today = date.today()
 
 server1='tcp:192.168.9.221'
-dbname1='SisMetPrec'
+dbname1='DevSisMetPrec'
 user1='sa'
 password1='Sistemas123*'
 
@@ -67,9 +67,9 @@ for codtb in data1:
         cursormysql.execute(f"SELECT B.id, S.id FROM balances B LEFT JOIN suplements S on B.id=S.balance_id WHERE B.id LIKE {certificate[2]}")
         suplement = cursormysql.fetchone()
         if suplement[1] == None:
-            querrySupl = f"INSERT INTO suplements(balance_id, descBl, ident, marc, modl, ser, maxCap, usCap, div_e, div_d, rang, est) VALUES ({suplement[0]}, '{balxpro[1].upper()}', '{balxpro[11].upper()}', '{balxpro[2].upper()}', '{balxpro[3].upper()}', '{balxpro[4].upper()}', {balxpro[5]}, {balxpro[6]}, {round(balxpro[7],6)}, {round(balxpro[8],6)}, {balxpro[9]}, 'A')"
+            querrySupl = f"INSERT INTO suplements(balance_id, descBl, ident, marc, modl, ser, maxCap, usCap, div_e, div_d, rang, est) VALUES ({suplement[0]}, '{balxpro[1].upper()}', '{balxpro[20].upper()}', '{balxpro[2].upper()}', '{balxpro[3].upper()}', '{balxpro[4].upper()}', {balxpro[5]}, {balxpro[6]}, {round(balxpro[7],6)}, {round(balxpro[8],6)}, {balxpro[9]}, 'A')"
         else:
-            querrySupl = f"UPDATE suplements SET descBl = '{balxpro[1].upper()}', ident = '{balxpro[11].upper()}', marc = '{balxpro[2].upper()}', modl = '{balxpro[3].upper()}', ser = '{balxpro[4].upper()}', maxCap = {balxpro[5]}, usCap = {balxpro[6]}, div_e = {round(balxpro[7],6)}, div_d = {round(balxpro[8],6)}, rang = {balxpro[9]}, est = 'I' WHERE id LIKE {suplement[1]}"
+            querrySupl = f"UPDATE suplements SET descBl = '{balxpro[1].upper()}', ident = '{balxpro[20].upper()}', marc = '{balxpro[2].upper()}', modl = '{balxpro[3].upper()}', ser = '{balxpro[4].upper()}', maxCap = {balxpro[5]}, usCap = {balxpro[6]}, div_e = {round(balxpro[7],6)}, div_d = {round(balxpro[8],6)}, rang = {balxpro[9]}, est = 'I' WHERE id LIKE {suplement[1]}"
         try:
             cursormysql.execute(querrySupl)
             MySQLConnection.commit() 
@@ -152,6 +152,7 @@ for codtb in data1:
                 querryInsertRept = f"INSERT INTO repeatests(codPro,certificate_id,intCarg,maxDif,maxErr,lec1,lec1_0,lec2,lec2_0,lec3,lec3_0,lec4,lec4_0,lec5,lec5_0,lec6,lec6_0,evl) VALUES ('{codtb[0]}',{certificate[0]},{repet[1]},{round(repet[2],6)},{round(repet[3],6)},{round(repet[7],6)},{round(repet[8],6)},{round(repet[9],6)},{round(repet[10],6)},{round(repet[11],6)},{round(repet[12],6)},{round(repet[13],6)},{round(repet[14],6)},{round(repet[15],6)},{round(repet[16],6)},{round(repet[17],6)},{round(repet[18],6)},'{repet[4]}')"
             else: 
                 querryInsertRept = f"INSERT INTO repeatests(codPro,certificate_id,intCarg,maxDif,maxErr,lec1,lec1_0,lec2,lec2_0,lec3,lec3_0,evl) VALUES ('{codtb[0]}',{certificate[0]},{repet[1]},{round(repet[2],6)},{round(repet[3],6)},{round(repet[7],6)},{round(repet[8],6)},{round(repet[9],6)},{round(repet[10],6)},{round(repet[11],6)},{round(repet[12],6)},'{repet[4]}')"
+            
             cursormysql.execute(querryInsertRept)
             MySQLConnection.commit() 
             print ("  ==> SUCCESSFULLY LOADED REPETIBILITY TEST DATA ✅")
@@ -204,7 +205,8 @@ for codtb in data1:
                 aux = aux[1:-1].rjust(3, '0')
             elif aux[0] == 'I':
                 aux = '001'
-                
+            # print(querryInsertPex + f"('{codtb[0]}',{listCert[pesxpro[pexs][3]]},'{pesxpro[pexs][2]}','{aux}',{pesxpro[pexs][4]}, {pesxpro[pexs][5]},{pesxpro[pexs][6]},{pesxpro[pexs][7]},{pesxpro[pexs][8]},{pesxpro[pexs][9]},{pesxpro[pexs][10]},{pesxpro[pexs][11]},{pesxpro[pexs][12]},{pesxpro[pexs][13]},{pesxpro[pexs][14]},{pesxpro[pexs][15]},{pesxpro[pexs][16]},{pesxpro[pexs][17]},{pesxpro[pexs][18]},{pesxpro[pexs][19]},{pesxpro[pexs][20]},{pesxpro[pexs][21]},{pesxpro[pexs][22]},{pesxpro[pexs][23]},{pesxpro[pexs][24]},{pesxpro[pexs][25]},{pesxpro[pexs][26]},{pesxpro[pexs][27]},{pesxpro[pexs][28]},{pesxpro[pexs][29]},{pesxpro[pexs][36]}),")   
+            # print("\n  \n\n")
             querryInsertPex = querryInsertPex + f"('{codtb[0]}',{listCert[pesxpro[pexs][3]]},'{pesxpro[pexs][2]}','{aux}',{pesxpro[pexs][4]}, {pesxpro[pexs][5]},{pesxpro[pexs][6]},{pesxpro[pexs][7]},{pesxpro[pexs][8]},{pesxpro[pexs][9]},{pesxpro[pexs][10]},{pesxpro[pexs][11]},{pesxpro[pexs][12]},{pesxpro[pexs][13]},{pesxpro[pexs][14]},{pesxpro[pexs][15]},{pesxpro[pexs][16]},{pesxpro[pexs][17]},{pesxpro[pexs][18]},{pesxpro[pexs][19]},{pesxpro[pexs][20]},{pesxpro[pexs][21]},{pesxpro[pexs][22]},{pesxpro[pexs][23]},{pesxpro[pexs][24]},{pesxpro[pexs][25]},{pesxpro[pexs][26]},{pesxpro[pexs][27]},{pesxpro[pexs][28]},{pesxpro[pexs][29]},{pesxpro[pexs][36]}),"
         
         try:
