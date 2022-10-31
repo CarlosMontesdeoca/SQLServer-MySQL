@@ -69,7 +69,7 @@ for codtb in data1:
         if suplement[1] == None:
             querrySupl = f"INSERT INTO suplements(balance_id, descBl, ident, marc, modl, ser, maxCap, usCap, div_e, div_d, rang, est) VALUES ({suplement[0]}, '{balxpro[1].upper()}', '{balxpro[20].upper()}', '{balxpro[2].upper()}', '{balxpro[3].upper()}', '{balxpro[4].upper()}', {balxpro[5]}, {balxpro[6]}, {round(balxpro[7],6)}, {round(balxpro[8],6)}, {balxpro[9]}, 'A')"
         else:
-            querrySupl = f"UPDATE suplements SET descBl = '{balxpro[1].upper()}', ident = '{balxpro[20].upper()}', marc = '{balxpro[2].upper()}', modl = '{balxpro[3].upper()}', ser = '{balxpro[4].upper()}', maxCap = {balxpro[5]}, usCap = {balxpro[6]}, div_e = {round(balxpro[7],6)}, div_d = {round(balxpro[8],6)}, rang = {balxpro[9]}, est = 'I' WHERE id LIKE {suplement[1]}"
+            querrySupl = f"UPDATE suplements SET descBl = '{balxpro[1].upper()}', ident = '{balxpro[20].upper()}', marc = '{balxpro[2].upper()}', modl = '{balxpro[3].upper()}', ser = '{balxpro[4].upper()}', maxCap = {balxpro[5]}, usCap = {balxpro[6]}, div_e = {round(balxpro[7],6)}, div_d = {round(balxpro[8],6)}, rang = {balxpro[9]}, est = 'A' WHERE id LIKE {suplement[1]}"
         try:
             cursormysql.execute(querrySupl)
             MySQLConnection.commit() 
@@ -169,7 +169,7 @@ for codtb in data1:
         ## ------ Querry para pruebas de Carga
         querryInsertCrg = "INSERT INTO cargtests(codPro, certificate_id, numPr, intCarg, lecAsc, lecDesc, errAsc, errDesc, maxErr, evl) VALUES "
         for pcar in range(0,len(cargCad)):
-            querryInsertCrg = querryInsertCrg + f"('{codtb[0]}{cargCad[pcar][2]}',{certificate[0]},{cargCad[pcar][2]},{cargCad[pcar][1]},{cargDet[pcar][1]},{cargDet[pcar][2]},{cargDet[pcar][3]},{cargDet[pcar][4]},{cargDet[pcar][5]},'{cargCad[pcar][4]}'),"
+            querryInsertCrg = querryInsertCrg + f"('{codtb[0]}{cargCad[pcar][2]}',{certificate[0]},{cargCad[pcar][2]},{round(cargCad[pcar][1],3)},{round(cargDet[pcar][1],3)},{round(cargDet[pcar][2],3)},{round(cargDet[pcar][3],3)},{round(cargDet[pcar][4],3)},{round(cargDet[pcar][5],3)},'{cargCad[pcar][4]}'),"
         
         ## ------ Insercion de pruebas de Carga
         try:
