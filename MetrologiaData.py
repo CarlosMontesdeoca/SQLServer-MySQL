@@ -129,9 +129,9 @@ for codtb in data1:
         ## ------ crear el querry para insertar los datos de pruebas de exentricidad
         for pex in [0,1]:
             if balxpro[0] == 'Camionera':
-                querryInsertExc = querryInsertExc + f"('{codtb[0]}{exectCad[pex][2]}',{certificate[0]},{exectCad[pex][1]},{exectCad[pex][2]},{round(exectDet[pex][6],6)},{round(exectDet[pex][7],6)},{round(exectDet[pex][1],6)},{round(exectDet[pex][2],6)},{round(exectDet[pex][3],6)},{round(exectDet[pex][4],6)},{round(exectDet[pex][5],6)},{round(exectDet[pex][6],6)},'{exectCad[pex][4]}' ),"
+                querryInsertExc = querryInsertExc + f"('{codtb[0]}{exectCad[pex][2]}',{certificate[0]},{exectCad[pex][1]},{exectCad[pex][2]},{round(exectDet[pex][6],5)},{round(exectDet[pex][7],5)},{round(exectDet[pex][1],5)},{round(exectDet[pex][2],5)},{round(exectDet[pex][3],5)},{round(exectDet[pex][4],5)},{round(exectDet[pex][5],5)},{round(exectDet[pex][6],5)},'{exectCad[pex][4]}' ),"
             else :
-                querryInsertExc = querryInsertExc + f"('{codtb[0]}{exectCad[pex][2]}',{certificate[0]},{exectCad[pex][1]},{exectCad[pex][2]},{round(exectDet[pex][6],6)},{round(exectDet[pex][7],6)},{round(exectDet[pex][1],6)},{round(exectDet[pex][2],6)},{round(exectDet[pex][3],6)},{round(exectDet[pex][4],6)},{round(exectDet[pex][5],6)},'{exectCad[pex][4]}' ),"
+                querryInsertExc = querryInsertExc + f"('{codtb[0]}{exectCad[pex][2]}',{certificate[0]},{exectCad[pex][1]},{exectCad[pex][2]},{round(exectDet[pex][6],5)},{round(exectDet[pex][7],5)},{round(exectDet[pex][1],5)},{round(exectDet[pex][2],5)},{round(exectDet[pex][3],5)},{round(exectDet[pex][4],5)},{round(exectDet[pex][5],5)},'{exectCad[pex][4]}' ),"
         
         ## ------ insercion de pruebas de exentricidad
         try:
@@ -149,9 +149,9 @@ for codtb in data1:
         try:
             ## --- creacion de querry para insertar datos de repetbilidad
             if balxpro[0] == 'II':
-                querryInsertRept = f"INSERT INTO repeatests(codPro,certificate_id,intCarg,maxDif,maxErr,lec1,lec1_0,lec2,lec2_0,lec3,lec3_0,lec4,lec4_0,lec5,lec5_0,lec6,lec6_0,evl) VALUES ('{codtb[0]}',{certificate[0]},{repet[1]},{round(repet[2],6)},{round(repet[3],6)},{round(repet[7],6)},{round(repet[8],6)},{round(repet[9],6)},{round(repet[10],6)},{round(repet[11],6)},{round(repet[12],6)},{round(repet[13],6)},{round(repet[14],6)},{round(repet[15],6)},{round(repet[16],6)},{round(repet[17],6)},{round(repet[18],6)},'{repet[4]}')"
+                querryInsertRept = f"INSERT INTO repeatests(codPro,certificate_id,intCarg,maxDif,maxErr,lec1,lec1_0,lec2,lec2_0,lec3,lec3_0,lec4,lec4_0,lec5,lec5_0,lec6,lec6_0,evl) VALUES ('{codtb[0]}',{certificate[0]},{repet[1]},{round(repet[2],5)},{round(repet[3],5)},{round(repet[7],5)},{round(repet[8],5)},{round(repet[9],5)},{round(repet[10],5)},{round(repet[11],5)},{round(repet[12],5)},{round(repet[13],5)},{round(repet[14],5)},{round(repet[15],5)},{round(repet[16],5)},{round(repet[17],5)},{round(repet[18],5)},'{repet[4]}')"
             else: 
-                querryInsertRept = f"INSERT INTO repeatests(codPro,certificate_id,intCarg,maxDif,maxErr,lec1,lec1_0,lec2,lec2_0,lec3,lec3_0,evl) VALUES ('{codtb[0]}',{certificate[0]},{repet[1]},{round(repet[2],6)},{round(repet[3],6)},{round(repet[7],6)},{round(repet[8],6)},{round(repet[9],6)},{round(repet[10],6)},{round(repet[11],6)},{round(repet[12],6)},'{repet[4]}')"
+                querryInsertRept = f"INSERT INTO repeatests(codPro,certificate_id,intCarg,maxDif,maxErr,lec1,lec1_0,lec2,lec2_0,lec3,lec3_0,evl) VALUES ('{codtb[0]}',{certificate[0]},{repet[1]},{round(repet[2],5)},{round(repet[3],5)},{round(repet[7],5)},{round(repet[8],5)},{round(repet[9],5)},{round(repet[10],5)},{round(repet[11],5)},{round(repet[12],5)},'{repet[4]}')"
             
             cursormysql.execute(querryInsertRept)
             MySQLConnection.commit() 
