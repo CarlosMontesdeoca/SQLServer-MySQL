@@ -113,7 +113,7 @@ for codtb in data1:
             querryRepet = f"SELECT * FROM RepetII_Cab C JOIN RepetII_Det D ON C.IdeComBpr = D.CodRii_C WHERE C.IdeComBpr LIKE '{codtb[0]}'"
         elif balxpro[0] == 'Camionera':
             ## consulta para ver las pruebas de exentricidad
-            querryExcCad = f"SELECT * FROM ExecCam_Cab WHERE IdeComBpr LIKE '{codtb[0]}' ORDER BY PrbEii ASC"
+            querryExcCad = f"SELECT * FROM ExecCam_Cab WHERE IdeComBpr LIKE '{codtb[0]}' ORDER BY PrbCam_c ASC"
             querryExcDet = f"SELECT * FROM ExecCam_Det WHERE CodCam_c LIKE '{codtb[0]}%' ORDER BY RIGHT(CodCam_c,1) ASC"
 
             querryInsertExc = "INSERT INTO excentests(codPro, certificate_id, intCarg, numPr, maxExec, maxErr, pos1, pos1_r, pos2, pos2_r, pos3, pos3_r, evl) VALUES "
@@ -181,11 +181,12 @@ for codtb in data1:
             print ("  ==> ERROR LADING WEIGTH TEST DATA ⚠")
 
         ## ------ Datos de pruebas de Pesas
-        cursorsqlsrv.execute(f"SELECT * FROM Pesxpro WHERE IdeComBpr LIKE '{codtb[0]}'")
+        cursorsqlsrv.execute(f"SELECT ideComBpr,TipPxp,NonCerPxp,SUM(N1) AS N1,SUM(N2) AS N2,SUM(N2A) AS N2A,SUM(N5) AS N5,SUM(N10) AS N10,SUM(N20) AS N20,SUM(N20A) AS N20A,SUM(N50) AS N50,SUM(N100) AS N100,SUM(N200) AS N200,SUM(N200A) AS N200A,SUM(N500) AS N500,SUM(N1000) AS N1000,SUM(N2000) AS N2000,SUM(N2000A) AS N2000A,SUM(N5000) AS N5000,SUM(N10000) AS N10000,SUM(N20000) AS N20000,SUM(N500000) AS N500000,SUM(N1000000) AS N1000000,SUM(CrgPxp1) AS CrgPxp1,SUM(CrgPxp2) AS CrgPxp2,SUM(CrgPxp3) AS CrgPxp3,SUM(CrgPxp4) AS CrgPxp4,SUM(CrgPxp5) AS CrgPxp5,SUM(CrgPxp6) AS CrgPxp6,SUM(AjsPxp) AS AjsPxp FROM Pesxpro WHERE IdeComBpr LIKE '{codtb[0]}' GROUP BY IdeComBpr, NonCerPxp, TipPxp")
         pesxpro = cursorsqlsrv.fetchall()  
         cursorsqlsrv.execute(f"SELECT NomCer FROM Cert_Balxpro WHERE IdeComBpr LIKE '{codtb[0]}'")
-        certItems = cursorsqlsrv.fetchall()  
-        
+        certItems = cursorsqlsrv.fetchall()
+
+        # print(pesxpro)
         listCert = {}
         for crt in range(0,len(certItems)):
             cursormysql.execute(f"SELECT id FROM cert_items WHERE nom LIKE '{certItems[crt][0]}'")
@@ -200,14 +201,12 @@ for codtb in data1:
                     print('  ==> ERROR IN FIND CERTITEMS ⚠')
         querryInsertPex = "INSERT INTO cargpesxes(codPro, cert_item_id, tip, keyJ, N1, N2, N2A, N5, N10, N20, N20A, N50, N100, N200, N200A, N500, N1000, N2000, N2000A, N5000, N10000, N20000, N500000, N1000000, CrgPxp1, CrgPxp2, CrgPxp3, CrgPxp4, CrgPxp5, CrgPxp6, AjsPxp) VALUES"
         for pexs in range(0,len(pesxpro)):
-            aux = pesxpro[pexs][2]
+            aux = pesxpro[pexs][1]
             if aux[0] == 'C':
                 aux = aux[1:-1].rjust(3, '0')
             elif aux[0] == 'I':
                 aux = '001'
-            # print(querryInsertPex + f"('{codtb[0]}',{listCert[pesxpro[pexs][3]]},'{pesxpro[pexs][2]}','{aux}',{pesxpro[pexs][4]}, {pesxpro[pexs][5]},{pesxpro[pexs][6]},{pesxpro[pexs][7]},{pesxpro[pexs][8]},{pesxpro[pexs][9]},{pesxpro[pexs][10]},{pesxpro[pexs][11]},{pesxpro[pexs][12]},{pesxpro[pexs][13]},{pesxpro[pexs][14]},{pesxpro[pexs][15]},{pesxpro[pexs][16]},{pesxpro[pexs][17]},{pesxpro[pexs][18]},{pesxpro[pexs][19]},{pesxpro[pexs][20]},{pesxpro[pexs][21]},{pesxpro[pexs][22]},{pesxpro[pexs][23]},{pesxpro[pexs][24]},{pesxpro[pexs][25]},{pesxpro[pexs][26]},{pesxpro[pexs][27]},{pesxpro[pexs][28]},{pesxpro[pexs][29]},{pesxpro[pexs][36]}),")   
-            # print("\n  \n\n")
-            querryInsertPex = querryInsertPex + f"('{codtb[0]}',{listCert[pesxpro[pexs][3]]},'{pesxpro[pexs][2]}','{aux}',{pesxpro[pexs][4]}, {pesxpro[pexs][5]},{pesxpro[pexs][6]},{pesxpro[pexs][7]},{pesxpro[pexs][8]},{pesxpro[pexs][9]},{pesxpro[pexs][10]},{pesxpro[pexs][11]},{pesxpro[pexs][12]},{pesxpro[pexs][13]},{pesxpro[pexs][14]},{pesxpro[pexs][15]},{pesxpro[pexs][16]},{pesxpro[pexs][17]},{pesxpro[pexs][18]},{pesxpro[pexs][19]},{pesxpro[pexs][20]},{pesxpro[pexs][21]},{pesxpro[pexs][22]},{pesxpro[pexs][23]},{pesxpro[pexs][24]},{pesxpro[pexs][25]},{pesxpro[pexs][26]},{pesxpro[pexs][27]},{pesxpro[pexs][28]},{pesxpro[pexs][29]},{pesxpro[pexs][36]}),"
+            querryInsertPex = querryInsertPex + f"('{codtb[0]}',{listCert[pesxpro[pexs][2]]},'{pesxpro[pexs][1]}','{aux}',{pesxpro[pexs][3]},{pesxpro[pexs][4]},{pesxpro[pexs][5]},{pesxpro[pexs][6]},{pesxpro[pexs][7]},{pesxpro[pexs][8]},{pesxpro[pexs][9]},{pesxpro[pexs][10]},{pesxpro[pexs][11]},{pesxpro[pexs][12]},{pesxpro[pexs][13]},{pesxpro[pexs][14]},{pesxpro[pexs][15]},{pesxpro[pexs][16]},{pesxpro[pexs][17]},{pesxpro[pexs][18]},{pesxpro[pexs][19]},{pesxpro[pexs][20]},{pesxpro[pexs][21]},{pesxpro[pexs][22]},{pesxpro[pexs][23]},{pesxpro[pexs][24]},{pesxpro[pexs][25]},{pesxpro[pexs][26]},{pesxpro[pexs][27]},{pesxpro[pexs][28]},{pesxpro[pexs][29]}),"
         
         try:
             cursormysql.execute(querryInsertPex[:-1])
