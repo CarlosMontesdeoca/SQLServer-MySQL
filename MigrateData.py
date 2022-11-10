@@ -149,31 +149,31 @@ if certificate:  ## SI  HAY DATOS POR LO QUE SE ENVIARAN LOS DATOS PRIMARIOS
         logs += "==> ERROR LADING REPEATABILITY TEST DATA \n" 
         print ("  ==> ERROR LADING REPEATABILITY TEST DATA ⚠")
 
-#         ## ------ Datos de pruebas de Carga
-#         cursorsqlsrv.execute(f"SELECT * FROM PCarga_Cab WHERE IdeComBpr LIKE '{codtb[0]}' ORDER BY NumPca ASC")
-#         cargCad = cursorsqlsrv.fetchall()
-#         cursorsqlsrv.execute(f"SELECT * FROM PCarga_Det WHERE CodPca_C LIKE '{codtb[0]}%' ORDER BY RIGHT(CodPca_C,1) ASC")
-#         cargDet = cursorsqlsrv.fetchall()
+    ## ------ Datos de pruebas de Carga
+    cursorsqlsrv.execute(f"SELECT * FROM PCarga_Cab WHERE IdeComBpr LIKE '{codPro}' ORDER BY NumPca ASC")
+    cargCad = cursorsqlsrv.fetchall()
+    cursorsqlsrv.execute(f"SELECT * FROM PCarga_Det WHERE CodPca_C LIKE '{codPro}%' ORDER BY RIGHT(CodPca_C,1) ASC")
+    cargDet = cursorsqlsrv.fetchall()
 
-#         ## ------ Querry para pruebas de Carga
-#         querryInsertCrg = "INSERT INTO cargtests(codPro, certificate_id, numPr, intCarg, lecAsc, lecDesc, errAsc, errDesc, maxErr, evl) VALUES "
-#         for pcar in range(0,len(cargCad)):
-#             querryInsertCrg = querryInsertCrg + f"('{codtb[0]}{cargCad[pcar][2]}',{certificate[0]},{cargCad[pcar][2]},{round(cargCad[pcar][1],3)},{round(cargDet[pcar][1],3)},{round(cargDet[pcar][2],3)},{round(cargDet[pcar][3],3)},{round(cargDet[pcar][4],3)},{round(cargDet[pcar][5],3)},'{cargCad[pcar][4]}'),"
-        
-#         ## ------ Insercion de pruebas de Carga
-#         try:
-#             cursormysql.execute(querryInsertCrg[:-1])
-#             MySQLConnection.commit()  
-#             print ("  ==> SUCCESSFULLY LOADED WEIGTH TEST DATA ✅")
-#         except:
-#             logs += "==> ERROR LADING WEIGTH TEST DATA \n" 
-#             print ("  ==> ERROR LADING WEIGTH TEST DATA ⚠")
+    ## ------ Querry para pruebas de Carga
+    querryInsertCrg = "INSERT INTO cargtests(codPro, certificate_id, numPr, intCarg, lecAsc, lecDesc, errAsc, errDesc, maxErr, evl) VALUES "
+    for pcar in range(0,len(cargCad)):
+        querryInsertCrg = querryInsertCrg + f"('{codPro}{cargCad[pcar][2]}',{codCert[0]},{cargCad[pcar][2]},{round(cargCad[pcar][1],3)},{round(cargDet[pcar][1],3)},{round(cargDet[pcar][2],3)},{round(cargDet[pcar][3],3)},{round(cargDet[pcar][4],3)},{round(cargDet[pcar][5],3)},'{cargCad[pcar][4]}'),"
+    
+    ## ------ Insercion de pruebas de Carga
+    try:
+        # cursormysql.execute(querryInsertCrg[:-1])
+        # MySQLConnection.commit()  
+        print ("  ==> SUCCESSFULLY LOADED WEIGTH TEST DATA ✅")
+    except:
+        logs += "==> ERROR LADING WEIGTH TEST DATA \n" 
+        print ("  ==> ERROR LADING WEIGTH TEST DATA ⚠")
 
-#         ## ------ Datos de pruebas de Pesas
-#         cursorsqlsrv.execute(f"SELECT ideComBpr,TipPxp,NonCerPxp,SUM(N1) AS N1,SUM(N2) AS N2,SUM(N2A) AS N2A,SUM(N5) AS N5,SUM(N10) AS N10,SUM(N20) AS N20,SUM(N20A) AS N20A,SUM(N50) AS N50,SUM(N100) AS N100,SUM(N200) AS N200,SUM(N200A) AS N200A,SUM(N500) AS N500,SUM(N1000) AS N1000,SUM(N2000) AS N2000,SUM(N2000A) AS N2000A,SUM(N5000) AS N5000,SUM(N10000) AS N10000,SUM(N20000) AS N20000,SUM(N500000) AS N500000,SUM(N1000000) AS N1000000,SUM(CrgPxp1) AS CrgPxp1,SUM(CrgPxp2) AS CrgPxp2,SUM(CrgPxp3) AS CrgPxp3,SUM(CrgPxp4) AS CrgPxp4,SUM(CrgPxp5) AS CrgPxp5,SUM(CrgPxp6) AS CrgPxp6,SUM(AjsPxp) AS AjsPxp FROM Pesxpro WHERE IdeComBpr LIKE '{codtb[0]}' GROUP BY IdeComBpr, NonCerPxp, TipPxp")
-#         pesxpro = cursorsqlsrv.fetchall()  
-#         cursorsqlsrv.execute(f"SELECT NomCer FROM Cert_Balxpro WHERE IdeComBpr LIKE '{codtb[0]}'")
-#         certItems = cursorsqlsrv.fetchall()
+    ## ------ Datos de pruebas de Pesas
+    cursorsqlsrv.execute(f"SELECT ideComBpr,TipPxp,NonCerPxp,SUM(N1) AS N1,SUM(N2) AS N2,SUM(N2A) AS N2A,SUM(N5) AS N5,SUM(N10) AS N10,SUM(N20) AS N20,SUM(N20A) AS N20A,SUM(N50) AS N50,SUM(N100) AS N100,SUM(N200) AS N200,SUM(N200A) AS N200A,SUM(N500) AS N500,SUM(N1000) AS N1000,SUM(N2000) AS N2000,SUM(N2000A) AS N2000A,SUM(N5000) AS N5000,SUM(N10000) AS N10000,SUM(N20000) AS N20000,SUM(N500000) AS N500000,SUM(N1000000) AS N1000000,SUM(CrgPxp1) AS CrgPxp1,SUM(CrgPxp2) AS CrgPxp2,SUM(CrgPxp3) AS CrgPxp3,SUM(CrgPxp4) AS CrgPxp4,SUM(CrgPxp5) AS CrgPxp5,SUM(CrgPxp6) AS CrgPxp6,SUM(AjsPxp) AS AjsPxp FROM Pesxpro WHERE IdeComBpr LIKE '{codtb[0]}' GROUP BY IdeComBpr, NonCerPxp, TipPxp")
+    pesxpro = cursorsqlsrv.fetchall()  
+    cursorsqlsrv.execute(f"SELECT NomCer FROM Cert_Balxpro WHERE IdeComBpr LIKE '{codtb[0]}'")
+    certItems = cursorsqlsrv.fetchall()
 
 #         # print(pesxpro)
 #         listCert = {}
