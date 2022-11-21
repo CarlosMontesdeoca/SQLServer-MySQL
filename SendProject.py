@@ -5,6 +5,7 @@ from datetime import date
 import sys
 
 codPro = sys.argv[1]
+client = sys.argv[2]
 
 today = date.today()
 
@@ -27,19 +28,26 @@ except:
 cursorsqlsrv = SQLServerConnection.cursor()
 cursormysql = MySQLConnection.cursor()
 
+cursormysql.execute(f"SELECT CO.id, C.nom, C.id, S.ciu, S.dir, CO.email, CO.telf, CO.nom, C.ind, S.prov FROM contacts CO JOIN plants S ON CO.plant_id = S.id JOIN clients C ON S.client_id = C.id WHERE CO.id LIKE {client}")
+clientInfo = cursormysql.fetchone()
 
-## buscar la informacion del proyecto en mysql informacion base 
-cursormysql.execute(f"SELECT P.codPro, S.client_id, M.nom FROM projects P JOIN plants S ON P.plant_id=S.id JOIN metrologists M ON P.metrologist_id=M.id WHERE P.codPro LIKE {codPro}")
-project = cursormysql.fetchone()
-# print(project)
-
-## busca el cliente en SisMetPrec
-# cursorsqlsrv.execute(f"SELECT * FROM Clientes WHERE CiRucCli LIKE {project[1]}")
-# client = cursorsqlsrv.fetchone()
-print(f"SELECT * FROM Clientes WHERE CiRucCli LIKE {project[1]}")
+# busca el cliente en SisMetPrec
+querryFindClient = f"IF NOT EXISTS ( SELECT * FROM Clientes WHERE codAux LIKE {client}) BEGIN INSERT INTO Clientes (codAux,  NomCli, CiRucCli, CiuCli, DirCli, EmaCli, TelCli, ConCli, EstCli, matProCli) VALUES ({clientInfo[0]}, '{clientInfo[1]}', '{clientInfo[2]}', '{clientInfo[3]}', '{clientInfo[4]}', '{clientInfo[5]}', '{clientInfo[6]}', '{clientInfo[7]}', 'A', '{clientInfo[8]}' ) END"
+cursorsqlsrv.execute(querryFindClient)
+SQLServerConnection.commit() 
 
 ##crea el registro en Identificadores 
-qeurryIdentificadores = f"INSERT INTO Identificadores(codcli, idepro) VALUES (CODCLI, {project[0]})"
+# qeurryIdentificadores = f"INSERT INTO Identificadores(codcli, idepro) VALUES (CODCLI, {project[0]})"
+
+
+
+## busca el cliente en SisMetPrec
+# SELECT P.contact_id, C.nom, C.id, S.ciu, S.dir, C.ind, S.prov FROM projects P JOIN plants S ON P.plant_id = S.id JOIN clients C ON S.client_id = C.id JOIN contacts CO ON P.contact_id = CO.id WHERE P.codPro LIKE 221101
+# cursorsqlsrv.execute(f"SELECT * FROM Clientes WHERE CiRucCli LIKE {project[1]}")
+# client = cursorsqlsrv.fetchone()
+
+##crea el registro en Identificadores 
+# qeurryIdentificadores = f"INSERT INTO Identificadores(codcli, idepro) VALUES (CODCLI, {project[0]})"
 
 
 MySQLConnection.close()
