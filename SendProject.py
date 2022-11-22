@@ -3,6 +3,9 @@ import pyodbc
 import pymysql
 from datetime import date
 import sys
+from datetime import datetime
+
+datenow = datetime.now()
 
 codPro = sys.argv[1]
 client = sys.argv[2]
@@ -43,18 +46,27 @@ CodCli = cursorsqlsrv.fetchone()
 
 ##Obtener la informacion de el Proyecto
 
-cursormysql.execute(f"SELECT codPro, metrologist_id FROM projects WHERE codPro LIKE {codPro}") 
+cursormysql.execute(f"SELECT P.codPro, M.id FROM projects P JOIN metrologists M ON P.metrologist_id=M.id WHERE P.codPro LIKE {codPro}") 
 project = cursormysql.fetchone()
-# print(project)
 # qeurryIdentificadores = f"INSERT INTO Identificadores(codcli, idepro) VALUES (CODCLI, {project[0]})"
 
 ## INSERTAR IDENTIFICADORES
-# SELECT P.contact_id, C.nom, C.id, S.ciu, S.dir, C.ind, S.prov FROM projects P JOIN plants S ON P.plant_id = S.id JOIN clients C ON S.client_id = C.id JOIN contacts CO ON P.contact_id = CO.id WHERE P.codPro LIKE 221101
 cursorsqlsrv.execute(f"IF NOT EXISTS ( SELECT * FROM Identificadores WHERE idepro LIKE {codPro} ) BEGIN INSERT INTO Identificadores (codcli, idepro) VALUES ({CodCli[0]}, {codPro}) END")
 SQLServerConnection.commit()
 
-##crea el registro en Identificadores 
-# qeurryIdentificadores = f"INSERT INTO Identificadores(codcli, idepro) VALUES (CODCLI, {project[0]})"
+strdate = str(datenow)
+dateLong = f"{datenow.strftime('%B %d %Y')} {datenow.time().strftime('%H:%M')}"
+
+cursorsqlsrv.execute(f"SELECT CodMet FROM Metrologos WHERE CodAux LIKE {project[1]}")
+CodMet = cursorsqlsrv.fetchone()
+
+## INSERTAR PROYECTOS
+cursorsqlsrv.execute(f"IF NOT EXISTS ( SELECT * FROM Proyectos WHERE idepro LIKE {codPro} ) BEGIN INSERT INTO Proyectos (EstPro, FecPro, FecSigCalPro, CodCli, Idepro, CodMet) VALUES ('NU','{strdate[0:10]}','{dateLong}',{CodCli[0]}, {codPro}, {CodMet[0]}) END")
+SQLServerConnection.commit()
+
+## INSERTAR BALXPRO
+# cursorsqlsrv.execute(f"IF NOT EXISTS ( SELECT * FROM Proyectos WHERE idepro LIKE {codPro} ) BEGIN INSERT INTO Proyectos (EstPro, FecPro, FecSigCalPro, CodCli, Idepro, CodMet) VALUES ('NU','{strdate[0:10]}','{dateLong}',{CodCli[0]}, {codPro}, {CodMet[0]}) END")
+# SQLServerConnection.commit()
 
 
 MySQLConnection.close()
