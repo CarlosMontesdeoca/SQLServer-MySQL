@@ -43,17 +43,15 @@ CodCli = cursorsqlsrv.fetchone()
 
 ##Obtener la informacion de el Proyecto
 
-cursormysql.execute(f"SELECT * FROM projects WHERE codPro LIKE {codPro}") 
+cursormysql.execute(f"SELECT codPro, metrologist_id FROM projects WHERE codPro LIKE {codPro}") 
 project = cursormysql.fetchone()
-print(project)
+# print(project)
 # qeurryIdentificadores = f"INSERT INTO Identificadores(codcli, idepro) VALUES (CODCLI, {project[0]})"
 
-
-
-## busca el cliente en SisMetPrec
+## INSERTAR IDENTIFICADORES
 # SELECT P.contact_id, C.nom, C.id, S.ciu, S.dir, C.ind, S.prov FROM projects P JOIN plants S ON P.plant_id = S.id JOIN clients C ON S.client_id = C.id JOIN contacts CO ON P.contact_id = CO.id WHERE P.codPro LIKE 221101
-# cursorsqlsrv.execute(f"SELECT * FROM Clientes WHERE CiRucCli LIKE {project[1]}")
-# client = cursorsqlsrv.fetchone()
+cursorsqlsrv.execute(f"IF NOT EXISTS ( SELECT * FROM Identificadores WHERE idepro LIKE {codPro} ) BEGIN INSERT INTO Identificadores (codcli, idepro) VALUES ({CodCli[0]}, {codPro}) END")
+SQLServerConnection.commit()
 
 ##crea el registro en Identificadores 
 # qeurryIdentificadores = f"INSERT INTO Identificadores(codcli, idepro) VALUES (CODCLI, {project[0]})"
