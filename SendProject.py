@@ -31,7 +31,7 @@ except:
 cursorsqlsrv = SQLServerConnection.cursor()
 cursormysql = MySQLConnection.cursor()
 
-cursormysql.execute(f"SELECT CO.id, C.nom, C.id, S.ciu, S.dir, CO.email, CO.telf, CO.nom, C.ind, S.prov FROM contacts CO JOIN plants S ON CO.plant_id = S.id JOIN clients C ON S.client_id = C.id WHERE CO.id LIKE {client}")
+cursormysql.execute(f"SELECT CO.id, C.nom, C.id, S.ciu, S.dir, CO.email, CO.telf, CO.nom, C.ind, S.prov, S.cost FROM contacts CO JOIN plants S ON CO.plant_id = S.id JOIN clients C ON S.client_id = C.id WHERE CO.id LIKE {client}")
 clientInfo = cursormysql.fetchone()
 
 # busca el cliente en SisMetPrec y crealo si no existe
@@ -61,12 +61,31 @@ cursorsqlsrv.execute(f"SELECT CodMet FROM Metrologos WHERE CodAux LIKE {project[
 CodMet = cursorsqlsrv.fetchone()
 
 ## INSERTAR PROYECTOS
-cursorsqlsrv.execute(f"IF NOT EXISTS ( SELECT * FROM Proyectos WHERE idepro LIKE {codPro} ) BEGIN INSERT INTO Proyectos (EstPro, FecPro, FecSigCalPro, CodCli, Idepro, CodMet) VALUES ('NU','{strdate[0:10]}','{dateLong}',{CodCli[0]}, {codPro}, {CodMet[0]}) END")
+loc = 'GYE/MTA'
+if(clientInfo[10] == 'QUITO'):
+    loc = 'UIO'
+
+cursorsqlsrv.execute(f"IF NOT EXISTS ( SELECT * FROM Proyectos WHERE idepro LIKE {codPro} ) BEGIN INSERT INTO Proyectos (EstPro, FecPro, FecSigCalPro, CodCli, Idepro, CodMet, LocPro) VALUES ('A','{strdate[0:10]}','{dateLong}',{CodCli[0]}, {codPro}, {CodMet[0]}, '{loc}') END")
 SQLServerConnection.commit()
 
+cursorsqlsrv.execute(f"SELECT CodPro FROM Proyectos WHERE Idepro LIKE {codPro}")
+IdePro = cursorsqlsrv.fetchone()
+
 ## INSERTAR BALXPRO
-# cursorsqlsrv.execute(f"IF NOT EXISTS ( SELECT * FROM Proyectos WHERE idepro LIKE {codPro} ) BEGIN INSERT INTO Proyectos (EstPro, FecPro, FecSigCalPro, CodCli, Idepro, CodMet) VALUES ('NU','{strdate[0:10]}','{dateLong}',{CodCli[0]}, {codPro}, {CodMet[0]}) END")
-# SQLServerConnection.commit()
+# busca los certificados del proyecto
+cursormysql.execute(f"SELECT B.descBl, B.ident, B.marc, B.modl, B.ser, B.maxCap, B.usCap, B.div_e, B.div_d, B.uni, C.codPro, B.cls FROM certificates C JOIN balances B ON C.balance_id = B.id WHERE C.codPro LIKE '{codPro}%'")
+certificates = cursormysql.fetchall()
+
+querryInsertBalxpro = "INSERT INTO Balxpro (NumBpr, DesBpr, IdentBpr, MarBpr, ModBpr, SerBpr, CapMaxBpr, CapUsoBpr, DivEscBpr, UniDivEscBpr,DivEsc_dBpr, UniDivEsc_dBpr, CodPro, CodMet, IdeBpr, EstBpr, LitBpr, IdeComBpr, DivEscCalBpr, CapCalBpr, ClaBpr) VALUES "
+for num in range(0,len(certificates)):
+    if certificates[num][11] == 'CAM':
+        clsBl = "Camionera"
+    else:
+        clsBl = certificates[num][11]
+    querryInsertBalxpro = querryInsertBalxpro + f"({num+1},'{certificates[num][0]}','{certificates[num][1]}','{certificates[num][2]}','{certificates[num][3]}','{certificates[num][4]}',{certificates[num][5]},{certificates[num][6]},{certificates[num][7]},'{certificates[num][9]}',{certificates[num][8]},'{certificates[num][9]}',{IdePro[0]},{CodMet[0]},{codPro},'A','{certificates[num][10][6:]}','{certificates[num][10]}','e','max','{clsBl}'),"
+
+cursorsqlsrv.execute(f"IF NOT EXISTS ( SELECT * FROM Balxpro WHERE IdeBpr LIKE {codPro} ) BEGIN {querryInsertBalxpro[:-1]} END")
+SQLServerConnection.commit()
 
 
 MySQLConnection.close()
