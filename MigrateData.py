@@ -40,7 +40,7 @@ cursormysql.execute("SELECT codPro FROM certificates  WHERE est LIKE 'P' AND cod
 data1 = cursormysql.fetchall()
 
 print(data1)
-codPro ='221007B'
+# codPro ='221031A'
 print('=========================================================================')
 
 print('CHECKING.......')
