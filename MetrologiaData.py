@@ -27,6 +27,24 @@ except:
     logs += "==> error to try connect the database MySQL \n" 
     print ('error to try connect the database MySQL')
 
+##============================================================================================================================================
+##============================================================================================================================================
+##============================================================================================================================================
+   
+def migrateSimple():
+    print('sin certificados nuevos')
+
+##============================================================================================================================================
+##============================================================================================================================================
+##============================================================================================================================================
+    
+def migrateWithNews():
+    print("nuevos certificados")
+
+##============================================================================================================================================
+##============================================================================================================================================
+##============================================================================================================================================
+
 print('=========================================================================')
 # CONSULTAS
 
@@ -39,6 +57,7 @@ print('SEARCHING PENDING DATA....')
 ## busca todos los proyectos pendientes de MySQL
 cursormysql.execute("SELECT codPro FROM projects WHERE est LIKE 'P'")
 data1 = cursormysql.fetchall()
+print(data1)
 
 print('=========================================================================')
 
@@ -46,11 +65,19 @@ print('CHECKING.......')
 ## Buscaremos todos los certificados si se han recivido datos SQLServer 
 for codtb in data1:
     codPro = codtb[0]
-    cursorsqlsrv.execute(f"SELECT * FROM Balxpro WHERE IdeBpr LIKE {codPro} AND (est_esc LIKE 'PR' OR est_esc LIKE 'DS')")
-    certificates = cursorsqlsrv.fetchall()
-
-    if len(certificates) > 0 :
-        print(f"Proyecto: {codPro} → {len(certificates)}")
+    # cursorsqlsrv.execute(f"SELECT ClaBpr,DesBpr,identBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,IdeComBpr,UbiBpr,BalLimpBpr,AjuBpr,IRVBpr,ObsVBpr,CapCalBpr,RecPorCliBpr,fec_cal,fec_proxBpr FROM Balxpro WHERE IdeBpr LIKE {codPro} AND (est_esc LIKE 'PR' OR est_esc LIKE 'DS')")
+    cursorsqlsrv.execute(f"SELECT COUNT(*) FROM Balxpro WHERE IdeBpr LIKE {codPro} AND (est_esc LIKE 'PR' OR est_esc LIKE 'DS')")
+    certificates2 = cursorsqlsrv.fetchone()
+## si el proyecto de MySql tiene varios certificados de SQLServer en cola  se concidera que ya recbio todos los datos y se puede migrar información    
+    if certificates2[0] > 0 :
+        cursormysql.execute(f"SELECT COUNT(*) FROM certificates WHERE codPro LIKE '{codPro}%'")
+        certificates1 = cursormysql.fetchone()
+        if certificates2[0] == certificates1[0] :
+            migrateSimple()
+        else:
+            migrateWithNews()
+        # print(f"Proyecto: {codPro} → {len(certificates2)} || {certificates1[0]}")
+        # print(certificates)
     # cursormysql.execute(querry)
     # certificate = cursormysql.fetchone()
 
@@ -230,7 +257,6 @@ for codtb in data1:
     #     file.write("=======================================================\n")
     #     file.close()
 print("DATA MIGRATION COMPLETED SUCCESSFULLY")
-
 
 MySQLConnection.close()
 SQLServerConnection.close()
