@@ -11,7 +11,7 @@ user1='sa'
 password1='Sistemas123*'
 
 logs = ''
-
+## //////////////////  CONEXIONES CON LAS BASES DE DATOS SQL SERVER Y MYSQL //////////////////////////////////
 try:
     SQLServerConnection = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL server}; SERVER='+server1+';DATABASE='+dbname1+';UID='+user1+';PWD='+password1)
     print (" ==> CONNECCTION SUCCESS WITH SQL SERVER")
@@ -40,7 +40,7 @@ cursormysql.execute("SELECT codPro FROM certificates  WHERE est LIKE 'P' AND cod
 data1 = cursormysql.fetchall()
 
 print(data1)
-# codPro ='221031A'
+codPro ='221031A'
 print('=========================================================================')
 
 print('CHECKING.......')

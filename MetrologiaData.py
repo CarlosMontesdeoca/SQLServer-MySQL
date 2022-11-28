@@ -31,14 +31,17 @@ except:
 ##============================================================================================================================================
 ##============================================================================================================================================
    
-def migrateSimple():
-    print('sin certificados nuevos')
+def migrateSimple(codPro):
+    cursorsqlsrv.execute(f"SELECT ClaBpr,DesBpr,identBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,IdeComBpr,UbiBpr,BalLimpBpr,AjuBpr,IRVBpr,ObsVBpr,CapCalBpr,RecPorCliBpr,fec_cal,fec_proxBpr FROM Balxpro WHERE IdeBpr LIKE {codPro} AND (est_esc LIKE 'PR' OR est_esc LIKE 'DS')")
+    data_cert = cursorsqlsrv.fetchall()
+    for cert in data_cert:
+        print(cert)
 
 ##============================================================================================================================================
 ##============================================================================================================================================
 ##============================================================================================================================================
     
-def migrateWithNews():
+def migrateWithNews(codPro):
     print("nuevos certificados")
 
 ##============================================================================================================================================
@@ -72,10 +75,12 @@ for codtb in data1:
     if certificates2[0] > 0 :
         cursormysql.execute(f"SELECT COUNT(*) FROM certificates WHERE codPro LIKE '{codPro}%'")
         certificates1 = cursormysql.fetchone()
+        print(f"MIGRATING PROJECT: {codPro} ")
         if certificates2[0] == certificates1[0] :
-            migrateSimple()
+            migrateSimple(codPro)
         else:
-            migrateWithNews()
+            migrateWithNews(codPro)
+        print("========================================================================= \n\n")
         # print(f"Proyecto: {codPro} → {len(certificates2)} || {certificates1[0]}")
         # print(certificates)
     # cursormysql.execute(querry)
