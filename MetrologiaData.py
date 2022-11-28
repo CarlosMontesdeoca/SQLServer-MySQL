@@ -32,10 +32,15 @@ except:
 ##============================================================================================================================================
    
 def migrateSimple(codPro):
-    cursorsqlsrv.execute(f"SELECT ClaBpr,DesBpr,identBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,IdeComBpr,UbiBpr,BalLimpBpr,AjuBpr,IRVBpr,ObsVBpr,CapCalBpr,RecPorCliBpr,fec_cal,fec_proxBpr FROM Balxpro WHERE IdeBpr LIKE {codPro} AND (est_esc LIKE 'PR' OR est_esc LIKE 'DS')")
+##  datos primarios del certificados Balxpro    
+    cursorsqlsrv.execute(f"SELECT IdeComBpr,est_esc,ClaBpr,DesBpr,identBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,IdeComBpr,UbiBpr,BalLimpBpr,AjuBpr,IRVBpr,ObsVBpr,CapCalBpr,RecPorCliBpr,fec_cal,fec_proxBpr FROM Balxpro WHERE IdeBpr LIKE {codPro} AND (est_esc LIKE 'PR' OR est_esc LIKE 'DS')")
     data_cert = cursorsqlsrv.fetchall()
     for cert in data_cert:
-        print(cert)
+        if cert[1] == 'DS':
+            cursormysql.execute(f"UPDATE certificates SET est='D' WHERE codPro LIKE '{cert[0]}'")
+            MySQLConnection.commit()
+        else:
+            print(cert[0],cert[1])
 
 ##============================================================================================================================================
 ##============================================================================================================================================
