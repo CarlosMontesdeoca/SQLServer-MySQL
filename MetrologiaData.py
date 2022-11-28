@@ -33,97 +33,39 @@ except:
    
 def migrateSimple(codPro):
 ##  datos primarios del certificados Balxpro    
-    cursorsqlsrv.execute(f"SELECT IdeComBpr,est_esc,ClaBpr,DesBpr,identBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,IdeComBpr,UbiBpr,BalLimpBpr,AjuBpr,IRVBpr,ObsVBpr,CapCalBpr,RecPorCliBpr,fec_cal,fec_proxBpr FROM Balxpro WHERE IdeBpr LIKE {codPro} AND (est_esc LIKE 'PR' OR est_esc LIKE 'DS')")
+    cursorsqlsrv.execute(f"SELECT IdeComBpr,est_esc,ClaBpr,DesBpr,identBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,IdeComBpr,UbiBpr,BalLimpBpr,AjuBpr,IRVBpr,ObsVBpr,CapCalBpr,RecPorCliBpr,fec_cal FROM Balxpro WHERE IdeBpr LIKE {codPro} AND (est_esc LIKE 'PR' OR est_esc LIKE 'DS')")
     data_cert = cursorsqlsrv.fetchall()
     for cert in data_cert:
         if cert[1] == 'DS':
             cursormysql.execute(f"UPDATE certificates SET est='D' WHERE codPro LIKE '{cert[0]}'")
             MySQLConnection.commit()
         else:
-            print(cert[0],cert[1])
+            print (f"  ==> UPLOAD DATA FROM CERTIFICATE: {cert[0]}")
+##  modifica los datos del certificado con los datos calculados
+            try:
+                cursormysql.execute(f"UPDATE certificates SET ubi='{cert[14]}',luCal='{cert[14]}',est='RH',evlBal1='{cert[15]}',evlBal2='{cert[16]}',evlBal3='{cert[17]}',obs='{cert[18]}',uso='{cert[19]}',recPor='{cert[20]}',fecCal='{cert[21]}',frmt=11,motr=11 WHERE codPro LIKE '{cert[0]}'")
+                MySQLConnection.commit()  
+                print ("  ==> SUCCESSFULLY LOADED CERTIFICATE DATA ✅")
+            except:
+                # logs += "==> ERROR LADING CERTIFICATE DATA \n" 
+                print ("  ==> ERROR LADING CERTIFICATE DATA ⚠")
+##  Seleccionamos el certificado para cargarle un suplemento con informacion de la balanza
+            cursormysql.execute(f"SELECT id FROM certificates WHERE codPro LIKE '{cert[0]}'")
+            codCert = cursormysql.fetchone()
 
-##============================================================================================================================================
-##============================================================================================================================================
-##============================================================================================================================================
-    
-def migrateWithNews(codPro):
-    print("nuevos certificados")
+## ____________________________________________________  BALANZAS   ________________________________________________________________
+            querrySuplement = f"INSERT INTO suplements (certificate_id,cls,descBl,ident,marc,modl,ser,maxCap,usCap,div_e,div_d,rang,est)VALUES({codCert[0]},'{cert[2]}','{cert[3]}','{cert[4]}','{cert[5]}','{cert[6]}','{cert[7]}',{cert[8]},{cert[9]},{round(cert[10],6)},{round(cert[11],6)},{cert[12]},'A')"
+            try:
+                cursormysql.execute(querrySuplement)
+                MySQLConnection.commit() 
+                print ("  ==> SUCCESSFULLY LOADED BALANCE DATA ✅")
 
-##============================================================================================================================================
-##============================================================================================================================================
-##============================================================================================================================================
-
-print('=========================================================================')
-# CONSULTAS
-
-## CUSORES DE CONSULTAS 
-cursorsqlsrv = SQLServerConnection.cursor()
-cursormysql = MySQLConnection.cursor()
-## ==============================================================
-
-print('SEARCHING PENDING DATA....')
-## busca todos los proyectos pendientes de MySQL
-cursormysql.execute("SELECT codPro FROM projects WHERE est LIKE 'P'")
-data1 = cursormysql.fetchall()
-print(data1)
-
-print('=========================================================================')
-
-print('CHECKING.......')
-## Buscaremos todos los certificados si se han recivido datos SQLServer 
-for codtb in data1:
-    codPro = codtb[0]
-    # cursorsqlsrv.execute(f"SELECT ClaBpr,DesBpr,identBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,IdeComBpr,UbiBpr,BalLimpBpr,AjuBpr,IRVBpr,ObsVBpr,CapCalBpr,RecPorCliBpr,fec_cal,fec_proxBpr FROM Balxpro WHERE IdeBpr LIKE {codPro} AND (est_esc LIKE 'PR' OR est_esc LIKE 'DS')")
-    cursorsqlsrv.execute(f"SELECT COUNT(*) FROM Balxpro WHERE IdeBpr LIKE {codPro} AND (est_esc LIKE 'PR' OR est_esc LIKE 'DS')")
-    certificates2 = cursorsqlsrv.fetchone()
-## si el proyecto de MySql tiene varios certificados de SQLServer en cola  se concidera que ya recbio todos los datos y se puede migrar información    
-    if certificates2[0] > 0 :
-        cursormysql.execute(f"SELECT COUNT(*) FROM certificates WHERE codPro LIKE '{codPro}%'")
-        certificates1 = cursormysql.fetchone()
-        print(f"MIGRATING PROJECT: {codPro} ")
-        if certificates2[0] == certificates1[0] :
-            migrateSimple(codPro)
-        else:
-            migrateWithNews(codPro)
-        print("========================================================================= \n\n")
-        # print(f"Proyecto: {codPro} → {len(certificates2)} || {certificates1[0]}")
-        # print(certificates)
-    # cursormysql.execute(querry)
-    # certificate = cursormysql.fetchone()
-
-    # if certificate:  ## SI  HAY DATOS POR LO QUE SE ENVIARAN LOS DATOS PRIMARIOS
-    #     print (f"  ==> UPLOAD DATA FROM CERTIFICATE: {codtb[0]}")
-    #     cursorsqlsrv.execute(f"SELECT ClaBpr,DesBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,IdeComBpr, UbiBpr, BalLimpBpr, AjuBpr, IRVBpr, ObsVBpr, CapCalBpr, RecPorCliBpr, fec_cal, fec_proxBpr, identBpr FROM Balxpro  WHERE ideComBpr LIKE '{codtb[0]}'")
-    #     balxpro = cursorsqlsrv.fetchone()  
-        
-    #     ## modifica los datos del certificado con los datos calculados
-    #     try:
-    #         # cursormysql.execute(f"UPDATE certificates SET ubi = '{balxpro[11].upper()}', luCal = '{balxpro[11].upper()}', est = 'RH', evlBal1 = '{balxpro[12]}', evlBal2 = '{balxpro[13]}', evlBal3 = '{balxpro[14]}', obs = '{balxpro[15].upper()}', uso = '{balxpro[16]}', recPor = '{balxpro[17].upper()}', fecCal = '{balxpro[18]}', fecProxCal = '{balxpro[19]}', frmt = 12, motr = 11  WHERE codPro LIKE '{codtb[0]}'")
-    #         # MySQLConnection.commit()  
-    #         print ("  ==> SUCCESSFULLY LOADED CERTIFICATE DATA ✅")
-    #     except:
-    #         logs += "==> ERROR LADING CERTIFICATE DATA \n" 
-    #         print ("  ==> ERROR LADING CERTIFICATE DATA ⚠")
-
-    #     ## modifica la informacion de la balanza.
-    #     cursormysql.execute(f"SELECT C.id, S.id FROM certificates C LEFT JOIN suplements S on C.id=S.certificate_id WHERE C.id LIKE {certificate[0]}")
-    #     suplement = cursormysql.fetchone()
-    #     if suplement[1] == None:
-    #         querrySupl = f"INSERT INTO suplements(certificate_id, descBl, ident, marc, modl, ser, maxCap, usCap, div_e, div_d, rang, est) VALUES ({suplement[0]}, '{balxpro[1].upper()}', '{balxpro[20].upper()}', '{balxpro[2].upper()}', '{balxpro[3].upper()}', '{balxpro[4].upper()}', {balxpro[5]}, {balxpro[6]}, {round(balxpro[7],6)}, {round(balxpro[8],6)}, {balxpro[9]}, 'A')"
-    #     else:
-    #         querrySupl = f"UPDATE suplements SET descBl = '{balxpro[1].upper()}', ident = '{balxpro[20].upper()}', marc = '{balxpro[2].upper()}', modl = '{balxpro[3].upper()}', ser = '{balxpro[4].upper()}', maxCap = {balxpro[5]}, usCap = {balxpro[6]}, div_e = {round(balxpro[7],6)}, div_d = {round(balxpro[8],6)}, rang = {balxpro[9]}, est = 'A' WHERE id LIKE {suplement[1]}"
-    #     try:
-    #         # cursormysql.execute(querrySupl)
-    #         # MySQLConnection.commit() 
-    #         print ("  ==> SUCCESSFULLY LOADED BALANCE DATA ✅")
-
-    #     except:
-    #         logs += "==> ERROR LADING BALANCE DATA \n" 
-    #         print ("  ==> ERROR LADING BALANCE DATA ⚠")
-        
-    #     ###_____________________________________________________AMBIENTALES________________________________________________________________________###
-    #     cursorsqlsrv.execute(f"SELECT * FROM Ambientales WHERE IdeComBpr LIKE '{codtb[0]}'")
-    #     envir = cursorsqlsrv.fetchone() 
+            except:
+                # logs += "==> ERROR LADING BALANCE DATA \n" 
+                print ("  ==> ERROR LADING BALANCE DATA ⚠")
+###_____________________________________________________AMBIENTALES________________________________________________________________________###
+        cursorsqlsrv.execute(f"SELECT * FROM Ambientales WHERE IdeComBpr LIKE '{cert[0]}'")
+        envir = cursorsqlsrv.fetchone() 
         
     #     ## creacion de datos ambientales de la balanza.
     #     try:
@@ -257,6 +199,87 @@ for codtb in data1:
     #     except:
     #         logs += "==> ERROR LADING PESXPRO TEST DATA \n" 
     #         print ("  ==> ERROR LADING PESXPRO TEST DATA ⚠")
+
+##============================================================================================================================================
+##============================================================================================================================================
+##============================================================================================================================================
+    
+def migrateWithNews(codPro):
+    print("nuevos certificados")
+
+##============================================================================================================================================
+##============================================================================================================================================
+##============================================================================================================================================
+
+print('=========================================================================')
+# CONSULTAS
+
+## CUSORES DE CONSULTAS 
+cursorsqlsrv = SQLServerConnection.cursor()
+cursormysql = MySQLConnection.cursor()
+## ==============================================================
+
+print('SEARCHING PENDING DATA....')
+## busca todos los proyectos pendientes de MySQL
+cursormysql.execute("SELECT codPro FROM projects WHERE est LIKE 'P'")
+data1 = cursormysql.fetchall()
+print(data1)
+
+print('=========================================================================')
+
+print('CHECKING.......')
+## Buscaremos todos los certificados si se han recivido datos SQLServer 
+for codtb in data1:
+    codPro = codtb[0]
+    # cursorsqlsrv.execute(f"SELECT ClaBpr,DesBpr,identBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,IdeComBpr,UbiBpr,BalLimpBpr,AjuBpr,IRVBpr,ObsVBpr,CapCalBpr,RecPorCliBpr,fec_cal,fec_proxBpr FROM Balxpro WHERE IdeBpr LIKE {codPro} AND (est_esc LIKE 'PR' OR est_esc LIKE 'DS')")
+    cursorsqlsrv.execute(f"SELECT COUNT(*) FROM Balxpro WHERE IdeBpr LIKE {codPro} AND (est_esc LIKE 'PR' OR est_esc LIKE 'DS')")
+    certificates2 = cursorsqlsrv.fetchone()
+## si el proyecto de MySql tiene varios certificados de SQLServer en cola  se concidera que ya recbio todos los datos y se puede migrar información    
+    if certificates2[0] > 0 :
+        cursormysql.execute(f"SELECT COUNT(*) FROM certificates WHERE codPro LIKE '{codPro}%'")
+        certificates1 = cursormysql.fetchone()
+        print(f"MIGRATING PROJECT: {codPro} ")
+        if certificates2[0] == certificates1[0] :
+            migrateSimple(codPro)
+        else:
+            migrateWithNews(codPro)
+        print("========================================================================= \n\n")
+        # print(f"Proyecto: {codPro} → {len(certificates2)} || {certificates1[0]}")
+        # print(certificates)
+    # cursormysql.execute(querry)
+    # certificate = cursormysql.fetchone()
+
+    # if certificate:  ## SI  HAY DATOS POR LO QUE SE ENVIARAN LOS DATOS PRIMARIOS
+    #     print (f"  ==> UPLOAD DATA FROM CERTIFICATE: {codtb[0]}")
+    #     cursorsqlsrv.execute(f"SELECT ClaBpr,DesBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,IdeComBpr, UbiBpr, BalLimpBpr, AjuBpr, IRVBpr, ObsVBpr, CapCalBpr, RecPorCliBpr, fec_cal, fec_proxBpr, identBpr FROM Balxpro  WHERE ideComBpr LIKE '{codtb[0]}'")
+    #     balxpro = cursorsqlsrv.fetchone()  
+        
+    #     ## modifica los datos del certificado con los datos calculados
+    #     try:
+    #         # cursormysql.execute(f"UPDATE certificates SET ubi = '{balxpro[11].upper()}', luCal = '{balxpro[11].upper()}', est = 'RH', evlBal1 = '{balxpro[12]}', evlBal2 = '{balxpro[13]}', evlBal3 = '{balxpro[14]}', obs = '{balxpro[15].upper()}', uso = '{balxpro[16]}', recPor = '{balxpro[17].upper()}', fecCal = '{balxpro[18]}', fecProxCal = '{balxpro[19]}', frmt = 12, motr = 11  WHERE codPro LIKE '{codtb[0]}'")
+    #         # MySQLConnection.commit()  
+    #         print ("  ==> SUCCESSFULLY LOADED CERTIFICATE DATA ✅")
+    #     except:
+    #         logs += "==> ERROR LADING CERTIFICATE DATA \n" 
+    #         print ("  ==> ERROR LADING CERTIFICATE DATA ⚠")
+
+    #     ## modifica la informacion de la balanza.
+    #     cursormysql.execute(f"SELECT C.id, S.id FROM certificates C LEFT JOIN suplements S on C.id=S.certificate_id WHERE C.id LIKE {certificate[0]}")
+    #     suplement = cursormysql.fetchone()
+    #     if suplement[1] == None:
+    #         querrySupl = f"INSERT INTO suplements(certificate_id, descBl, ident, marc, modl, ser, maxCap, usCap, div_e, div_d, rang, est) VALUES ({suplement[0]}, '{balxpro[1].upper()}', '{balxpro[20].upper()}', '{balxpro[2].upper()}', '{balxpro[3].upper()}', '{balxpro[4].upper()}', {balxpro[5]}, {balxpro[6]}, {round(balxpro[7],6)}, {round(balxpro[8],6)}, {balxpro[9]}, 'A')"
+    #     else:
+    #         querrySupl = f"UPDATE suplements SET descBl = '{balxpro[1].upper()}', ident = '{balxpro[20].upper()}', marc = '{balxpro[2].upper()}', modl = '{balxpro[3].upper()}', ser = '{balxpro[4].upper()}', maxCap = {balxpro[5]}, usCap = {balxpro[6]}, div_e = {round(balxpro[7],6)}, div_d = {round(balxpro[8],6)}, rang = {balxpro[9]}, est = 'A' WHERE id LIKE {suplement[1]}"
+    #     try:
+    #         # cursormysql.execute(querrySupl)
+    #         # MySQLConnection.commit() 
+    #         print ("  ==> SUCCESSFULLY LOADED BALANCE DATA ✅")
+
+    #     except:
+    #         logs += "==> ERROR LADING BALANCE DATA \n" 
+    #         print ("  ==> ERROR LADING BALANCE DATA ⚠")
+        
+    
 
     #     print(' ======================================================= \n =======================================================')  
     # if logs != '':
