@@ -33,7 +33,7 @@ except:
    
 def migrateSimple(codPro):
 ##  datos primarios del certificados Balxpro    
-    cursorsqlsrv.execute(f"SELECT IdeComBpr,est_esc,ClaBpr,DesBpr,identBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,IdeComBpr,UbiBpr,BalLimpBpr,AjuBpr,IRVBpr,ObsVBpr,CapCalBpr,RecPorCliBpr,fec_cal FROM Balxpro WHERE IdeBpr LIKE {codPro} AND (est_esc LIKE 'PR' OR est_esc LIKE 'DS')")
+    cursorsqlsrv.execute(f"SELECT IdeComBpr,est_esc,ClaBpr,DesBpr,identBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,IdeComBpr,UbiBpr,BalLimpBpr,AjuBpr,IRVBpr,ObsVBpr,CapCalBpr,RecPorCliBpr,fec_cal FROM Balxpro WHERE IdeBpr LIKE {codPro} AND est_esc LIKE 'PR'")
     data_cert = cursorsqlsrv.fetchall()
     for cert in data_cert:
         if cert[1] == 'DS':
@@ -66,43 +66,41 @@ def migrateSimple(codPro):
 ###_____________________________________________________AMBIENTALES________________________________________________________________________###
         cursorsqlsrv.execute(f"SELECT * FROM Ambientales WHERE IdeComBpr LIKE '{cert[0]}'")
         envir = cursorsqlsrv.fetchone() 
+        try:
+            cursormysql.execute(f"INSERT INTO enviroments(certificate_id,codPro,tempIn,tempFn,humIn,humFn)VALUES({codCert[0]},'{cert[0]}',{round(envir[1],2)},{round(envir[2],2)},{round(envir[3],2)},{round(envir[4],2)})")
+            MySQLConnection.commit()  
+            print (f"  ==> SUCCESSFULLY LOADED ENVIROMENTALS DATA ✅")
+
+        except:
+            # logs += "==> ERROR LADING ENVIROMENT DATA \n" 
+            print ("  ==> ERROR LADING ENVIROMENT DATA ⚠") 
+
+####### ---------------------------------- INSERTA LOS DATOS DE LAS PRUEBAS DE CALIBRACION --------------------------------------------------#######
         
-    #     ## creacion de datos ambientales de la balanza.
-    #     try:
-    #         # cursormysql.execute(f"INSERT INTO enviroments(codPro,certificate_id,tempIn,tempFn,humIn,humFn)VALUES('{codtb[0]}',{certificate[0]},{round(envir[1],2)},{round(envir[2],2)},{round(envir[3],2)},{round(envir[4],2)})")
-    #         # MySQLConnection.commit()  
-    #         print (f"  ==> SUCCESSFULLY LOADED ENVIROMENTALS DATA ✅")
+        if cert[2] == 'III' or cert[2] == 'IIII':
+            ## consulta para ver las pruebas de exentricidad
+            querryExcCad = f"SELECT * FROM ExecII_Cab WHERE IdeComBpr LIKE '{cert[0]}' ORDER BY PrbEii ASC"
+            querryExcDet = f"SELECT * FROM ExecII_Det WHERE CodEii_c LIKE '{cert[0]}%' ORDER BY RIGHT(CodEii_c,1) ASC"
 
-    #     except:
-    #         logs += "==> ERROR LADING ENVIROMENT DATA \n" 
-    #         print ("  ==> ERROR LADING ENVIROMENT DATA ⚠") 
+            querryInsertExc = "INSERT INTO excentests(codPro, certificate_id, intCarg, numPr, maxExec, maxErr, pos1, pos1_r, pos2, pos2_r, pos3, evl) VALUES "
+            ## consulta para ver las pruebas de repetibilidad
+            querryRepet = f"SELECT * FROM RepetIII_Cab C JOIN RepetIII_Det D ON C.IdeComBpr = D.CodRiii_C WHERE C.IdeComBpr LIKE '{cert[0]}'"
+        elif cert[2] == 'II':
+            ## consulta para ver las pruebas de exentricidad
+            querryExcCad = f"SELECT * FROM ExecII_Cab WHERE IdeComBpr LIKE '{cert[0]}' ORDER BY PrbEii ASC"
+            querryExcDet = f"SELECT * FROM ExecII_Det WHERE CodEii_c LIKE '{cert[0]}%' ORDER BY RIGHT(CodEii_c,1) ASC"
 
-    #     ####### -------------- INSERTA LOS DATOS DE LAS PRUEBAS DE CALIBRACION ------------------------------#######
-        
-    #     if balxpro[0] == 'III' or balxpro[0] == 'IIII':
-    #         ## consulta para ver las pruebas de exentricidad
-    #         querryExcCad = f"SELECT * FROM ExecII_Cab WHERE IdeComBpr LIKE '{codtb[0]}' ORDER BY PrbEii ASC"
-    #         querryExcDet = f"SELECT * FROM ExecII_Det WHERE CodEii_c LIKE '{codtb[0]}%' ORDER BY RIGHT(CodEii_c,1) ASC"
+            querryInsertExc = "INSERT INTO excentests(codPro, certificate_id, intCarg, numPr, maxExec, maxErr, pos1, pos1_r, pos2, pos2_r, pos3, evl) VALUES "
+            ## consulta para ver las pruebas de repetibilidad
+            querryRepet = f"SELECT * FROM RepetII_Cab C JOIN RepetII_Det D ON C.IdeComBpr = D.CodRii_C WHERE C.IdeComBpr LIKE '{cert[0]}'"
+        elif cert[2] == 'Camionera':
+            ## consulta para ver las pruebas de exentricidad
+            querryExcCad = f"SELECT * FROM ExecCam_Cab WHERE IdeComBpr LIKE '{cert[0]}' ORDER BY PrbCam_c ASC"
+            querryExcDet = f"SELECT * FROM ExecCam_Det WHERE CodCam_c LIKE '{cert[0]}%' ORDER BY RIGHT(CodCam_c,1) ASC"
 
-    #         querryInsertExc = "INSERT INTO excentests(codPro, certificate_id, intCarg, numPr, maxExec, maxErr, pos1, pos1_r, pos2, pos2_r, pos3, evl) VALUES "
-    #         ## consulta para ver las pruebas de repetibilidad
-    #         querryRepet = f"SELECT * FROM RepetIII_Cab C JOIN RepetIII_Det D ON C.IdeComBpr = D.CodRiii_C WHERE C.IdeComBpr LIKE '{codtb[0]}'"
-    #     elif balxpro[0] == 'II':
-    #         ## consulta para ver las pruebas de exentricidad
-    #         querryExcCad = f"SELECT * FROM ExecII_Cab WHERE IdeComBpr LIKE '{codtb[0]}' ORDER BY PrbEii ASC"
-    #         querryExcDet = f"SELECT * FROM ExecII_Det WHERE CodEii_c LIKE '{codtb[0]}%' ORDER BY RIGHT(CodEii_c,1) ASC"
-
-    #         querryInsertExc = "INSERT INTO excentests(codPro, certificate_id, intCarg, numPr, maxExec, maxErr, pos1, pos1_r, pos2, pos2_r, pos3, evl) VALUES "
-    #         ## consulta para ver las pruebas de repetibilidad
-    #         querryRepet = f"SELECT * FROM RepetII_Cab C JOIN RepetII_Det D ON C.IdeComBpr = D.CodRii_C WHERE C.IdeComBpr LIKE '{codtb[0]}'"
-    #     elif balxpro[0] == 'Camionera':
-    #         ## consulta para ver las pruebas de exentricidad
-    #         querryExcCad = f"SELECT * FROM ExecCam_Cab WHERE IdeComBpr LIKE '{codtb[0]}' ORDER BY PrbCam_c ASC"
-    #         querryExcDet = f"SELECT * FROM ExecCam_Det WHERE CodCam_c LIKE '{codtb[0]}%' ORDER BY RIGHT(CodCam_c,1) ASC"
-
-    #         querryInsertExc = "INSERT INTO excentests(codPro, certificate_id, intCarg, numPr, maxExec, maxErr, pos1, pos1_r, pos2, pos2_r, pos3, pos3_r, evl) VALUES "
-    #         ## consulta para ver las pruebas de repetibilidad
-    #         querryRepet = f"SELECT * FROM RepetIII_Cab C JOIN RepetIII_Det D ON C.IdeComBpr = D.CodRiii_C WHERE C.IdeComBpr LIKE '{codtb[0]}'"
+            querryInsertExc = "INSERT INTO excentests(codPro, certificate_id, intCarg, numPr, maxExec, maxErr, pos1, pos1_r, pos2, pos2_r, pos3, pos3_r, evl) VALUES "
+            ## consulta para ver las pruebas de repetibilidad
+            querryRepet = f"SELECT * FROM RepetIII_Cab C JOIN RepetIII_Det D ON C.IdeComBpr = D.CodRiii_C WHERE C.IdeComBpr LIKE '{cert[0]}'"
 
     #     ## ------ Datos de Pruebas de exentricidad
     #     cursorsqlsrv.execute(querryExcCad)
