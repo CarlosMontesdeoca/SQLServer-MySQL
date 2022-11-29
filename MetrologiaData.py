@@ -172,10 +172,11 @@ def migrateSimple(codPro):
             cursormysql.execute(f"SELECT id FROM cert_items WHERE nom LIKE '{certItems[crt][0]}'")
             idCertItm = cursormysql.fetchone()
             if idCertItm:
+                listCert[certItems[crt][0]] = idCertItm[0]
                 try: 
                     cursormysql.execute(f"INSERT INTO cert_item_certificate(cert_item_id,certificate_id,codUni)VALUES({idCertItm[0]},{codCert[0]},{idCertItm[0]}{codCert[0]})")
                     MySQLConnection.commit()  
-                    listCert[certItems[crt][0]] = idCertItm[0]
+                    print ("  ==> SUCCESSFULLY LOADED RELATION CERTIFICATE WITH CERT_ITEM ✅")
                 except:
                     # logs += "==> ERROR IN FIND CERTITEMS\n" 
                     print('  ==> ERROR IN FIND CERTITEMS ⚠')
