@@ -219,7 +219,7 @@ cursormysql = MySQLConnection.cursor()
 
 print('SEARCHING PENDING DATA....')
 ## busca todos los proyectos pendientes de MySQL
-cursormysql.execute("SELECT codPro FROM projects WHERE est LIKE 'P'")
+cursormysql.execute("SELECT DISTINCT P.codPro FROM projects P JOIN certificates C on P.id=C.project_id WHERE P.est LIKE 'P' AND C.est LIKE 'P'")
 data1 = cursormysql.fetchall()
 print(data1)
 
@@ -242,51 +242,6 @@ for codtb in data1:
         else:
             migrateWithNews(codPro)
         print("========================================================================= \n\n")
-        # print(f"Proyecto: {codPro} → {len(certificates2)} || {certificates1[0]}")
-        # print(certificates)
-    # cursormysql.execute(querry)
-    # certificate = cursormysql.fetchone()
-
-    # if certificate:  ## SI  HAY DATOS POR LO QUE SE ENVIARAN LOS DATOS PRIMARIOS
-    #     print (f"  ==> UPLOAD DATA FROM CERTIFICATE: {codtb[0]}")
-    #     cursorsqlsrv.execute(f"SELECT ClaBpr,DesBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,IdeComBpr, UbiBpr, BalLimpBpr, AjuBpr, IRVBpr, ObsVBpr, CapCalBpr, RecPorCliBpr, fec_cal, fec_proxBpr, identBpr FROM Balxpro  WHERE ideComBpr LIKE '{codtb[0]}'")
-    #     balxpro = cursorsqlsrv.fetchone()  
-        
-    #     ## modifica los datos del certificado con los datos calculados
-    #     try:
-    #         # cursormysql.execute(f"UPDATE certificates SET ubi = '{balxpro[11].upper()}', luCal = '{balxpro[11].upper()}', est = 'RH', evlBal1 = '{balxpro[12]}', evlBal2 = '{balxpro[13]}', evlBal3 = '{balxpro[14]}', obs = '{balxpro[15].upper()}', uso = '{balxpro[16]}', recPor = '{balxpro[17].upper()}', fecCal = '{balxpro[18]}', fecProxCal = '{balxpro[19]}', frmt = 12, motr = 11  WHERE codPro LIKE '{codtb[0]}'")
-    #         # MySQLConnection.commit()  
-    #         print ("  ==> SUCCESSFULLY LOADED CERTIFICATE DATA ✅")
-    #     except:
-    #         logs += "==> ERROR LADING CERTIFICATE DATA \n" 
-    #         print ("  ==> ERROR LADING CERTIFICATE DATA ⚠")
-
-    #     ## modifica la informacion de la balanza.
-    #     cursormysql.execute(f"SELECT C.id, S.id FROM certificates C LEFT JOIN suplements S on C.id=S.certificate_id WHERE C.id LIKE {certificate[0]}")
-    #     suplement = cursormysql.fetchone()
-    #     if suplement[1] == None:
-    #         querrySupl = f"INSERT INTO suplements(certificate_id, descBl, ident, marc, modl, ser, maxCap, usCap, div_e, div_d, rang, est) VALUES ({suplement[0]}, '{balxpro[1].upper()}', '{balxpro[20].upper()}', '{balxpro[2].upper()}', '{balxpro[3].upper()}', '{balxpro[4].upper()}', {balxpro[5]}, {balxpro[6]}, {round(balxpro[7],6)}, {round(balxpro[8],6)}, {balxpro[9]}, 'A')"
-    #     else:
-    #         querrySupl = f"UPDATE suplements SET descBl = '{balxpro[1].upper()}', ident = '{balxpro[20].upper()}', marc = '{balxpro[2].upper()}', modl = '{balxpro[3].upper()}', ser = '{balxpro[4].upper()}', maxCap = {balxpro[5]}, usCap = {balxpro[6]}, div_e = {round(balxpro[7],6)}, div_d = {round(balxpro[8],6)}, rang = {balxpro[9]}, est = 'A' WHERE id LIKE {suplement[1]}"
-    #     try:
-    #         # cursormysql.execute(querrySupl)
-    #         # MySQLConnection.commit() 
-    #         print ("  ==> SUCCESSFULLY LOADED BALANCE DATA ✅")
-
-    #     except:
-    #         logs += "==> ERROR LADING BALANCE DATA \n" 
-    #         print ("  ==> ERROR LADING BALANCE DATA ⚠")
-        
-    
-
-    #     print(' ======================================================= \n =======================================================')  
-    # if logs != '':
-    #     file = open(f"./LogMySQL-{today}.txt", "a")
-    #     file.write("=======================================================\n")
-    #     file.write(f"PROJECT: {codtb[0]}")
-    #     file.write(logs)
-    #     file.write("=======================================================\n")
-    #     file.close()
 print("DATA MIGRATION COMPLETED SUCCESSFULLY")
 
 MySQLConnection.close()
