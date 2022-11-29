@@ -102,45 +102,44 @@ def migrateSimple(codPro):
             ## consulta para ver las pruebas de repetibilidad
             querryRepet = f"SELECT * FROM RepetIII_Cab C JOIN RepetIII_Det D ON C.IdeComBpr = D.CodRiii_C WHERE C.IdeComBpr LIKE '{cert[0]}'"
 
-    #     ## ------ Datos de Pruebas de exentricidad
-    #     cursorsqlsrv.execute(querryExcCad)
-    #     exectCad = cursorsqlsrv.fetchall()
-    #     cursorsqlsrv.execute(querryExcDet)
-    #     exectDet = cursorsqlsrv.fetchall()
+## __________________________________________________ EXENTRICIDAD __________________________________________________
+        cursorsqlsrv.execute(querryExcCad)
+        exectCad = cursorsqlsrv.fetchall()
+        cursorsqlsrv.execute(querryExcDet)
+        exectDet = cursorsqlsrv.fetchall()
 
-    #     ## ------ crear el querry para insertar los datos de pruebas de exentricidad
-    #     for pex in [0,1]:
-    #         if balxpro[0] == 'Camionera':
-    #             querryInsertExc = querryInsertExc + f"('{codtb[0]}{exectCad[pex][2]}',{certificate[0]},{exectCad[pex][1]},{exectCad[pex][2]},{round(exectDet[pex][6],5)},{round(exectDet[pex][7],5)},{round(exectDet[pex][1],5)},{round(exectDet[pex][2],5)},{round(exectDet[pex][3],5)},{round(exectDet[pex][4],5)},{round(exectDet[pex][5],5)},{round(exectDet[pex][6],5)},'{exectCad[pex][4]}' ),"
-    #         else :
-    #             querryInsertExc = querryInsertExc + f"('{codtb[0]}{exectCad[pex][2]}',{certificate[0]},{exectCad[pex][1]},{exectCad[pex][2]},{round(exectDet[pex][6],5)},{round(exectDet[pex][7],5)},{round(exectDet[pex][1],5)},{round(exectDet[pex][2],5)},{round(exectDet[pex][3],5)},{round(exectDet[pex][4],5)},{round(exectDet[pex][5],5)},'{exectCad[pex][4]}' ),"
+        ## ------ crear el querry para insertar los datos de pruebas de exentricidad
+        for pex in [0,1]:
+            if cert[2] == 'Camionera':
+                querryInsertExc = querryInsertExc + f"('{cert[0]}{exectCad[pex][2]}',{codCert[0]},{exectCad[pex][1]},{exectCad[pex][2]},{round(exectDet[pex][6],5)},{round(exectDet[pex][7],5)},{round(exectDet[pex][1],5)},{round(exectDet[pex][2],5)},{round(exectDet[pex][3],5)},{round(exectDet[pex][4],5)},{round(exectDet[pex][5],5)},{round(exectDet[pex][6],5)},'{exectCad[pex][4]}' ),"
+            else :
+                querryInsertExc = querryInsertExc + f"('{cert[0]}{exectCad[pex][2]}',{codCert[0]},{exectCad[pex][1]},{exectCad[pex][2]},{round(exectDet[pex][6],5)},{round(exectDet[pex][7],5)},{round(exectDet[pex][1],5)},{round(exectDet[pex][2],5)},{round(exectDet[pex][3],5)},{round(exectDet[pex][4],5)},{round(exectDet[pex][5],5)},'{exectCad[pex][4]}' ),"
         
-    #     ## ------ insercion de pruebas de exentricidad
-    #     try:
-    #         # cursormysql.execute(querryInsertExc[:-1])
-    #         # MySQLConnection.commit() 
-    #         print ("  ==> SUCCESSFULLY LOADED ECCENTRICITY TEST DATA ✅")
-    #     except:
-    #         logs += "==> ERROR LADING ECCENTRICITY TEST DATA \n" 
-    #         print ("  ==> ERROR LADING ECCENTRICITY TEST DATA ⚠")
+        ## ------ insercion de pruebas de exentricidad
+        try:
+            cursormysql.execute(querryInsertExc[:-1])
+            MySQLConnection.commit() 
+            print ("  ==> SUCCESSFULLY LOADED ECCENTRICITY TEST DATA ✅")
+        except:
+            print ("  ==> ERROR LADING ECCENTRICITY TEST DATA ⚠")
 
-    #     ## ------ Datos de Pruebas de repetibilidad
-    #     cursorsqlsrv.execute(querryRepet)
-    #     repet = cursorsqlsrv.fetchone()
+        ## ------ Datos de Pruebas de repetibilidad
+        cursorsqlsrv.execute(querryRepet)
+        repet = cursorsqlsrv.fetchone()
 
-    #     try:
-    #         ## --- creacion de querry para insertar datos de repetbilidad
-    #         if balxpro[0] == 'II':
-    #             querryInsertRept = f"INSERT INTO repeatests(codPro,certificate_id,intCarg,maxDif,maxErr,lec1,lec1_0,lec2,lec2_0,lec3,lec3_0,lec4,lec4_0,lec5,lec5_0,lec6,lec6_0,evl) VALUES ('{codtb[0]}',{certificate[0]},{repet[1]},{round(repet[2],5)},{round(repet[3],5)},{round(repet[7],5)},{round(repet[8],5)},{round(repet[9],5)},{round(repet[10],5)},{round(repet[11],5)},{round(repet[12],5)},{round(repet[13],5)},{round(repet[14],5)},{round(repet[15],5)},{round(repet[16],5)},{round(repet[17],5)},{round(repet[18],5)},'{repet[4]}')"
-    #         else: 
-    #             querryInsertRept = f"INSERT INTO repeatests(codPro,certificate_id,intCarg,maxDif,maxErr,lec1,lec1_0,lec2,lec2_0,lec3,lec3_0,evl) VALUES ('{codtb[0]}',{certificate[0]},{repet[1]},{round(repet[2],5)},{round(repet[3],5)},{round(repet[7],5)},{round(repet[8],5)},{round(repet[9],5)},{round(repet[10],5)},{round(repet[11],5)},{round(repet[12],5)},'{repet[4]}')"
+        try:
+            ## --- creacion de querry para insertar datos de repetbilidad
+            if cert[2] == 'II':
+                querryInsertRept = f"INSERT INTO repeatests(codPro,certificate_id,intCarg,maxDif,maxErr,lec1,lec1_0,lec2,lec2_0,lec3,lec3_0,lec4,lec4_0,lec5,lec5_0,lec6,lec6_0,evl) VALUES ('{cert[0]}',{codCert[0]},{repet[1]},{round(repet[2],5)},{round(repet[3],5)},{round(repet[7],5)},{round(repet[8],5)},{round(repet[9],5)},{round(repet[10],5)},{round(repet[11],5)},{round(repet[12],5)},{round(repet[13],5)},{round(repet[14],5)},{round(repet[15],5)},{round(repet[16],5)},{round(repet[17],5)},{round(repet[18],5)},'{repet[4]}')"
+            else: 
+                querryInsertRept = f"INSERT INTO repeatests(codPro,certificate_id,intCarg,maxDif,maxErr,lec1,lec1_0,lec2,lec2_0,lec3,lec3_0,evl) VALUES ('{cert[0]}',{codCert[0]},{repet[1]},{round(repet[2],5)},{round(repet[3],5)},{round(repet[7],5)},{round(repet[8],5)},{round(repet[9],5)},{round(repet[10],5)},{round(repet[11],5)},{round(repet[12],5)},'{repet[4]}')"
             
-    #         # cursormysql.execute(querryInsertRept)
-    #         # MySQLConnection.commit() 
-    #         print ("  ==> SUCCESSFULLY LOADED REPETIBILITY TEST DATA ✅")
-    #     except:
-    #         logs += "==> ERROR LADING REPEATABILITY TEST DATA \n" 
-    #         print ("  ==> ERROR LADING REPEATABILITY TEST DATA ⚠")
+            cursormysql.execute(querryInsertRept)
+            MySQLConnection.commit() 
+            print ("  ==> SUCCESSFULLY LOADED REPETIBILITY TEST DATA ✅")
+        except:
+            # logs += "==> ERROR LADING REPEATABILITY TEST DATA \n" 
+            print ("  ==> ERROR LADING REPEATABILITY TEST DATA ⚠")
 
     #     ## ------ Datos de pruebas de Carga
     #     cursorsqlsrv.execute(f"SELECT * FROM PCarga_Cab WHERE IdeComBpr LIKE '{codtb[0]}' ORDER BY NumPca ASC")
@@ -197,6 +196,7 @@ def migrateSimple(codPro):
     #     except:
     #         logs += "==> ERROR LADING PESXPRO TEST DATA \n" 
     #         print ("  ==> ERROR LADING PESXPRO TEST DATA ⚠")
+        print("♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠")
 
 ##============================================================================================================================================
 ##============================================================================================================================================
