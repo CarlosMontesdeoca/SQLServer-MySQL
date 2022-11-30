@@ -13,7 +13,7 @@ client = sys.argv[2]
 today = date.today()
 
 server1='tcp:192.168.9.221'
-dbname1='DevSisMetPrec'
+dbname1='SisMetPrec'
 user1='sa'
 password1='Sistemas123*'
 
@@ -36,8 +36,11 @@ clientInfo = cursormysql.fetchone()
 
 # busca el cliente en SisMetPrec y crealo si no existe
 querryFindClient = f"IF NOT EXISTS ( SELECT * FROM Clientes WHERE codAux LIKE {client}) BEGIN INSERT INTO Clientes (codAux,  NomCli, CiRucCli, CiuCli, DirCli, EmaCli, TelCli, ConCli, EstCli, matProCli) VALUES ({clientInfo[0]}, '{clientInfo[1]}', '{clientInfo[2]}', '{clientInfo[3]}', '{clientInfo[4]}', '{clientInfo[5]}', '{clientInfo[6]}', '{clientInfo[7]}', 'A', '{clientInfo[8]}' ) END"
-cursorsqlsrv.execute(querryFindClient)
-SQLServerConnection.commit() 
+try:
+    cursorsqlsrv.execute(querryFindClient)
+    SQLServerConnection.commit() 
+except:
+    print('ERROR AL CREAR EL CLIENTE')
 
 #Guarda el codigo del Cliente
 cursorsqlsrv.execute(f"SELECT CodCli FROM Clientes WHERE codAux LIKE {client}")
@@ -51,8 +54,11 @@ project = cursormysql.fetchone()
 # qeurryIdentificadores = f"INSERT INTO Identificadores(codcli, idepro) VALUES (CODCLI, {project[0]})"
 
 ## INSERTAR IDENTIFICADORES
-cursorsqlsrv.execute(f"IF NOT EXISTS ( SELECT * FROM Identificadores WHERE idepro LIKE {codPro} ) BEGIN INSERT INTO Identificadores (codcli, idepro) VALUES ({CodCli[0]}, {codPro}) END")
-SQLServerConnection.commit()
+try:
+    cursorsqlsrv.execute(f"IF NOT EXISTS ( SELECT * FROM Identificadores WHERE idepro LIKE {codPro} ) BEGIN INSERT INTO Identificadores (codcli, idepro) VALUES ({CodCli[0]}, {codPro}) END")
+    SQLServerConnection.commit()
+except:
+    print("ERROR AL CREAR LOS IDENTIFICADORES")
 
 strdate = str(datenow)
 dateLong = f"{datenow.strftime('%B %d %Y')} {datenow.time().strftime('%H:%M')}"
