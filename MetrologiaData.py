@@ -205,11 +205,23 @@ def migrateSimple(codPro):
 ##============================================================================================================================================
     
 def migrateWithNews(codPro):
+    lit = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AG']
     ##  datos primarios del certificados Balxpro    
-    cursorsqlsrv.execute(f"SELECT IdeComBpr,est_esc,ClaBpr,DesBpr,identBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,IdeComBpr,UbiBpr,BalLimpBpr,AjuBpr,IRVBpr,ObsVBpr,CapCalBpr,RecPorCliBpr,fec_cal FROM Balxpro WHERE IdeBpr LIKE {codPro} AND (est_esc LIKE 'PR' OR est_esc LIKE 'DS')")
+    cursorsqlsrv.execute(f"SELECT IdeComBpr,est_esc,ClaBpr,DesBpr,identBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,UbiBpr,BalLimpBpr,AjuBpr,IRVBpr,ObsVBpr,CapCalBpr,RecPorCliBpr,fec_cal FROM Balxpro WHERE IdeBpr LIKE {codPro} AND (est_esc LIKE 'PR' OR est_esc LIKE 'DS') ORDER BY IdeComBpr ASC")
     data_cert = cursorsqlsrv.fetchall()
-
-    print(data_cert)
+    aux_cert = []
+    new_cert = []
+    
+    for i in range(0,len(data_cert)): 
+        if (i == 0):
+            aux_cert.append(data_cert[i])
+        else:
+            if(data_cert[i][5] == data_cert[i-1][5] and data_cert[i][6] == data_cert[i-1][6] and data_cert[i][7] == data_cert[i-1][7]):
+                new_cert.append(data_cert[i])
+            else:
+                aux_cert.append(data_cert[i])
+    print(aux_cert)
+    print(new_cert)
 
 ##============================================================================================================================================
 ##============================================================================================================================================
