@@ -23,7 +23,7 @@ except:
     print ('error to try connect the database SQL Server')
 
 try:
-    MySQLConnection = pymysql.connect(host="127.0.0.1",user="root",passwd="",database="test" )
+    MySQLConnection = pymysql.connect(host="127.0.0.1",user="root",passwd="",database="metrologia" )
 except:
     print ('error to try connect the database MySQL')
 
