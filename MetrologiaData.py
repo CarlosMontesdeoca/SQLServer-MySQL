@@ -266,7 +266,7 @@ def migrateWithNews(codPro):
             print (f"  ==> UPLOAD DATA FROM CERTIFICATE: {cert[0]}")
 ##  modifica los datos del certificado con los datos calculados
             try:
-                cursormysql.execute(f"UPDATE certificates SET ubi='{cert[14]}',luCal='{cert[14]}',est='RH',evlBal1='{cert[15]}',evlBal2='{cert[16]}',evlBal3='{cert[17]}',obs='{cert[18]}',uso='{cert[19]}',recPor='{cert[20]}',fecCal='{cert[21]}',frmt=11,motr=11 WHERE codPro LIKE '{cert[0]}'")
+                cursormysql.execute(f"UPDATE certificates SET ubi='{cert[13]}',luCal='{cert[13]}',est='RH',evlBal1='{cert[14]}',evlBal2='{cert[15]}',evlBal3='{cert[16]}',obs='{cert[17]}',uso='{cert[18]}',recPor='{cert[19]}',fecCal='{cert[20]}',frmt=11,motr=11 WHERE codPro LIKE '{cert[0]}'")
                 MySQLConnection.commit()  
                 print ("  ==> SUCCESSFULLY LOADED CERTIFICATE DATA ✅")
             except:
@@ -298,71 +298,71 @@ def migrateWithNews(codPro):
                 # logs += "==> ERROR LADING ENVIROMENT DATA \n" 
                 print ("  ==> ERROR LADING ENVIROMENT DATA ⚠") 
 
-#     ####### ---------------------------------- INSERTA LOS DATOS DE LAS PRUEBAS DE CALIBRACION --------------------------------------------------#######
+    ####### ---------------------------------- INSERTA LOS DATOS DE LAS PRUEBAS DE CALIBRACION --------------------------------------------------#######
             
-#             if cert[2] == 'III' or cert[2] == 'IIII':
-#                 ## consulta para ver las pruebas de exentricidad
-#                 querryExcCad = f"SELECT * FROM ExecII_Cab WHERE IdeComBpr LIKE '{cert[0]}' ORDER BY PrbEii ASC"
-#                 querryExcDet = f"SELECT * FROM ExecII_Det WHERE CodEii_c LIKE '{cert[0]}%' ORDER BY RIGHT(CodEii_c,1) ASC"
+            if cert[2] == 'III' or cert[2] == 'IIII':
+                ## consulta para ver las pruebas de exentricidad
+                querryExcCad = f"SELECT * FROM ExecII_Cab WHERE IdeComBpr LIKE '{cert[-1]}' ORDER BY PrbEii ASC"
+                querryExcDet = f"SELECT * FROM ExecII_Det WHERE CodEii_c LIKE '{cert[-1]}%' ORDER BY RIGHT(CodEii_c,1) ASC"
 
-#                 querryInsertExc = "INSERT INTO excentests(codPro, certificate_id, intCarg, numPr, maxExec, maxErr, pos1, pos1_r, pos2, pos2_r, pos3, evl) VALUES "
-#                 ## consulta para ver las pruebas de repetibilidad
-#                 querryRepet = f"SELECT * FROM RepetIII_Cab C JOIN RepetIII_Det D ON C.IdeComBpr = D.CodRiii_C WHERE C.IdeComBpr LIKE '{cert[0]}'"
-#             elif cert[2] == 'II':
-#                 ## consulta para ver las pruebas de exentricidad
-#                 querryExcCad = f"SELECT * FROM ExecII_Cab WHERE IdeComBpr LIKE '{cert[0]}' ORDER BY PrbEii ASC"
-#                 querryExcDet = f"SELECT * FROM ExecII_Det WHERE CodEii_c LIKE '{cert[0]}%' ORDER BY RIGHT(CodEii_c,1) ASC"
+                querryInsertExc = "INSERT INTO excentests(codPro, certificate_id, intCarg, numPr, maxExec, maxErr, pos1, pos1_r, pos2, pos2_r, pos3, evl) VALUES "
+                ## consulta para ver las pruebas de repetibilidad
+                querryRepet = f"SELECT * FROM RepetIII_Cab C JOIN RepetIII_Det D ON C.IdeComBpr = D.CodRiii_C WHERE C.IdeComBpr LIKE '{cert[-1]}'"
+            elif cert[2] == 'II':
+                ## consulta para ver las pruebas de exentricidad
+                querryExcCad = f"SELECT * FROM ExecII_Cab WHERE IdeComBpr LIKE '{cert[-1]}' ORDER BY PrbEii ASC"
+                querryExcDet = f"SELECT * FROM ExecII_Det WHERE CodEii_c LIKE '{cert[-1]}%' ORDER BY RIGHT(CodEii_c,1) ASC"
 
-#                 querryInsertExc = "INSERT INTO excentests(codPro, certificate_id, intCarg, numPr, maxExec, maxErr, pos1, pos1_r, pos2, pos2_r, pos3, evl) VALUES "
-#                 ## consulta para ver las pruebas de repetibilidad
-#                 querryRepet = f"SELECT * FROM RepetII_Cab C JOIN RepetII_Det D ON C.IdeComBpr = D.CodRii_C WHERE C.IdeComBpr LIKE '{cert[0]}'"
-#             elif cert[2] == 'Camionera':
-#                 ## consulta para ver las pruebas de exentricidad
-#                 querryExcCad = f"SELECT * FROM ExecCam_Cab WHERE IdeComBpr LIKE '{cert[0]}' ORDER BY PrbCam_c ASC"
-#                 querryExcDet = f"SELECT * FROM ExecCam_Det WHERE CodCam_c LIKE '{cert[0]}%' ORDER BY RIGHT(CodCam_c,1) ASC"
+                querryInsertExc = "INSERT INTO excentests(codPro, certificate_id, intCarg, numPr, maxExec, maxErr, pos1, pos1_r, pos2, pos2_r, pos3, evl) VALUES "
+                ## consulta para ver las pruebas de repetibilidad
+                querryRepet = f"SELECT * FROM RepetII_Cab C JOIN RepetII_Det D ON C.IdeComBpr = D.CodRii_C WHERE C.IdeComBpr LIKE '{cert[-1]}'"
+            elif cert[2] == 'Camionera':
+                ## consulta para ver las pruebas de exentricidad
+                querryExcCad = f"SELECT * FROM ExecCam_Cab WHERE IdeComBpr LIKE '{cert[-1]}' ORDER BY PrbCam_c ASC"
+                querryExcDet = f"SELECT * FROM ExecCam_Det WHERE CodCam_c LIKE '{cert[-1]}%' ORDER BY RIGHT(CodCam_c,1) ASC"
 
-#                 querryInsertExc = "INSERT INTO excentests(codPro, certificate_id, intCarg, numPr, maxExec, maxErr, pos1, pos1_r, pos2, pos2_r, pos3, pos3_r, evl) VALUES "
-#                 ## consulta para ver las pruebas de repetibilidad
-#                 querryRepet = f"SELECT * FROM RepetIII_Cab C JOIN RepetIII_Det D ON C.IdeComBpr = D.CodRiii_C WHERE C.IdeComBpr LIKE '{cert[0]}'"
+                querryInsertExc = "INSERT INTO excentests(codPro, certificate_id, intCarg, numPr, maxExec, maxErr, pos1, pos1_r, pos2, pos2_r, pos3, pos3_r, evl) VALUES "
+                ## consulta para ver las pruebas de repetibilidad
+                querryRepet = f"SELECT * FROM RepetIII_Cab C JOIN RepetIII_Det D ON C.IdeComBpr = D.CodRiii_C WHERE C.IdeComBpr LIKE '{cert[-1]}'"
 
-#     ## __________________________________________________ EXENTRICIDAD __________________________________________________
-#             cursorsqlsrv.execute(querryExcCad)
-#             exectCad = cursorsqlsrv.fetchall()
-#             cursorsqlsrv.execute(querryExcDet)
-#             exectDet = cursorsqlsrv.fetchall()
+    ## __________________________________________________ EXENTRICIDAD __________________________________________________
+            cursorsqlsrv.execute(querryExcCad)
+            exectCad = cursorsqlsrv.fetchall()
+            cursorsqlsrv.execute(querryExcDet)
+            exectDet = cursorsqlsrv.fetchall()
 
-#             ## ------ crear el querry para insertar los datos de pruebas de exentricidad
-#             for pex in [0,1]:
-#                 if cert[2] == 'Camionera':
-#                     querryInsertExc = querryInsertExc + f"('{cert[0]}{exectCad[pex][2]}',{codCert[0]},{exectCad[pex][1]},{exectCad[pex][2]},{round(exectDet[pex][6],5)},{round(exectDet[pex][7],5)},{round(exectDet[pex][1],5)},{round(exectDet[pex][2],5)},{round(exectDet[pex][3],5)},{round(exectDet[pex][4],5)},{round(exectDet[pex][5],5)},{round(exectDet[pex][6],5)},'{exectCad[pex][4]}' ),"
-#                 else :
-#                     querryInsertExc = querryInsertExc + f"('{cert[0]}{exectCad[pex][2]}',{codCert[0]},{exectCad[pex][1]},{exectCad[pex][2]},{round(exectDet[pex][6],5)},{round(exectDet[pex][7],5)},{round(exectDet[pex][1],5)},{round(exectDet[pex][2],5)},{round(exectDet[pex][3],5)},{round(exectDet[pex][4],5)},{round(exectDet[pex][5],5)},'{exectCad[pex][4]}' ),"
+            ## ------ crear el querry para insertar los datos de pruebas de exentricidad
+            for pex in [0,1]:
+                if cert[2] == 'Camionera':
+                    querryInsertExc = querryInsertExc + f"('{cert[0]}{exectCad[pex][2]}',{codCert[0]},{exectCad[pex][1]},{exectCad[pex][2]},{round(exectDet[pex][6],5)},{round(exectDet[pex][7],5)},{round(exectDet[pex][1],5)},{round(exectDet[pex][2],5)},{round(exectDet[pex][3],5)},{round(exectDet[pex][4],5)},{round(exectDet[pex][5],5)},{round(exectDet[pex][6],5)},'{exectCad[pex][4]}' ),"
+                else :
+                    querryInsertExc = querryInsertExc + f"('{cert[0]}{exectCad[pex][2]}',{codCert[0]},{exectCad[pex][1]},{exectCad[pex][2]},{round(exectDet[pex][6],5)},{round(exectDet[pex][7],5)},{round(exectDet[pex][1],5)},{round(exectDet[pex][2],5)},{round(exectDet[pex][3],5)},{round(exectDet[pex][4],5)},{round(exectDet[pex][5],5)},'{exectCad[pex][4]}' ),"
             
-#             ## ------ insercion de pruebas de exentricidad
-#             try:
-#                 cursormysql.execute(querryInsertExc[:-1])
-#                 MySQLConnection.commit() 
-#                 print ("  ==> SUCCESSFULLY LOADED ECCENTRICITY TEST DATA ✅")
-#             except:
-#                 print ("  ==> ERROR LADING ECCENTRICITY TEST DATA ⚠")
+            ## ------ insercion de pruebas de exentricidad
+            try:
+                cursormysql.execute(querryInsertExc[:-1])
+                MySQLConnection.commit() 
+                print ("  ==> SUCCESSFULLY LOADED ECCENTRICITY TEST DATA ✅")
+            except:
+                print ("  ==> ERROR LADING ECCENTRICITY TEST DATA ⚠")
 
-#             ## ------ Datos de Pruebas de repetibilidad
-#             cursorsqlsrv.execute(querryRepet)
-#             repet = cursorsqlsrv.fetchone()
+            ## ------ Datos de Pruebas de repetibilidad
+            cursorsqlsrv.execute(querryRepet)
+            repet = cursorsqlsrv.fetchone()
 
-#             try:
-#                 ## --- creacion de querry para insertar datos de repetbilidad
-#                 if cert[2] == 'II':
-#                     querryInsertRept = f"INSERT INTO repeatests(codPro,certificate_id,intCarg,maxDif,maxErr,lec1,lec1_0,lec2,lec2_0,lec3,lec3_0,lec4,lec4_0,lec5,lec5_0,lec6,lec6_0,evl) VALUES ('{cert[0]}',{codCert[0]},{repet[1]},{round(repet[2],5)},{round(repet[3],5)},{round(repet[7],5)},{round(repet[8],5)},{round(repet[9],5)},{round(repet[10],5)},{round(repet[11],5)},{round(repet[12],5)},{round(repet[13],5)},{round(repet[14],5)},{round(repet[15],5)},{round(repet[16],5)},{round(repet[17],5)},{round(repet[18],5)},'{repet[4]}')"
-#                 else: 
-#                     querryInsertRept = f"INSERT INTO repeatests(codPro,certificate_id,intCarg,maxDif,maxErr,lec1,lec1_0,lec2,lec2_0,lec3,lec3_0,evl) VALUES ('{cert[0]}',{codCert[0]},{repet[1]},{round(repet[2],5)},{round(repet[3],5)},{round(repet[7],5)},{round(repet[8],5)},{round(repet[9],5)},{round(repet[10],5)},{round(repet[11],5)},{round(repet[12],5)},'{repet[4]}')"
+            try:
+                ## --- creacion de querry para insertar datos de repetbilidad
+                if cert[2] == 'II':
+                    querryInsertRept = f"INSERT INTO repeatests(codPro,certificate_id,intCarg,maxDif,maxErr,lec1,lec1_0,lec2,lec2_0,lec3,lec3_0,lec4,lec4_0,lec5,lec5_0,lec6,lec6_0,evl) VALUES ('{cert[0]}',{codCert[0]},{repet[1]},{round(repet[2],5)},{round(repet[3],5)},{round(repet[7],5)},{round(repet[8],5)},{round(repet[9],5)},{round(repet[10],5)},{round(repet[11],5)},{round(repet[12],5)},{round(repet[13],5)},{round(repet[14],5)},{round(repet[15],5)},{round(repet[16],5)},{round(repet[17],5)},{round(repet[18],5)},'{repet[4]}')"
+                else: 
+                    querryInsertRept = f"INSERT INTO repeatests(codPro,certificate_id,intCarg,maxDif,maxErr,lec1,lec1_0,lec2,lec2_0,lec3,lec3_0,evl) VALUES ('{cert[0]}',{codCert[0]},{repet[1]},{round(repet[2],5)},{round(repet[3],5)},{round(repet[7],5)},{round(repet[8],5)},{round(repet[9],5)},{round(repet[10],5)},{round(repet[11],5)},{round(repet[12],5)},'{repet[4]}')"
                 
-#                 cursormysql.execute(querryInsertRept)
-#                 MySQLConnection.commit() 
-#                 print ("  ==> SUCCESSFULLY LOADED REPETIBILITY TEST DATA ✅")
-#             except:
-#                 # logs += "==> ERROR LADING REPEATABILITY TEST DATA \n" 
-#                 print ("  ==> ERROR LADING REPEATABILITY TEST DATA ⚠")
+                cursormysql.execute(querryInsertRept)
+                MySQLConnection.commit() 
+                print ("  ==> SUCCESSFULLY LOADED REPETIBILITY TEST DATA ✅")
+            except:
+                # logs += "==> ERROR LADING REPEATABILITY TEST DATA \n" 
+                print ("  ==> ERROR LADING REPEATABILITY TEST DATA ⚠")
 
 #             ## ------ Datos de pruebas de Carga
 #             cursorsqlsrv.execute(f"SELECT * FROM PCarga_Cab WHERE IdeComBpr LIKE '{cert[0]}' ORDER BY NumPca ASC")
