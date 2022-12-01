@@ -228,12 +228,16 @@ def migrateWithNews(codPro):
     for i in range(len(aux_cert),len(data_cert)):
         new_cert[ii][0] = f"{codPro}{lit[i]}"
         ii =  ii + 1
-
+    
+    cursormysql.execute(f"SELECT id FROM projects WHERE codPro LIKE '{codPro}'")
+    idPro = cursormysql.fetchone()
+    
     for cert in new_cert:
         cursormysql.execute(f"SELECT id FROM balances WHERE ser LIKE '{cert[7]}'")
         balance = cursormysql.fetchone()
         if balance:
-            print("si existe")
+            cursormysql.execute(f"INSERT INTO certificates (codPro,balance_id,project_id,est)VALUES('{cert[0]}',{balance[0]},{idPro[0]},'P')")
+            MySQLConnection.commit()
         else :
             print(' crear')
 
