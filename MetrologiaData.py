@@ -207,7 +207,7 @@ def migrateSimple(codPro):
 def migrateWithNews(codPro):
     lit = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AG']
     ##  datos primarios del certificados Balxpro    
-    cursorsqlsrv.execute(f"SELECT IdeComBpr,est_esc,ClaBpr,DesBpr,identBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,UbiBpr,BalLimpBpr,AjuBpr,IRVBpr,ObsVBpr,CapCalBpr,RecPorCliBpr,fec_cal FROM Balxpro WHERE IdeBpr LIKE {codPro} AND (est_esc LIKE 'PR' OR est_esc LIKE 'DS') ORDER BY IdeComBpr ASC")
+    cursorsqlsrv.execute(f"SELECT IdeComBpr,est_esc,ClaBpr,DesBpr,identBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,UbiBpr,BalLimpBpr,AjuBpr,IRVBpr,ObsVBpr,CapCalBpr,RecPorCliBpr,fec_cal,IdeComBpr AS Aux FROM Balxpro WHERE IdeBpr LIKE {codPro} AND (est_esc LIKE 'PR' OR est_esc LIKE 'DS') ORDER BY IdeComBpr ASC")
     data_cert = cursorsqlsrv.fetchall()
     aux_cert = []
     new_cert = []
@@ -232,14 +232,30 @@ def migrateWithNews(codPro):
     cursormysql.execute(f"SELECT id FROM projects WHERE codPro LIKE '{codPro}'")
     idPro = cursormysql.fetchone()
     
-    for cert in new_cert:
-        cursormysql.execute(f"SELECT id FROM balances WHERE ser LIKE '{cert[7]}'")
-        balance = cursormysql.fetchone()
-        if balance:
-            cursormysql.execute(f"INSERT INTO certificates (codPro,balance_id,project_id,est)VALUES('{cert[0]}',{balance[0]},{idPro[0]},'P')")
-            MySQLConnection.commit()
-        else :
-            print(' crear')
+    aux_cert.extend(new_cert)
+    ## nueva lista de certificados
+    for cert in aux_cert:
+        cursormysql.execute(f"SELECT * FROM certificates WHERE codPro LIKE '{cert[0]}'")
+        certificate = cursormysql.fetchone()
+        # ----- --- si no existe el certificado se lo crea
+        if certificate == None:
+            cursormysql.execute(f"SELECT id FROM balances WHERE ser LIKE '{cert[7]}'")
+            balance = cursormysql.fetchone()
+            if balance:
+                # --- crear el certificado nuevo al final de los ya asignados
+                cursormysql.execute(f"INSERT INTO certificates (codPro,balance_id,project_id,est)VALUES('{cert[0]}',{balance[0]},{idPro[0]},'P')")
+                MySQLConnection.commit()
+            else :
+                print('crear')
+    #         
+    #     else :
+    #         ## --- crea un balanza
+    #         cursormysql.execute(f"INSERT INTO balances (tip,desc,ident,marc,modl,ser,cls,maxCap,usCap,div_e,div_d,uni)VALUES('{cert[0]}',{balance[0]},{idPro[0]},'P')")
+    #         MySQLConnection.commit()
+
+    #         ## --crea el proyecto con la nueva balnza.
+    #         cursormysql.execute(f"INSERT INTO certificates (codPro,balance_id,project_id,est)VALUES('{cert[0]}',{balance[0]},{idPro[0]},'P')")
+    #         MySQLConnection.commit()
 
 #     for cert in aux_cert:
 #         if cert[1] == 'DS':
