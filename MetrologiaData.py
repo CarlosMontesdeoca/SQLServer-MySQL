@@ -258,45 +258,45 @@ def migrateWithNews(codPro):
     #         MySQLConnection.commit()
 
 #     for cert in aux_cert:
-#         if cert[1] == 'DS':
-#             print (f"  ==> DISCARDED CERTIFICATE: {cert[0]}")
-#             cursormysql.execute(f"UPDATE certificates SET est='D', com='{cert[18]}, obs='{cert[18]}' WHERE codPro LIKE '{cert[0]}'")
-#             MySQLConnection.commit()
-#         else:
-#             print (f"  ==> UPLOAD DATA FROM CERTIFICATE: {cert[0]}")
-# ##  modifica los datos del certificado con los datos calculados
-#             try:
-#                 cursormysql.execute(f"UPDATE certificates SET ubi='{cert[14]}',luCal='{cert[14]}',est='RH',evlBal1='{cert[15]}',evlBal2='{cert[16]}',evlBal3='{cert[17]}',obs='{cert[18]}',uso='{cert[19]}',recPor='{cert[20]}',fecCal='{cert[21]}',frmt=11,motr=11 WHERE codPro LIKE '{cert[0]}'")
-#                 MySQLConnection.commit()  
-#                 print ("  ==> SUCCESSFULLY LOADED CERTIFICATE DATA ✅")
-#             except:
-#                 # logs += "==> ERROR LADING CERTIFICATE DATA \n" 
-#                 print ("  ==> ERROR LADING CERTIFICATE DATA ⚠")
-# ##  Seleccionamos el certificado para cargarle un suplemento con informacion de la balanza
-#             cursormysql.execute(f"SELECT id FROM certificates WHERE codPro LIKE '{cert[0]}'")
-#             codCert = cursormysql.fetchone()
+        if cert[1] == 'DS':
+            print (f"  ==> DISCARDED CERTIFICATE: {cert[0]}")
+            cursormysql.execute(f"UPDATE certificates SET est='D', com='{cert[18]}, obs='{cert[18]}' WHERE codPro LIKE '{cert[0]}'")
+            MySQLConnection.commit()
+        else:
+            print (f"  ==> UPLOAD DATA FROM CERTIFICATE: {cert[0]}")
+##  modifica los datos del certificado con los datos calculados
+            try:
+                cursormysql.execute(f"UPDATE certificates SET ubi='{cert[14]}',luCal='{cert[14]}',est='RH',evlBal1='{cert[15]}',evlBal2='{cert[16]}',evlBal3='{cert[17]}',obs='{cert[18]}',uso='{cert[19]}',recPor='{cert[20]}',fecCal='{cert[21]}',frmt=11,motr=11 WHERE codPro LIKE '{cert[0]}'")
+                MySQLConnection.commit()  
+                print ("  ==> SUCCESSFULLY LOADED CERTIFICATE DATA ✅")
+            except:
+                # logs += "==> ERROR LADING CERTIFICATE DATA \n" 
+                print ("  ==> ERROR LADING CERTIFICATE DATA ⚠")
+##  Seleccionamos el certificado para cargarle un suplemento con informacion de la balanza
+            cursormysql.execute(f"SELECT id FROM certificates WHERE codPro LIKE '{cert[0]}'")
+            codCert = cursormysql.fetchone()
 
-# ## ____________________________________________________  BALANZAS   ________________________________________________________________
-#             querrySuplement = f"INSERT INTO suplements (certificate_id,cls,descBl,ident,marc,modl,ser,maxCap,usCap,div_e,div_d,rang,est)VALUES({codCert[0]},'{cert[2]}','{cert[3]}','{cert[4]}','{cert[5]}','{cert[6]}','{cert[7]}',{cert[8]},{cert[9]},{round(cert[10],6)},{round(cert[11],6)},{cert[12]},'A')"
-#             try:
-#                 cursormysql.execute(querrySuplement)
-#                 MySQLConnection.commit() 
-#                 print ("  ==> SUCCESSFULLY LOADED BALANCE DATA ✅")
+## ____________________________________________________  BALANZAS   ________________________________________________________________
+            querrySuplement = f"INSERT INTO suplements (certificate_id,cls,descBl,ident,marc,modl,ser,maxCap,usCap,div_e,div_d,rang,est)VALUES({codCert[0]},'{cert[2]}','{cert[3]}','{cert[4]}','{cert[5]}','{cert[6]}','{cert[7]}',{cert[8]},{cert[9]},{round(cert[10],6)},{round(cert[11],6)},{cert[12]},'A')"
+            try:
+                cursormysql.execute(querrySuplement)
+                MySQLConnection.commit() 
+                print ("  ==> SUCCESSFULLY LOADED BALANCE DATA ✅")
 
-#             except:
-#                 # logs += "==> ERROR LADING BALANCE DATA \n" 
-#                 print ("  ==> ERROR LADING BALANCE DATA ⚠")
-# ###_____________________________________________________AMBIENTALES________________________________________________________________________###
-#             cursorsqlsrv.execute(f"SELECT * FROM Ambientales WHERE IdeComBpr LIKE '{cert[0]}'")
-#             envir = cursorsqlsrv.fetchone() 
-#             try:
-#                 cursormysql.execute(f"INSERT INTO enviroments(certificate_id,codPro,tempIn,tempFn,humIn,humFn)VALUES({codCert[0]},'{cert[0]}',{round(envir[1],2)},{round(envir[2],2)},{round(envir[3],2)},{round(envir[4],2)})")
-#                 MySQLConnection.commit()  
-#                 print (f"  ==> SUCCESSFULLY LOADED ENVIROMENTALS DATA ✅")
+            except:
+                # logs += "==> ERROR LADING BALANCE DATA \n" 
+                print ("  ==> ERROR LADING BALANCE DATA ⚠")
+###_____________________________________________________AMBIENTALES________________________________________________________________________###
+            cursorsqlsrv.execute(f"SELECT * FROM Ambientales WHERE IdeComBpr LIKE '{cert[-1]}'")
+            envir = cursorsqlsrv.fetchone() 
+            try:
+                cursormysql.execute(f"INSERT INTO enviroments(certificate_id,codPro,tempIn,tempFn,humIn,humFn)VALUES({codCert[0]},'{cert[0]}',{round(envir[1],2)},{round(envir[2],2)},{round(envir[3],2)},{round(envir[4],2)})")
+                MySQLConnection.commit()  
+                print (f"  ==> SUCCESSFULLY LOADED ENVIROMENTALS DATA ✅")
 
-#             except:
-#                 # logs += "==> ERROR LADING ENVIROMENT DATA \n" 
-#                 print ("  ==> ERROR LADING ENVIROMENT DATA ⚠") 
+            except:
+                # logs += "==> ERROR LADING ENVIROMENT DATA \n" 
+                print ("  ==> ERROR LADING ENVIROMENT DATA ⚠") 
 
 #     ####### ---------------------------------- INSERTA LOS DATOS DE LAS PRUEBAS DE CALIBRACION --------------------------------------------------#######
             
@@ -419,7 +419,7 @@ def migrateWithNews(codPro):
 #             except:
 #                 # logs += "==> ERROR LADING PESXPRO TEST DATA \n" 
 #                 print ("  ==> ERROR LADING PESXPRO TEST DATA ⚠")
-#         print("♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠")
+        print("♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠")
 
 ##============================================================================================================================================
 ##============================================================================================================================================
