@@ -207,7 +207,7 @@ def migrateSimple(codPro):
 def migrateWithNews(codPro):
     lit = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AG']
     ##  datos primarios del certificados Balxpro    
-    cursorsqlsrv.execute(f"SELECT IdeComBpr,est_esc,ClaBpr,DesBpr,identBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,UbiBpr,BalLimpBpr,AjuBpr,IRVBpr,ObsVBpr,CapCalBpr,RecPorCliBpr,fec_cal,IdeComBpr AS Aux FROM Balxpro WHERE IdeBpr LIKE {codPro} AND (est_esc LIKE 'PR' OR est_esc LIKE 'DS') ORDER BY IdeComBpr ASC")
+    cursorsqlsrv.execute(f"SELECT IdeComBpr,est_esc,ClaBpr,DesBpr,identBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,UbiBpr,BalLimpBpr,AjuBpr,IRVBpr,ObsVBpr,CapCalBpr,RecPorCliBpr,fec_cal,IdeComBpr,FechaRecepcion AS Aux FROM Balxpro WHERE IdeBpr LIKE {codPro} AND (est_esc LIKE 'PR' OR est_esc LIKE 'DS') ORDER BY IdeComBpr ASC")
     data_cert = cursorsqlsrv.fetchall()
     aux_cert = []
     new_cert = []
@@ -266,7 +266,7 @@ def migrateWithNews(codPro):
             print (f"  ==> UPLOAD DATA FROM CERTIFICATE: {cert[0]}")
 ##  modifica los datos del certificado con los datos calculados
             try:
-                cursormysql.execute(f"UPDATE certificates SET ubi='{cert[13]}',luCal='{cert[13]}',est='RH',evlBal1='{cert[14]}',evlBal2='{cert[15]}',evlBal3='{cert[16]}',obs='{cert[17]}',uso='{cert[18]}',recPor='{cert[19]}',fecCal='{cert[20]}',frmt=11,motr=11 WHERE codPro LIKE '{cert[0]}'")
+                cursormysql.execute(f"UPDATE certificates SET ubi='{cert[13]}',luCal='{cert[13]}',est='RH',evlBal1='{cert[14]}',evlBal2='{cert[15]}',evlBal3='{cert[16]}',obs='{cert[17]}',uso='{cert[18]}',recPor='{cert[19]}',fecCal='{cert[20]}',fecRegDt='{cert[22]}',frmt=11,motr=11 WHERE codPro LIKE '{cert[0]}'")
                 MySQLConnection.commit()  
                 print ("  ==> SUCCESSFULLY LOADED CERTIFICATE DATA ✅")
             except:
