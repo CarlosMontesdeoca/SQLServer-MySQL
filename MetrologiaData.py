@@ -266,7 +266,7 @@ def migrateWithNews(codPro):
             print (f"  ==> UPLOAD DATA FROM CERTIFICATE: {cert[0]}")
 ##  modifica los datos del certificado con los datos calculados
             try:
-                cursormysql.execute(f"UPDATE certificates SET ubi='{cert[13]}',luCal='{cert[13]}',est='RH',evlBal1='{cert[14]}',evlBal2='{cert[15]}',evlBal3='{cert[16]}',obs='{cert[17]}',uso='{cert[18]}',recPor='{cert[19]}',fecCal='{cert[20]}',fecRegDt='{cert[22]}',frmt=11,motr=11 WHERE codPro LIKE '{cert[0]}'")
+                cursormysql.execute(f"UPDATE certificates SET ubi='{cert[13]}',luCal='{cert[13]}',est='RH',evlBal1='{cert[14]}',evlBal2='{cert[15]}',evlBal3='{cert[16]}',obs='{cert[17]}',uso='{cert[18]}',recPor='{cert[19]}',fecCal='{cert[20]}',fecRegDt='{cert[22][0:-4]}',frmt=11,motr=11 WHERE codPro LIKE '{cert[0]}'")
                 MySQLConnection.commit()  
                 print ("  ==> SUCCESSFULLY LOADED CERTIFICATE DATA ✅")
             except:
