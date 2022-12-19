@@ -35,53 +35,30 @@ except:
 ##============================================================================================================================================
 ##============================================================================================================================================
     
-def migrateWithNews(codPro):
+def migrateWithNews(listCodPro):
     
-    ##  datos primarios del certificados Balxpro    
-    print(f"SELECT IdeComBpr,est_esc,ClaBpr,DesBpr,identBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,UbiBpr,BalLimpBpr,AjuBpr,IRVBpr,ObsVBpr,CapCalBpr,RecPorCliBpr,fec_cal,FechaRecepcion AS Aux FROM Balxpro WHERE IdeBpr LIKE {codPro} AND (est_esc LIKE 'PR' OR est_esc LIKE 'DS') ORDER BY IdeComBpr ASC")
-    # data_cert = cursorsqlsrv.fetchall()
+    ##  datos primarios del certificados Balxpro
+    for codPro in listCodPro:
+        codPro = codPro[0]
+        cursorsqlsrv.execute(f"SELECT IdeComBpr,est_esc,ClaBpr,DesBpr,identBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,UbiBpr,BalLimpBpr,AjuBpr,IRVBpr,ObsVBpr,CapCalBpr,RecPorCliBpr,fec_cal,FechaRecepcion AS Aux FROM Balxpro WHERE IdeComBpr LIKE '{codPro}' AND (est_esc LIKE 'PR' OR est_esc LIKE 'DS') ORDER BY IdeComBpr ASC")
+        data_cert = cursorsqlsrv.fetchone()
+        # print(data_cert)
 
 
-    ## nueva lista de certificados
-    # for cert in data_cert:
-    #     print(cert[0])
-#         cursormysql.execute(f"SELECT * FROM certificates WHERE codPro LIKE '{cert[0]}'")
-#         certificate = cursormysql.fetchone()
-#         # ----- --- si no existe el certificado se lo crea
-#         if certificate == None:
-#             cursormysql.execute(f"SELECT id FROM balances WHERE ser LIKE '{cert[7]}'")
-#             balance = cursormysql.fetchone()
-#             if balance:
-#                 # --- crear el certificado nuevo al final de los ya asignados
-#                 cursormysql.execute(f"INSERT INTO certificates (codPro,balance_id,project_id,est)VALUES('{cert[0]}',{balance[0]},{idPro[0]},'P')")
-#                 MySQLConnection.commit()
-#             else :
-#                 print('crear')
-#     #         
-#     #     else :
-#     #         ## --- crea un balanza
-#     #         cursormysql.execute(f"INSERT INTO balances (tip,desc,ident,marc,modl,ser,cls,maxCap,usCap,div_e,div_d,uni)VALUES('{cert[0]}',{balance[0]},{idPro[0]},'P')")
-#     #         MySQLConnection.commit()
-
-#     #         ## --crea el proyecto con la nueva balnza.
-#     #         cursormysql.execute(f"INSERT INTO certificates (codPro,balance_id,project_id,est)VALUES('{cert[0]}',{balance[0]},{idPro[0]},'P')")
-#     #         MySQLConnection.commit()
-
-# #     for cert in aux_cert:
-#         if cert[1] == 'DS':
-#             print (f"  ==> DISCARDED CERTIFICATE: {cert[0]}")
-#             cursormysql.execute(f"UPDATE certificates SET est='D', com='{cert[18]}, obs='{cert[18]}' WHERE codPro LIKE '{cert[0]}'")
-#             MySQLConnection.commit()
-#         else:
-#             print (f"  ==> UPLOAD DATA FROM CERTIFICATE: {cert[0]}")
-# ##  modifica los datos del certificado con los datos calculados
-#             try:
-#                 cursormysql.execute(f"UPDATE certificates SET ubi='{cert[13]}',luCal='{cert[13]}',est='RH',evlBal1='{cert[14]}',evlBal2='{cert[15]}',evlBal3='{cert[16]}',obs='{cert[17]}',uso='{cert[18]}',recPor='{cert[19]}',fecCal='{cert[20]}',fecRegDt='{cert[22][0:-4]}',frmt=11,motr=11 WHERE codPro LIKE '{cert[0]}'")
-#                 MySQLConnection.commit()  
-#                 print ("  ==> SUCCESSFULLY LOADED CERTIFICATE DATA ✅")
-#             except:
-#                 # logs += "==> ERROR LADING CERTIFICATE DATA \n" 
-#                 print ("  ==> ERROR LADING CERTIFICATE DATA ⚠")
+    ## ___________COMPARA SI EXISTE EL CERTIFICADO
+        cursormysql.execute(f"SELECT * FROM certificates WHERE codPro LIKE '{codPro}'")
+        myCert = cursormysql.fetchone()
+        if(myCert):
+            print("Existe")
+        else:
+            print("Crear")
+    # try:
+    #     cursormysql.execute(f"UPDATE certificates SET ubi='{cert[13]}',luCal='{cert[13]}',est='RH',evlBal1='{cert[14]}',evlBal2='{cert[15]}',evlBal3='{cert[16]}',obs='{cert[17]}',uso='{cert[18]}',recPor='{cert[19]}',fecCal='{cert[20]}',fecRegDt='{cert[22][0:-4]}',frmt=11,motr=11 WHERE codPro LIKE '{cert[0]}'")
+    #     MySQLConnection.commit()  
+    #     print ("  ==> SUCCESSFULLY LOADED CERTIFICATE DATA ✅")
+    # except:
+    #     # logs += "==> ERROR LADING CERTIFICATE DATA \n" 
+    #     print ("  ==> ERROR LADING CERTIFICATE DATA ⚠")
 # ##  Seleccionamos el certificado para cargarle un suplemento con informacion de la balanza
 #             cursormysql.execute(f"SELECT id FROM certificates WHERE codPro LIKE '{cert[0]}'")
 #             codCert = cursormysql.fetchone()
@@ -254,16 +231,16 @@ print('=========================================================================
 print('CHECKING.......')
 ## Buscaremos todos los certificados si se han recivido datos SQLServer 
 for codtb in data1:
-    codPro = codtb[0]
+    idPro = codtb[0]
     # cursorsqlsrv.execute(f"SELECT ClaBpr,DesBpr,identBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,IdeComBpr,UbiBpr,BalLimpBpr,AjuBpr,IRVBpr,ObsVBpr,CapCalBpr,RecPorCliBpr,fec_cal,fec_proxBpr FROM Balxpro WHERE IdeBpr LIKE {codPro} AND (est_esc LIKE 'PR' OR est_esc LIKE 'DS')")
-    cursorsqlsrv.execute(f"SELECT COUNT(*) FROM Balxpro WHERE IdeBpr LIKE {codPro} AND (est_esc LIKE 'PR' OR est_esc LIKE 'DS')")
-    certificates2 = cursorsqlsrv.fetchone()
+    cursorsqlsrv.execute(f"SELECT IdeComBpr FROM Balxpro WHERE IdeBpr LIKE {idPro} AND (est_esc LIKE 'PR' OR est_esc LIKE 'DS')")
+    certificates2 = cursorsqlsrv.fetchall()
 ## si el proyecto de MySql tiene varios certificados de SQLServer en cola  se concidera que ya recbio todos los datos y se puede migrar información    
-    if certificates2[0] > 0 :
-        cursormysql.execute(f"SELECT COUNT(*) FROM certificates WHERE codPro LIKE '{codPro}%'")
-        certificates1 = cursormysql.fetchone()
-        print(f"MIGRATING PROJECT: {codPro} |||| {certificates2} {certificates1} \n")
-        migrateWithNews(codPro)
+    if len(certificates2) > 0 :
+        cursormysql.execute(f"SELECT codPro FROM certificates WHERE codPro LIKE '{idPro}%'")
+        certificates1 = cursormysql.fetchall()
+        print(f"MIGRATING PROJECT: {idPro} |||| SQL:({len(certificates2)}) MySQL:({len(certificates1)}) \n")
+        migrateWithNews(certificates2)
         print("========================================================================= \n\n")
 print("DATA MIGRATION COMPLETED SUCCESSFULLY")
 
