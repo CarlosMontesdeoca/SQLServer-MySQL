@@ -47,6 +47,7 @@ def migrateWithNews(listCodPro, idPro):
     ## ___________COMPARA SI EXISTE EL CERTIFICADO
         cursormysql.execute(f"SELECT * FROM certificates WHERE codPro LIKE '{codPro}'")
         myCert = cursormysql.fetchone()
+        print( f"=|=|=|=|=|=|=|=|=|=|=|=|=|=|=|=|=== {codPro} =====|=|=|=|=|=|=|=|=|=|=|=|=|=|=|=|=|=|=|=|=|=|=|=|=|=|=|=|")
         if(myCert):
             print("Existe")
         else:
@@ -75,7 +76,7 @@ def migrateWithNews(listCodPro, idPro):
 
 
         try:
-            cursormysql.execute(f"UPDATE certificates SET ubi='{data_cert[13]}',luCal='{data_cert[13]}',est='P',evlBal1='{data_cert[14]}',evlBal2='{data_cert[15]}',evlBal3='{data_cert[16]}',obs='{data_cert[17]}',uso='{data_cert[18]}',recPor='{data_cert[19]}',fecCal='{data_cert[20]}',fecRegDt='{data_cert[21]}',frmt=11,motr=11 WHERE codPro LIKE '{data_cert[0]}'")
+            cursormysql.execute(f"UPDATE certificates SET ubi='{data_cert[13]}',luCal='{data_cert[13]}',est='RH',evlBal1='{data_cert[14]}',evlBal2='{data_cert[15]}',evlBal3='{data_cert[16]}',obs='{data_cert[17]}',uso='{data_cert[18]}',recPor='{data_cert[19]}',fecCal='{data_cert[20]}',fecRegDt='{data_cert[21]}',frmt=11,motr=11 WHERE codPro LIKE '{data_cert[0]}'")
             MySQLConnection.commit()  
             print ("  ==> SUCCESSFULLY LOADED CERTIFICATE DATA ✅")
         except:
