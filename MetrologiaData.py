@@ -39,7 +39,7 @@ def migrateWithNews(listCodPro, idPro):
     ##  datos primarios del certificados Balxpro
     for codPro in listCodPro:
         codPro = codPro[0]
-        cursorsqlsrv.execute(f"SELECT IdeComBpr,est_esc,ClaBpr,DesBpr,identBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,UbiBpr,BalLimpBpr,AjuBpr,IRVBpr,ObsVBpr,CapCalBpr,RecPorCliBpr,fec_cal,FechaRecepcion AS Aux FROM Balxpro WHERE IdeComBpr LIKE '{codPro}' AND (est_esc LIKE 'PR' OR est_esc LIKE 'DS') ORDER BY IdeComBpr ASC")
+        cursorsqlsrv.execute(f"SELECT IdeComBpr,est_esc,ClaBpr,DesBpr,identBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,UbiBpr,BalLimpBpr,AjuBpr,IRVBpr,ObsVBpr,CapCalBpr,RecPorCliBpr,fec_cal,FechaRecepcion,UniDivEscBpr AS Aux FROM Balxpro WHERE IdeComBpr LIKE '{codPro}' AND (est_esc LIKE 'PR' OR est_esc LIKE 'DS') ORDER BY IdeComBpr ASC")
         data_cert = cursorsqlsrv.fetchone()
         # print(data_cert)
 
@@ -59,7 +59,7 @@ def migrateWithNews(listCodPro, idPro):
             else: 
                 # create balance
                 clsBl = data_cert[2]
-                if (clsBl == 'camionera'):
+                if (clsBl == 'Camionera'):
                     clsBl = 'CAM'
                 cursormysql.execute(f"INSERT INTO balances (tip,marc,modl,ser,cls,maxCap,usCap,div_e,div_d,uni) VALUES ('{data_cert[3]}','{data_cert[5]}','{data_cert[6]}','{data_cert[7]}','{clsBl}',{data_cert[8]},{data_cert[9]},{round(data_cert[10],6)},{round(data_cert[11],6)},'kg')")
                 MySQLConnection.commit()
@@ -94,7 +94,7 @@ def migrateWithNews(listCodPro, idPro):
     if (isDiscard):
 
     ## ____________________________________________________  BALANZAS   ________________________________________________________________
-            querrySuplement = f"INSERT INTO suplements (certificate_id,cls,descBl,ident,marc,modl,ser,maxCap,usCap,div_e,div_d,rang,est)VALUES({codCert[0]},'{data_cert[2]}','{data_cert[3]}','{data_cert[4]}','{data_cert[5]}','{data_cert[6]}','{data_cert[7]}',{data_cert[8]},{data_cert[9]},{round(data_cert[10],6)},{round(data_cert[11],6)},{data_cert[12]},'A')"
+            querrySuplement = f"INSERT INTO suplements (certificate_id,cls,descBl,ident,marc,modl,ser,maxCap,usCap,div_e,div_d,rang,uni,est)VALUES({codCert[0]},'{data_cert[2]}','{data_cert[3]}','{data_cert[4]}','{data_cert[5]}','{data_cert[6]}','{data_cert[7]}',{data_cert[8]},{data_cert[9]},{round(data_cert[10],6)},{round(data_cert[11],6)},{data_cert[12]},'{data_cert[22]}','A')"
             try:
                 cursormysql.execute(querrySuplement)
                 MySQLConnection.commit() 
@@ -216,6 +216,7 @@ def migrateWithNews(listCodPro, idPro):
                 if idCertItm:
                     listCert[certItems[crt][0]] = idCertItm[0]
                     try: 
+                        print(f"INSERT INTO cert_item_certificate(cert_item_id,certificate_id,codUni)VALUES({idCertItm[0]},{codCert[0]},{idCertItm[0]}{codCert[0]})")
                         cursormysql.execute(f"INSERT INTO cert_item_certificate(cert_item_id,certificate_id,codUni)VALUES({idCertItm[0]},{codCert[0]},{idCertItm[0]}{codCert[0]})")
                         MySQLConnection.commit()  
                         print ("  ==> SUCCESSFULLY LOADED RELATION CERTIFICATE WITH CERT_ITEM ✅")
