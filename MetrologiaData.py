@@ -81,18 +81,18 @@ for codtb in data1:
                     if (clsBl == 'Camionera'):
                         clsBl = 'CAM'
                     try: 
-                        # cursormysql.execute(f"INSERT INTO balances (tip,marc,modl,ser,cls,maxCap,usCap,div_e,div_d,uni) VALUES ('{data_cert[3]}','{data_cert[5]}','{data_cert[6]}','{data_cert[7]}','{clsBl}',{data_cert[8]},{data_cert[9]},{round(data_cert[10],6)},{round(data_cert[11],6)},'kg')")
-                        # MySQLConnection.commit()
+                        cursormysql.execute(f"INSERT INTO balances (tip,marc,modl,ser,cls,maxCap,usCap,div_e,div_d,uni) VALUES ('{data_cert[3]}','{data_cert[5]}','{data_cert[6]}','{data_cert[7]}','{clsBl}',{data_cert[8]},{data_cert[9]},{round(data_cert[10],6)},{round(data_cert[11],6)},'kg')")
+                        MySQLConnection.commit()
                         print(f"        ==> SUCCESSFULLY TO CREATED NEW BALANCE FOR CERTIFICATE {codPro} ✅")
                     except:
                         logs += f"==> ERROR TO CREATED NEW BALANCE FOR CERTIFICATE {codPro} ⚠ \n" 
                         print('        ==> ERROR TO CREATED NEW BALANCE ⚠')
-                    # cursormysql.execute(f"SELECT id FROM balances WHERE ser LIKE '{data_cert[7]}' AND marc like '{data_cert[5]}'")
-                    # myBals = cursormysql.fetchone()
+                    cursormysql.execute(f"SELECT id FROM balances WHERE ser LIKE '{data_cert[7]}' AND marc like '{data_cert[5]}'")
+                    myBals = cursormysql.fetchone()
                 print(f"     ==> CREATING NEW CERTIFICATE {codPro}..")
                 try:
-                    # cursormysql.execute(f"INSERT INTO certificates (codPro,balance_id,project_id) VALUES ('{codPro}',{myBals[0]},{idPro})")
-                    # MySQLConnection.commit()
+                    cursormysql.execute(f"INSERT INTO certificates (codPro,balance_id,project_id) VALUES ('{codPro}',{myBals[0]},{idPro})")
+                    MySQLConnection.commit()
                     print(f"        ==> SUCCESSFULLY CREATED NEW CERTIFICATE {codPro} ✅")
                 except:
                     logs += f"==> ERROR LADING CERTIFICATE {codPro} \n" 
@@ -108,8 +108,8 @@ for codtb in data1:
                 querryCertificate = f"UPDATE certificates SET ubi='{data_cert[13]}',luCal='{data_cert[13]}',est='RH',evlBal1='{data_cert[14]}',evlBal2='{data_cert[15]}',evlBal3='{data_cert[16]}',obs='{data_cert[17]}',uso='{data_cert[18]}',recPor='{data_cert[19]}',fecCal='{data_cert[20]}',fecRegDt='{data_cert[21]}',frmt=11,motr=11 WHERE codPro LIKE '{data_cert[0]}'"
             print(f"   ==> UPDATING CERTIFICATE DATA: {data_cert[0]}..")
             try:
-                # cursormysql.execute(querryCertificate)
-                # MySQLConnection.commit()  
+                cursormysql.execute(querryCertificate)
+                MySQLConnection.commit()  
                 print (f"      ==> SUCCESSFULLY LOADED CERTIFICATE DATA || EST: {data_cert[1]} ✅")
             except:
                 logs += f"==> ERROR LADING CERTIFICATE DATA ⚠\n" 
@@ -141,8 +141,8 @@ for codtb in data1:
                 envir = cursorsqlsrv.fetchone() 
                 print("     ==> UPLOADING DATA ENVIRONMENT..")
                 try:
-                    # cursormysql.execute(f"INSERT INTO enviroments(certificate_id,codPro,tempIn,tempFn,humIn,humFn)VALUES({codCert[0]},'{data_cert[0]}',{round(envir[1],2)},{round(envir[2],2)},{round(envir[3],2)},{round(envir[4],2)})")
-                    # MySQLConnection.commit()  
+                    cursormysql.execute(f"INSERT INTO enviroments(certificate_id,codPro,tempIn,tempFn,humIn,humFn)VALUES({codCert[0]},'{data_cert[0]}',{round(envir[1],2)},{round(envir[2],2)},{round(envir[3],2)},{round(envir[4],2)})")
+                    MySQLConnection.commit()  
                     print (f"        ==> SUCCESSFULLY LOADED ENVIROMENTALS DATA ✅")
 
                 except:
@@ -177,23 +177,23 @@ for codtb in data1:
                     querryRepet = f"SELECT * FROM RepetIII_Cab C JOIN RepetIII_Det D ON C.IdeComBpr = D.CodRiii_C WHERE C.IdeComBpr LIKE '{data_cert[0]}'"
 
     ## __________________________________________________ EXENTRICIDAD __________________________________________________
-                # cursorsqlsrv.execute(querryExcCad)
-                # exectCad = cursorsqlsrv.fetchall()
-                # cursorsqlsrv.execute(querryExcDet)
-                # exectDet = cursorsqlsrv.fetchall()
+                cursorsqlsrv.execute(querryExcCad)
+                exectCad = cursorsqlsrv.fetchall()
+                cursorsqlsrv.execute(querryExcDet)
+                exectDet = cursorsqlsrv.fetchall()
 
     ## --------------------------- crear el querry para insertar los datos de pruebas de exentricidad
-                # for pex in [0,1]:
-                #     if data_cert[2] == 'Camionera':
-                #         querryInsertExc = querryInsertExc + f"('{data_cert[0]}{exectCad[pex][2]}',{codCert[0]},{exectCad[pex][1]},{exectCad[pex][2]},{round(exectDet[pex][6],5)},{round(exectDet[pex][7],5)},{round(exectDet[pex][1],5)},{round(exectDet[pex][2],5)},{round(exectDet[pex][3],5)},{round(exectDet[pex][4],5)},{round(exectDet[pex][5],5)},{round(exectDet[pex][6],5)},'{exectCad[pex][4]}' ),"
-                #     else :
-                #         querryInsertExc = querryInsertExc + f"('{data_cert[0]}{exectCad[pex][2]}',{codCert[0]},{exectCad[pex][1]},{exectCad[pex][2]},{round(exectDet[pex][6],5)},{round(exectDet[pex][7],5)},{round(exectDet[pex][1],5)},{round(exectDet[pex][2],5)},{round(exectDet[pex][3],5)},{round(exectDet[pex][4],5)},{round(exectDet[pex][5],5)},'{exectCad[pex][4]}' ),"
+                for pex in [0,1]:
+                    if data_cert[2] == 'Camionera':
+                        querryInsertExc = querryInsertExc + f"('{data_cert[0]}{exectCad[pex][2]}',{codCert[0]},{exectCad[pex][1]},{exectCad[pex][2]},{round(exectDet[pex][6],5)},{round(exectDet[pex][7],5)},{round(exectDet[pex][1],5)},{round(exectDet[pex][2],5)},{round(exectDet[pex][3],5)},{round(exectDet[pex][4],5)},{round(exectDet[pex][5],5)},{round(exectDet[pex][6],5)},'{exectCad[pex][4]}' ),"
+                    else :
+                        querryInsertExc = querryInsertExc + f"('{data_cert[0]}{exectCad[pex][2]}',{codCert[0]},{exectCad[pex][1]},{exectCad[pex][2]},{round(exectDet[pex][6],5)},{round(exectDet[pex][7],5)},{round(exectDet[pex][1],5)},{round(exectDet[pex][2],5)},{round(exectDet[pex][3],5)},{round(exectDet[pex][4],5)},{round(exectDet[pex][5],5)},'{exectCad[pex][4]}' ),"
                 
     ## -------------------------- insercion de pruebas de exentricidad
                 print("     ==> UPLOADING DATA ECCENTRUCUTY TEST DATA..")
                 try:
-                    # cursormysql.execute(querryInsertExc[:-1])
-                    # MySQLConnection.commit() 
+                    cursormysql.execute(querryInsertExc[:-1])
+                    MySQLConnection.commit() 
                     print ("        ==> SUCCESSFULLY LOADED ECCENTRICITY TEST DATA ✅")
                 except:
                     logs += f"==> ERROR LADING ECCENTRICITY TEST DATA ⚠ || {data_cert[0]}\n"
@@ -211,8 +211,8 @@ for codtb in data1:
                     else: 
                         querryInsertRept = f"INSERT INTO repeatests(codPro,certificate_id,intCarg,maxDif,maxErr,lec1,lec1_0,lec2,lec2_0,lec3,lec3_0,evl) VALUES ('{data_cert[0]}',{codCert[0]},{repet[1]},{round(repet[2],5)},{round(repet[3],5)},{round(repet[7],5)},{round(repet[8],5)},{round(repet[9],5)},{round(repet[10],5)},{round(repet[11],5)},{round(repet[12],5)},'{repet[4]}')"
                     
-                    # cursormysql.execute(querryInsertRept)
-                    # MySQLConnection.commit() 
+                    cursormysql.execute(querryInsertRept)
+                    MySQLConnection.commit() 
                     print ("        ==> SUCCESSFULLY LOADED REPETIBILITY TEST DATA ✅")
                 except:
                     logs += f"==> ERROR LADING REPEATABILITY TEST DATA ⚠ || {data_cert[0]}\n" 
@@ -226,14 +226,14 @@ for codtb in data1:
 
                 ## ------ Querry para pruebas de Carga
                 querryInsertCrg = "INSERT INTO cargtests(codPro, certificate_id, numPr, intCarg, lecAsc, lecDesc, errAsc, errDesc, maxErr, evl) VALUES "
-                # for pcar in range(0,len(cargCad)):
-                #     querryInsertCrg = querryInsertCrg + f"('{data_cert[0]}{cargCad[pcar][2]}',{codCert[0]},{cargCad[pcar][2]},{round(cargCad[pcar][1],3)},{round(cargDet[pcar][1],3)},{round(cargDet[pcar][2],3)},{round(cargDet[pcar][3],3)},{round(cargDet[pcar][4],3)},{round(cargDet[pcar][5],3)},'{cargCad[pcar][4]}'),"
+                for pcar in range(0,len(cargCad)):
+                    querryInsertCrg = querryInsertCrg + f"('{data_cert[0]}{cargCad[pcar][2]}',{codCert[0]},{cargCad[pcar][2]},{round(cargCad[pcar][1],3)},{round(cargDet[pcar][1],3)},{round(cargDet[pcar][2],3)},{round(cargDet[pcar][3],3)},{round(cargDet[pcar][4],3)},{round(cargDet[pcar][5],3)},'{cargCad[pcar][4]}'),"
                 
                 ## ------ Insercion de pruebas de Carga
                 print("     ==> UPLOADING DATA WEIGTH TEST DATA..")
                 try:
-                    # cursormysql.execute(querryInsertCrg[:-1])
-                    # MySQLConnection.commit()  
+                    cursormysql.execute(querryInsertCrg[:-1])
+                    MySQLConnection.commit()  
                     print ("        ==> SUCCESSFULLY LOADED WEIGTH TEST DATA ✅")
                 except:
                     logs += f"==> ERROR LADING WEIGTH TEST DATA ⚠ || {data_cert[0]}\n" 
@@ -254,8 +254,8 @@ for codtb in data1:
                     if idCertItm:
                         listCert[certItems[crt][0]] = idCertItm[0]
                         try: 
-                            # cursormysql.execute(f"INSERT INTO cert_item_certificate(cert_item_id,certificate_id,codUni)VALUES({idCertItm[0]},{codCert[0]},{idCertItm[0]}{codCert[0]})")
-                            # MySQLConnection.commit()  
+                            cursormysql.execute(f"INSERT INTO cert_item_certificate(cert_item_id,certificate_id,codUni)VALUES({idCertItm[0]},{codCert[0]},{idCertItm[0]}{codCert[0]})")
+                            MySQLConnection.commit()  
                             print ("        || ==> SUCCESSFULLY LOADED RELATION CERTIFICATE WITH CERT_ITEM ✅")
                         except:
                             logs += f"==> ERROR IN FIND CERTITEMS ⚠ || {data_cert[0]}\n" 
@@ -271,8 +271,8 @@ for codtb in data1:
                 
                 print("     ==> UPLOADING PEXPROXS..")
                 try:
-                    # cursormysql.execute(querryInsertPex[:-1])
-                    # MySQLConnection.commit()  
+                    cursormysql.execute(querryInsertPex[:-1])
+                    MySQLConnection.commit()  
                     print ("        ==> SUCCESSFULLY LOADED PESXPRO TEST DATA ✅")
                 except:
                     logs += f"==> ERROR LADING PESXPRO TEST DATA ⚠ || {data_cert[0]}\n" 
@@ -280,8 +280,11 @@ for codtb in data1:
         print("\n♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠")
         print("========================================================================= \n\n")
 print("DATA MIGRATION COMPLETED SUCCESSFULLY")
+# if logs != '':
+#     file = open(f"./LogMySQL-{today}.txt", "a")
+#     file.write(logs)
+#     file.close()
 
-print(logs)
 
 MySQLConnection.close()
 SQLServerConnection.close()
