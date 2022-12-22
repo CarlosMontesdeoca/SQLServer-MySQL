@@ -112,7 +112,7 @@ for codtb in data1:
                 # MySQLConnection.commit()  
                 print (f"      ==> SUCCESSFULLY LOADED CERTIFICATE DATA || EST: {data_cert[1]} ✅")
             except:
-                logs += "==> ERROR LADING CERTIFICATE DATA ⚠\n" 
+                logs += f"==> ERROR LADING CERTIFICATE DATA ⚠\n" 
                 print ("      ==> ERROR LADING CERTIFICATE DATA ⚠")
 
     ##  ______________________________ SELECCIONE Y SUBE LOS SUPLEMENTOS DE BALAZAS _______________________________________
@@ -132,7 +132,7 @@ for codtb in data1:
                     print ("        ==> SUCCESSFULLY LOADED BALANCE DATA ✅")
 
                 except:
-                    logs += "==> ERROR LADING BALANCE DATA \n" 
+                    logs += f"==> ERROR LADING BALANCE DATA || {data_cert[0]}\n" 
                     print ("        ==> ERROR LADING BALANCE DATA ⚠")
 
     ## _____________________________________________________AMBIENTALES__________________________________________________________________
@@ -146,7 +146,7 @@ for codtb in data1:
                     print (f"        ==> SUCCESSFULLY LOADED ENVIROMENTALS DATA ✅")
 
                 except:
-                    logs += "==> ERROR LADING ENVIROMENT DATA ⚠ \n" 
+                    logs += f"==> ERROR LADING ENVIROMENT DATA ⚠ || {data_cert[0]}\n" 
                     print ("        ==> ERROR LADING ENVIROMENT DATA ⚠") 
 
     ####### ---------------------------------- INSERTA LOS DATOS DE LAS PRUEBAS DE CALIBRACION --------------------------------------------------#######
@@ -196,7 +196,7 @@ for codtb in data1:
                     # MySQLConnection.commit() 
                     print ("        ==> SUCCESSFULLY LOADED ECCENTRICITY TEST DATA ✅")
                 except:
-                    logs += "==> ERROR LADING ECCENTRICITY TEST DATA ⚠ \n"
+                    logs += f"==> ERROR LADING ECCENTRICITY TEST DATA ⚠ || {data_cert[0]}\n"
                     print ("        ==> ERROR LADING ECCENTRICITY TEST DATA ⚠")
 
     ## --------------------------- Datos de Pruebas de repetibilidad
@@ -215,7 +215,7 @@ for codtb in data1:
                     # MySQLConnection.commit() 
                     print ("        ==> SUCCESSFULLY LOADED REPETIBILITY TEST DATA ✅")
                 except:
-                    logs += "==> ERROR LADING REPEATABILITY TEST DATA ⚠\n" 
+                    logs += f"==> ERROR LADING REPEATABILITY TEST DATA ⚠ || {data_cert[0]}\n" 
                     print ("        ==> ERROR LADING REPEATABILITY TEST DATA ⚠")
 
     ## --------------------------------- Datos de pruebas de Carga
@@ -236,7 +236,7 @@ for codtb in data1:
                     # MySQLConnection.commit()  
                     print ("        ==> SUCCESSFULLY LOADED WEIGTH TEST DATA ✅")
                 except:
-                    logs += "==> ERROR LADING WEIGTH TEST DATA ⚠\n" 
+                    logs += f"==> ERROR LADING WEIGTH TEST DATA ⚠ || {data_cert[0]}\n" 
                     print ("        ==> ERROR LADING WEIGTH TEST DATA ⚠")
 
     ## ------------------------------ Datos de pruebas de Pesas
@@ -258,7 +258,7 @@ for codtb in data1:
                             # MySQLConnection.commit()  
                             print ("        || ==> SUCCESSFULLY LOADED RELATION CERTIFICATE WITH CERT_ITEM ✅")
                         except:
-                            logs += "==> ERROR IN FIND CERTITEMS ⚠\n" 
+                            logs += f"==> ERROR IN FIND CERTITEMS ⚠ || {data_cert[0]}\n" 
                             print('        || ==> ERROR IN FIND CERTITEMS ⚠')
                 querryInsertPex = "INSERT INTO cargpesxes(codPro, cert_item_id, tip, keyJ, N1, N2, N2A, N5, N10, N20, N20A, N50, N100, N200, N200A, N500, N1000, N2000, N2000A, N5000, N10000, N20000, N500000, N1000000, CrgPxp1, CrgPxp2, CrgPxp3, CrgPxp4, CrgPxp5, CrgPxp6, AjsPxp) VALUES"
                 for pexs in range(0,len(pesxpro)):
@@ -275,11 +275,13 @@ for codtb in data1:
                     # MySQLConnection.commit()  
                     print ("        ==> SUCCESSFULLY LOADED PESXPRO TEST DATA ✅")
                 except:
-                    logs += "==> ERROR LADING PESXPRO TEST DATA ⚠\n" 
+                    logs += f"==> ERROR LADING PESXPRO TEST DATA ⚠ || {data_cert[0]}\n" 
                     print ("        ==> ERROR LADING PESXPRO TEST DATA ⚠")
         print("\n♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠")
         print("========================================================================= \n\n")
 print("DATA MIGRATION COMPLETED SUCCESSFULLY")
+
+print(logs)
 
 MySQLConnection.close()
 SQLServerConnection.close()
