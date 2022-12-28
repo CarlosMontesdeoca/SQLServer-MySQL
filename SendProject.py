@@ -71,7 +71,7 @@ loc = 'GYE/MTA'
 if(clientInfo[10] == 'QUITO'):
     loc = 'UIO'
 
-cursorsqlsrv.execute(f"IF NOT EXISTS ( SELECT * FROM Proyectos WHERE idepro LIKE {codPro} ) BEGIN INSERT INTO Proyectos (EstPro, FecPro, FecSigCalPro, CodCli, Idepro, CodMet, LocPro) VALUES ('A','{strdate[0:10]}','{dateLong}',{CodCli[0]}, {codPro}, {CodMet[0]}, '{loc}') END")
+cursorsqlsrv.execute(f"IF NOT EXISTS ( SELECT * FROM Proyectos WHERE idepro LIKE {codPro} ) BEGIN INSERT INTO Proyectos (EstPro, FecPro, FecSigCalPro, CodCli, Idepro, CodMet, LocPro) VALUES (?,?,?,?,?,?,?) END",'A','{strdate[0:10]}','{dateLong}',{CodCli[0]}, {codPro}, {CodMet[0]}, '{loc}')
 SQLServerConnection.commit()
 
 cursorsqlsrv.execute(f"SELECT CodPro FROM Proyectos WHERE Idepro LIKE {codPro}")
