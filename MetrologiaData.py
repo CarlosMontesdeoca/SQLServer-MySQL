@@ -129,7 +129,7 @@ for codtb in data1:
                 print("     ==> UPLOADING DATA SUPLEMENT..")
                 try:
                     uniSpl = 'g'
-                    if uniSpl == 'k':
+                    if data_cert[22] == 'k':
                         uniSpl = 'kg'
                     querrySuplement = f"INSERT INTO suplements (certificate_id,cls,descBl,ident,marc,modl,ser,maxCap,usCap,div_e,div_d,rang,uni,est)VALUES({codCert[0]},'{data_cert[2]}','{data_cert[3]}','{data_cert[4]}','{data_cert[5]}','{data_cert[6]}','{data_cert[7]}',{data_cert[8]},{data_cert[9]},{round(data_cert[10],6)},{round(data_cert[11],6)},{data_cert[12]},'{uniSpl}','A')"
                     cursormysql.execute(querrySuplement)
