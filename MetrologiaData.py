@@ -7,7 +7,7 @@ from datetime import date
 today = date.today()
 
 server1='tcp:192.168.9.221'
-dbname1='DevSisMetPrec'
+dbname1='dEVSisMetPrec'
 user1='sa'
 password1='Sistemas123*'
 
@@ -21,7 +21,7 @@ except:
     print ('error to try connect the database SQL Server')
 
 try:
-    MySQLConnection = pymysql.connect(host="127.0.0.1",user="root",passwd="",database="test" )
+    MySQLConnection = pymysql.connect(host="127.0.0.1",user="root",passwd="",database="metrologia" )
     print (" ==> CONNECCTION SUCCESS WITH MYSQL")
 except:
     logs += "==> error to try connect the database MySQL \n" 
@@ -34,7 +34,7 @@ print('=========================================================================
 ## CUSORES DE CONSULTAS 
 cursorsqlsrv = SQLServerConnection.cursor()
 cursormysql = MySQLConnection.cursor()
-## ==============================================================
+## ===================================================6===========
 
 print('SEARCHING PENDING DATA....')
 ## busca todos los proyectos pendientes de MySQL
@@ -45,7 +45,7 @@ print(data1, len(data1))
 print('=========================================================================')
 
 print('CHECKING.......')
-## Buscaremos todos los certificados si se han recivido datos SQLServer 
+# Buscaremos todos los certificados si se han recivido datos SQLServer 
 for codtb in data1:
     idPro = codtb[0]
     # cursorsqlsrv.execute(f"SELECT ClaBpr,DesBpr,identBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,IdeComBpr,UbiBpr,BalLimpBpr,AjuBpr,IRVBpr,ObsVBpr,CapCalBpr,RecPorCliBpr,fec_cal,fec_proxBpr FROM Balxpro WHERE IdeBpr LIKE {codPro} AND (est_esc LIKE 'PR' OR est_esc LIKE 'DS')")
@@ -114,6 +114,7 @@ for codtb in data1:
                 MySQLConnection.commit()  
                 print (f"      ==> SUCCESSFULLY LOADED CERTIFICATE DATA || EST: {data_cert[1]} ✅")
             except:
+                print(querryCertificate)
                 logs += f"==> ERROR LADING CERTIFICATE DATA ⚠\n" 
                 print ("      ==> ERROR LADING CERTIFICATE DATA ⚠")
 
@@ -130,10 +131,11 @@ for codtb in data1:
                 try:
                     querrySuplement = f"INSERT INTO suplements (certificate_id,cls,descBl,ident,marc,modl,ser,maxCap,usCap,div_e,div_d,rang,uni,est)VALUES({codCert[0]},'{data_cert[2]}','{data_cert[3]}','{data_cert[4]}','{data_cert[5]}','{data_cert[6]}','{data_cert[7]}',{data_cert[8]},{data_cert[9]},{round(data_cert[10],6)},{round(data_cert[11],6)},{data_cert[12]},'{data_cert[22]}','A')"
                     cursormysql.execute(querrySuplement)
-                    # MySQLConnection.commit() 
+                    MySQLConnection.commit() 
                     print ("        ==> SUCCESSFULLY LOADED BALANCE DATA ✅")
 
                 except:
+                    print(querrySuplement)
                     logs += f"==> ERROR LADING BALANCE DATA || {data_cert[0]}\n" 
                     print ("        ==> ERROR LADING BALANCE DATA ⚠")
 
