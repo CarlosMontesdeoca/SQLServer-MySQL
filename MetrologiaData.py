@@ -61,7 +61,7 @@ for codtb in data1:
         idPro = certificates1[0][1]
         for codPro in listCodPro:
             codPro = codPro[0]
-            cursorsqlsrv.execute(f"SELECT IdeComBpr,est_esc,ClaBpr,DesBpr,identBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,UbiBpr,BalLimpBpr,AjuBpr,IRVBpr,ObsVBpr,CapCalBpr,RecPorCliBpr,fec_cal,FechaRecepcion,UniDivEscBpr AS Aux FROM Balxpro WHERE IdeComBpr LIKE '{codPro}' AND (est_esc LIKE 'PR' OR est_esc LIKE 'DS') ORDER BY IdeComBpr ASC")
+            cursorsqlsrv.execute(f"SELECT IdeComBpr,est_esc,ClaBpr,DesBpr,identBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,UbiBpr,BalLimpBpr,AjuBpr,IRVBpr,ObsVBpr,CapCalBpr,RecPorCliBpr,fec_cal,FechaRecepcion,UniDivEscBpr,lugcalBpr AS Aux FROM Balxpro WHERE IdeComBpr LIKE '{codPro}' AND (est_esc LIKE 'PR' OR est_esc LIKE 'DS') ORDER BY IdeComBpr ASC")
             data_cert = cursorsqlsrv.fetchone()
             # print(data_cert)
 
@@ -107,7 +107,7 @@ for codtb in data1:
                 isDiscard = False
                 querryCertificate = f"UPDATE certificates SET est='D' WHERE codPro LIKE '{data_cert[0]}'"
             else :
-                querryCertificate = f"UPDATE certificates SET ubi='{data_cert[13]}',luCal='{data_cert[13]}',est='RH',evlBal1='{data_cert[14]}',evlBal2='{data_cert[15]}',evlBal3='{data_cert[16]}',obs='{data_cert[17]}',uso='{data_cert[18]}',recPor='{data_cert[19]}',fecCal='{data_cert[20]}',fecRegDt='{data_cert[21]}',frmt=11,motr=11 WHERE codPro LIKE '{data_cert[0]}'"
+                querryCertificate = f"UPDATE certificates SET ubi='{data_cert[13]}',luCal='{data_cert[23]}',est='RH',evlBal1='{data_cert[14]}',evlBal2='{data_cert[15]}',evlBal3='{data_cert[16]}',obs='{data_cert[17]}',uso='{data_cert[18]}',recPor='{data_cert[19]}',fecCal='{data_cert[20]}',fecRegDt='{data_cert[21]}',frmt=11,motr=11 WHERE codPro LIKE '{data_cert[0]}'"
             print(f"   ==> UPDATING CERTIFICATE DATA: {data_cert[0]}..")
             try:
                 cursormysql.execute(querryCertificate)
@@ -129,7 +129,10 @@ for codtb in data1:
                 
                 print("     ==> UPLOADING DATA SUPLEMENT..")
                 try:
-                    querrySuplement = f"INSERT INTO suplements (certificate_id,cls,descBl,ident,marc,modl,ser,maxCap,usCap,div_e,div_d,rang,uni,est)VALUES({codCert[0]},'{data_cert[2]}','{data_cert[3]}','{data_cert[4]}','{data_cert[5]}','{data_cert[6]}','{data_cert[7]}',{data_cert[8]},{data_cert[9]},{round(data_cert[10],6)},{round(data_cert[11],6)},{data_cert[12]},'{data_cert[22]}','A')"
+                    uniSpl = 'g'
+                    if data_cert[22] == 'k':
+                        uniSpl = 'kg'
+                    querrySuplement = f"INSERT INTO suplements (certificate_id,cls,descBl,ident,marc,modl,ser,maxCap,usCap,div_e,div_d,rang,uni,est)VALUES({codCert[0]},'{data_cert[2]}','{data_cert[3]}','{data_cert[4]}','{data_cert[5]}','{data_cert[6]}','{data_cert[7]}',{data_cert[8]},{data_cert[9]},{round(data_cert[10],6)},{round(data_cert[11],6)},{data_cert[12]},'{uniSpl}','A')"
                     cursormysql.execute(querrySuplement)
                     MySQLConnection.commit() 
                     print ("        ==> SUCCESSFULLY LOADED BALANCE DATA ✅")
