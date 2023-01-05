@@ -61,7 +61,7 @@ for codtb in data1:
         idPro = certificates1[0][1]
         for codPro in listCodPro:
             codPro = codPro[0]
-            cursorsqlsrv.execute(f"SELECT IdeComBpr,est_esc,ClaBpr,DesBpr,identBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,UbiBpr,BalLimpBpr,AjuBpr,IRVBpr,ObsVBpr,CapCalBpr,RecPorCliBpr,fec_cal,FechaRecepcion,UniDivEscBpr,lugcalBpr AS Aux FROM Balxpro WHERE IdeComBpr LIKE '{codPro}' AND (est_esc LIKE 'PR' OR est_esc LIKE 'DS') ORDER BY IdeComBpr ASC")
+            cursorsqlsrv.execute(f"SELECT IdeComBpr,est_esc,ClaBpr,DesBpr,identBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,UbiBpr,BalLimpBpr,AjuBpr,IRVBpr,ObsVBpr,CapCalBpr,RecPorCliBpr,fec_cal,FechaRecepcion,UniDivEscBpr,lugcalBpr,RecPorCliBpr FROM Balxpro WHERE IdeComBpr LIKE '{codPro}' AND (est_esc LIKE 'PR' OR est_esc LIKE 'DS') ORDER BY IdeComBpr ASC")
             data_cert = cursorsqlsrv.fetchone()
             # print(data_cert)
 
@@ -110,6 +110,11 @@ for codtb in data1:
                 querryCertificate = f"UPDATE certificates SET ubi='{data_cert[13]}',luCal='{data_cert[23]}',est='RH',evlBal1='{data_cert[14]}',evlBal2='{data_cert[15]}',evlBal3='{data_cert[16]}',obs='{data_cert[17]}',uso='{data_cert[18]}',recPor='{data_cert[19]}',fecCal='{data_cert[20]}',fecRegDt='{data_cert[21]}',frmt=11,motr=11 WHERE codPro LIKE '{data_cert[0]}'"
             print(f"   ==> UPDATING CERTIFICATE DATA: {data_cert[0]}..")
             try:
+                try: 
+                    cursormysql.execute(f"UPDATE projects SET recPor = '{data_cert[24]}' WHERE codPro LIKE '{data_cert[0][0:-1]}'")
+                except: 
+                    logs += f"==> ERROR TO WRITE RECIVIER ⚠\n" 
+                    print ("      ==> ERROR TO WRITE RECIVIER ⚠")
                 cursormysql.execute(querryCertificate)
                 MySQLConnection.commit()  
                 print (f"      ==> SUCCESSFULLY LOADED CERTIFICATE DATA || EST: {data_cert[1]} ✅")
