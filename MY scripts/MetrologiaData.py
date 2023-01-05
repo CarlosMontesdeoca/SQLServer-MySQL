@@ -7,7 +7,7 @@ from datetime import date
 today = date.today()
 
 server1='tcp:192.168.9.221'
-dbname1='DevSisMetPrec'
+dbname1='SisMetPrec'
 user1='sa'
 password1='Sistemas123*'
 
@@ -21,7 +21,7 @@ except:
     print ('error to try connect the database SQL Server')
 
 try:
-    MySQLConnection = pymysql.connect(host="127.0.0.1",user="root",passwd="",database="test" )
+    MySQLConnection = pymysql.connect(host="127.0.0.1",user="root",passwd="",database="metrologia" )
     print (" ==> CONNECCTION SUCCESS WITH MYSQL")
 except:
     logs += "==> error to try connect the database MySQL \n" 
@@ -38,22 +38,23 @@ cursormysql = MySQLConnection.cursor()
 
 print('SEARCHING PENDING DATA....')
 ## busca todos los proyectos pendientes de MySQL
-cursorsqlsrv.execute("SELECT DISTINCT NomCer FROM Cert_Balxpro WHERE IdeComBpr LIKE '2212%' ")
+cursorsqlsrv.execute("SELECT DISTINCT NomCer,IdeComBpr FROM Cert_Balxpro WHERE IdeComBpr LIKE '2212%' ")
 data1 = cursorsqlsrv.fetchall()
 # print(data1, len(data1))
 
 cursormysql.execute("SELECT DISTINCT nom FROM cert_items")
 data2 = cursormysql.fetchall()
 # print(data2, len(data1))
-
+i = 0
 for cert in data1:
     find = False
     for MyCert in data2:
         if(cert[0] == MyCert[0]):
             find = True
     if find == False:
-        print(f"Certificate: '{cert[0]}' not found")
-
+        i += 1
+        print(f"Certificate: '{cert[0]}' not found, used in {cert[1]}")
+print(i)
 
 MySQLConnection.close()
 SQLServerConnection.close()

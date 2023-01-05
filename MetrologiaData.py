@@ -7,7 +7,7 @@ from datetime import date
 today = date.today()
 
 server1='tcp:192.168.9.221'
-dbname1='dEVSisMetPrec'
+dbname1='SisMetPrec'
 user1='sa'
 password1='Sistemas123*'
 
