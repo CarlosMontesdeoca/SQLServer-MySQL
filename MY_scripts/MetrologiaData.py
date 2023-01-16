@@ -54,7 +54,6 @@ for cert in data1:
     if find == False:
         print(f"Certificate: '{cert[0]}' not found")
 
-
 MySQLConnection.close()
 SQLServerConnection.close()
 
