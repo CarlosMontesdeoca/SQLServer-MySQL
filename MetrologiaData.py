@@ -97,7 +97,7 @@ for codtb in data1:
                     MySQLConnection.commit()
                     print(f"        ==> SUCCESSFULLY CREATED NEW CERTIFICATE {codPro} ✅")
                 except:
-                    logs += f"==> ERROR LADING CERTIFICATE {codPro} \n" 
+                    logs += f"==> ERROR CREATED NEW CERTIFICATE DATA {codPro} \n" 
                     print ("        ==> ERROR CREATED NEW CERTIFICATE DATA ⚠")
 
     # ___________________________ SUBIDA DE DATOS PARA CADA CERTIFICADO INCLUIDO LOS NUEVOS ________________________________
@@ -283,6 +283,8 @@ for codtb in data1:
                 
                 print("     ==> UPLOADING PEXPROXS..")
                 try:
+                    # cursormysql.execute(f"DELETE cargpesxes WHERE codPro LIKE '{data_cert[0]}'")
+                    # MySQLConnection.commit()
                     cursormysql.execute(querryInsertPex[:-1])
                     MySQLConnection.commit()  
                     print ("        ==> SUCCESSFULLY LOADED PESXPRO TEST DATA ✅")
@@ -290,7 +292,9 @@ for codtb in data1:
                     logs += f"==> ERROR LADING PESXPRO TEST DATA ⚠ || {data_cert[0]}\n" 
                     print ("        ==> ERROR LADING PESXPRO TEST DATA ⚠")
         
-        print("\n♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠")
+        print("""\n♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠
+            \n♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠
+            \n♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠""")
         print("========================================================================= \n\n")
 print("DATA MIGRATION COMPLETED SUCCESSFULLY")
 # if logs != '':

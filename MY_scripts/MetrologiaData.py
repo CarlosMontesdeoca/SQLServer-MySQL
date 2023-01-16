@@ -52,9 +52,13 @@ for cert in data1:
         if(cert[0] == MyCert[0]):
             find = True
     if find == False:
+<<<<<<< HEAD:MY scripts/MetrologiaData.py
         i += 1
         print(f"Certificate: '{cert[0]}' not found, used in {cert[1]}")
 print(i)
+=======
+        print(f"Certificate: '{cert[0]}' not found")
+>>>>>>> 2f6116ea257331a7ae015f912a1e5a858b3a78c2:MY_scripts/MetrologiaData.py
 
 MySQLConnection.close()
 SQLServerConnection.close()
