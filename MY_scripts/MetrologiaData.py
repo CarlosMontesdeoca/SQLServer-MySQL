@@ -2,6 +2,7 @@
 ## este escript esta creado para comuicar dos bases de datos que se actualizaran cuando un metrolog envie datos primarios de la tablet al servidor
 import pyodbc
 import pymysql
+import numpy as np
 from datetime import date
 
 today = date.today()
@@ -38,7 +39,7 @@ cursormysql = MySQLConnection.cursor()
 
 print('SEARCHING PENDING DATA....')
 ## busca todos los proyectos pendientes de MySQL
-cursorsqlsrv.execute("SELECT DISTINCT NomCer,IdeComBpr FROM Cert_Balxpro WHERE IdeComBpr LIKE '2212%' ")
+cursorsqlsrv.execute("SELECT DISTINCT NomCer,IdeComBpr FROM Cert_Balxpro WHERE IdeComBpr LIKE '23%' ")
 data1 = cursorsqlsrv.fetchall()
 # print(data1, len(data1))
 

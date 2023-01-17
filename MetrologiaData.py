@@ -63,7 +63,10 @@ for codtb in data1:
             codPro = codPro[0]
             cursorsqlsrv.execute(f"SELECT IdeComBpr,est_esc,ClaBpr,DesBpr,identBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,UbiBpr,BalLimpBpr,AjuBpr,IRVBpr,ObsVBpr,CapCalBpr,RecPorCliBpr,fec_cal,FechaRecepcion,UniDivEscBpr,lugcalBpr,RecPorCliBpr FROM Balxpro WHERE IdeComBpr LIKE '{codPro}' AND (est_esc LIKE 'PR' OR est_esc LIKE 'DS') ORDER BY IdeComBpr ASC")
             data_cert = cursorsqlsrv.fetchone()
-            # print(data_cert)
+            e = str(float(round(data_cert[10],8))).split('.')[1]
+            rd = len(e)
+            if (e == '0' or e == 0):
+                rd = 0
 
 
         ## ___________COMPARA SI EXISTE EL CERTIFICADO
@@ -197,9 +200,9 @@ for codtb in data1:
     ## --------------------------- crear el querry para insertar los datos de pruebas de exentricidad
                 for pex in [0,1]:
                     if data_cert[2] == 'Camionera':
-                        querryInsertExc = querryInsertExc + f"('{data_cert[0]}{exectCad[pex][2]}',{codCert[0]},{exectCad[pex][1]},{exectCad[pex][2]},{round(exectDet[pex][6],5)},{round(exectDet[pex][7],5)},{round(exectDet[pex][1],5)},{round(exectDet[pex][2],5)},{round(exectDet[pex][3],5)},{round(exectDet[pex][4],5)},{round(exectDet[pex][5],5)},{round(exectDet[pex][6],5)},'{exectCad[pex][4]}' ),"
+                        querryInsertExc = querryInsertExc + f"('{data_cert[0]}{exectCad[pex][2]}',{codCert[0]},{exectCad[pex][1]},{exectCad[pex][2]},{round(exectDet[pex][6],rd)},{round(exectDet[pex][7],rd)},{round(exectDet[pex][1],rd)},{round(exectDet[pex][2],rd)},{round(exectDet[pex][3],rd)},{round(exectDet[pex][4],rd)},{round(exectDet[pex][5],rd)},{round(exectDet[pex][6],rd)},'{exectCad[pex][4]}' ),"
                     else :
-                        querryInsertExc = querryInsertExc + f"('{data_cert[0]}{exectCad[pex][2]}',{codCert[0]},{exectCad[pex][1]},{exectCad[pex][2]},{round(exectDet[pex][6],5)},{round(exectDet[pex][7],5)},{round(exectDet[pex][1],5)},{round(exectDet[pex][2],5)},{round(exectDet[pex][3],5)},{round(exectDet[pex][4],5)},{round(exectDet[pex][5],5)},'{exectCad[pex][4]}' ),"
+                        querryInsertExc = querryInsertExc + f"('{data_cert[0]}{exectCad[pex][2]}',{codCert[0]},{exectCad[pex][1]},{exectCad[pex][2]},{round(exectDet[pex][6],rd)},{round(exectDet[pex][7],rd)},{round(exectDet[pex][1],rd)},{round(exectDet[pex][2],rd)},{round(exectDet[pex][3],rd)},{round(exectDet[pex][4],rd)},{round(exectDet[pex][5],rd)},'{exectCad[pex][4]}' ),"
                 
     ## -------------------------- insercion de pruebas de exentricidad
                 print("     ==> UPLOADING DATA ECCENTRUCUTY TEST DATA..")
@@ -219,9 +222,9 @@ for codtb in data1:
                 try:
                     ## --- creacion de querry para insertar datos de repetbilidad
                     if data_cert[2] == 'II':
-                        querryInsertRept = f"INSERT INTO repeatests(codPro,certificate_id,intCarg,maxDif,maxErr,lec1,lec1_0,lec2,lec2_0,lec3,lec3_0,lec4,lec4_0,lec5,lec5_0,lec6,lec6_0,evl) VALUES ('{data_cert[0]}',{codCert[0]},{repet[1]},{round(repet[2],5)},{round(repet[3],5)},{round(repet[7],5)},{round(repet[8],5)},{round(repet[9],5)},{round(repet[10],5)},{round(repet[11],5)},{round(repet[12],5)},{round(repet[13],5)},{round(repet[14],5)},{round(repet[15],5)},{round(repet[16],5)},{round(repet[17],5)},{round(repet[18],5)},'{repet[4]}')"
+                        querryInsertRept = f"INSERT INTO repeatests(codPro,certificate_id,intCarg,maxDif,maxErr,lec1,lec1_0,lec2,lec2_0,lec3,lec3_0,lec4,lec4_0,lec5,lec5_0,lec6,lec6_0,evl) VALUES ('{data_cert[0]}',{codCert[0]},{repet[1]},{round(repet[2],rd)},{round(repet[3],rd)},{round(repet[7],rd)},{round(repet[8],rd)},{round(repet[9],rd)},{round(repet[10],rd)},{round(repet[11],rd)},{round(repet[12],rd)},{round(repet[13],rd)},{round(repet[14],rd)},{round(repet[15],rd)},{round(repet[16],rd)},{round(repet[17],rd)},{round(repet[18],rd)},'{repet[4]}')"
                     else: 
-                        querryInsertRept = f"INSERT INTO repeatests(codPro,certificate_id,intCarg,maxDif,maxErr,lec1,lec1_0,lec2,lec2_0,lec3,lec3_0,evl) VALUES ('{data_cert[0]}',{codCert[0]},{repet[1]},{round(repet[2],5)},{round(repet[3],5)},{round(repet[7],5)},{round(repet[8],5)},{round(repet[9],5)},{round(repet[10],5)},{round(repet[11],5)},{round(repet[12],5)},'{repet[4]}')"
+                        querryInsertRept = f"INSERT INTO repeatests(codPro,certificate_id,intCarg,maxDif,maxErr,lec1,lec1_0,lec2,lec2_0,lec3,lec3_0,evl) VALUES ('{data_cert[0]}',{codCert[0]},{repet[1]},{round(repet[2],rd)},{round(repet[3],rd)},{round(repet[7],rd)},{round(repet[8],rd)},{round(repet[9],rd)},{round(repet[10],rd)},{round(repet[11],rd)},{round(repet[12],rd)},'{repet[4]}')"
                     
                     cursormysql.execute(querryInsertRept)
                     MySQLConnection.commit() 
@@ -237,7 +240,7 @@ for codtb in data1:
                 ## ------ Querry para pruebas de Carga
                 querryInsertCrg = "INSERT INTO cargtests(codPro, certificate_id, numPr, intCarg, lecAsc, lecDesc, errAsc, errDesc, maxErr, evl) VALUES "
                 for pcar in range(0,len(carg)):
-                    querryInsertCrg = querryInsertCrg + f"('{data_cert[0]}{carg[pcar][0]}',{codCert[0]},{carg[pcar][0]},{round(carg[pcar][1],3)},{round(carg[pcar][2],3)},{round(carg[pcar][3],3)},{round(carg[pcar][4],3)},{round(carg[pcar][5],3)},{round(carg[pcar][6],3)},'{carg[pcar][7]}'),"
+                    querryInsertCrg = querryInsertCrg + f"('{data_cert[0]}{carg[pcar][0]}',{codCert[0]},{carg[pcar][0]},{round(carg[pcar][1],rd)},{round(carg[pcar][2],rd)},{round(carg[pcar][3],rd)},{round(carg[pcar][4],rd)},{round(carg[pcar][5],rd)},{round(carg[pcar][6],rd)},'{carg[pcar][7]}'),"
                 
                 ## ------ Insercion de pruebas de Carga
                 print("     ==> UPLOADING DATA WEIGTH TEST DATA..")
