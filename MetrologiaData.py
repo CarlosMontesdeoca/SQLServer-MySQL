@@ -231,15 +231,13 @@ for codtb in data1:
                     print ("        ==> ERROR LADING REPEATABILITY TEST DATA ⚠")
 
     ## --------------------------------- Datos de pruebas de Carga
-                cursorsqlsrv.execute(f"SELECT * FROM PCarga_Cab WHERE IdeComBpr LIKE '{data_cert[0]}' ORDER BY NumPca ASC")
-                cargCad = cursorsqlsrv.fetchall()
-                cursorsqlsrv.execute(f"SELECT * FROM PCarga_Det WHERE CodPca_C LIKE '{data_cert[0]}%' ORDER BY RIGHT(CodPca_C,1) ASC")
-                cargDet = cursorsqlsrv.fetchall()
+                cursorsqlsrv.execute(f" SELECT C.NumPca,C.CarPca,D.LecAscPca,D.LecDscPca,D.ErrAscPca,D.ErrDscPca,D.EmpPca,D.SatPca_D FROM PCarga_Cab C LEFT OUTER JOIN( SELECT LecAscPca,LecDscPca,ErrAscPca,ErrDscPca,EmpPca,SUBSTRING(CodPca_C, 8, 2) AS NumPc,SatPca_D FROM PCarga_Det  WHERE CodPca_C LIKE '{data_cert[0]}%') D ON (D.NumPc=C.NumPca) WHERE C.IdeComBpr LIKE '{data_cert[0]}%'")
+                carg = cursorsqlsrv.fetchall()
 
                 ## ------ Querry para pruebas de Carga
                 querryInsertCrg = "INSERT INTO cargtests(codPro, certificate_id, numPr, intCarg, lecAsc, lecDesc, errAsc, errDesc, maxErr, evl) VALUES "
-                for pcar in range(0,len(cargCad)):
-                    querryInsertCrg = querryInsertCrg + f"('{data_cert[0]}{cargCad[pcar][2]}',{codCert[0]},{cargCad[pcar][2]},{round(cargCad[pcar][1],3)},{round(cargDet[pcar][1],3)},{round(cargDet[pcar][2],3)},{round(cargDet[pcar][3],3)},{round(cargDet[pcar][4],3)},{round(cargDet[pcar][5],3)},'{cargCad[pcar][4]}'),"
+                for pcar in range(0,len(carg)):
+                    querryInsertCrg = querryInsertCrg + f"('{data_cert[0]}{carg[pcar][0]}',{codCert[0]},{carg[pcar][0]},{round(carg[pcar][1],3)},{round(carg[pcar][2],3)},{round(carg[pcar][3],3)},{round(carg[pcar][4],3)},{round(carg[pcar][5],3)},{round(carg[pcar][6],3)},'{carg[pcar][7]}'),"
                 
                 ## ------ Insercion de pruebas de Carga
                 print("     ==> UPLOADING DATA WEIGTH TEST DATA..")
