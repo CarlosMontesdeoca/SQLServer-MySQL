@@ -21,7 +21,7 @@ except:
     print ('error to try connect the database SQL Server')
 
 try:
-    MySQLConnection = pymysql.connect(host="127.0.0.1",user="root",passwd="",database="metrologia" )
+    MySQLConnection = pymysql.connect(host="192.168.9.221",user="root",passwd="AdminSistemas@",database="metrologia" )
     print (" ==> CONNECCTION SUCCESS WITH MYSQL")
 except:
     logs += "==> error to try connect the database MySQL \n" 
@@ -38,7 +38,7 @@ cursormysql = MySQLConnection.cursor()
 
 print('SEARCHING PENDING DATA....')
 ## busca todos los proyectos pendientes de MySQL
-cursorsqlsrv.execute("SELECT DISTINCT NomCer,IdeComBpr FROM Cert_Balxpro WHERE IdeComBpr LIKE '2212%' ")
+cursorsqlsrv.execute("SELECT DISTINCT NomCer,IdeComBpr FROM Cert_Balxpro WHERE IdeComBpr LIKE '23%' ")
 data1 = cursorsqlsrv.fetchall()
 # print(data1, len(data1))
 
@@ -57,4 +57,3 @@ for cert in data1:
 
 MySQLConnection.close()
 SQLServerConnection.close()
-
