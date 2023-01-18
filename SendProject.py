@@ -23,7 +23,7 @@ except:
     print ('error to try connect the database SQL Server')
 
 try:
-    MySQLConnection = pymysql.connect(host="127.0.0.1",user="root",passwd="",database="metrologia" )
+    MySQLConnection = pymysql.connect(host="127.0.0.1",user="root",passwd="AdminSistemas@",database="metrologia" )
 except:
     print ('error to try connect the database MySQL')
 
@@ -53,7 +53,7 @@ cursormysql.execute(f"SELECT P.codPro, M.id FROM projects P JOIN metrologists M 
 project = cursormysql.fetchone()
 # qeurryIdentificadores = f"INSERT INTO Identificadores(codcli, idepro) VALUES (CODCLI, {project[0]})"
 
-## INSERTAR IDENTIFICADORES
+# INSERTAR IDENTIFICADORES
 try:
     cursorsqlsrv.execute(f"IF NOT EXISTS ( SELECT * FROM Identificadores WHERE idepro LIKE {codPro} ) BEGIN INSERT INTO Identificadores (codcli, idepro) VALUES ({CodCli[0]}, {codPro}) END")
     SQLServerConnection.commit()
@@ -71,7 +71,7 @@ loc = 'GYE/MTA'
 if(clientInfo[10] == 'QUITO'):
     loc = 'UIO'
 
-cursorsqlsrv.execute(f"IF NOT EXISTS ( SELECT * FROM Proyectos WHERE idepro LIKE {codPro} ) BEGIN INSERT INTO Proyectos (EstPro, FecPro, FecSigCalPro, CodCli, Idepro, CodMet, LocPro) VALUES (?,?,?,?,?,?,?) END",'A','{strdate[0:10]}','{dateLong}',{CodCli[0]}, {codPro}, {CodMet[0]}, '{loc}')
+cursorsqlsrv.execute(f"IF NOT EXISTS ( SELECT * FROM Proyectos WHERE idepro LIKE {codPro} ) BEGIN INSERT INTO Proyectos (EstPro, FecPro, FecSigCalPro, CodCli, Idepro, CodMet, LocPro) VALUES ('A','{strdate[0:10]}','{dateLong}',{CodCli[0]},{codPro},{CodMet[0]},'{loc}') END")
 SQLServerConnection.commit()
 
 cursorsqlsrv.execute(f"SELECT CodPro FROM Proyectos WHERE Idepro LIKE {codPro}")

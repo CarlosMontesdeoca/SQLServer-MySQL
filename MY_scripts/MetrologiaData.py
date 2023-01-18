@@ -2,6 +2,7 @@
 ## este escript esta creado para comuicar dos bases de datos que se actualizaran cuando un metrolog envie datos primarios de la tablet al servidor
 import pyodbc
 import pymysql
+import numpy as np
 from datetime import date
 
 today = date.today()
