@@ -13,7 +13,7 @@ client = sys.argv[2]
 today = date.today()
 
 server1='tcp:192.168.9.221'
-dbname1='SisMetPrec'
+dbname1='DevSisMetPrec'
 user1='sa'
 password1='Sistemas123*'
 
@@ -23,7 +23,7 @@ except:
     print ('error to try connect the database SQL Server')
 
 try:
-    MySQLConnection = pymysql.connect(host="127.0.0.1",user="root",passwd="AdminSistemas@",database="metrologia" )
+    MySQLConnection = pymysql.connect(host="127.0.0.1",user="root",passwd="",database="test" )
 except:
     print ('error to try connect the database MySQL')
 
