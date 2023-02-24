@@ -33,31 +33,21 @@ for item in data1:
     newnom = item[1].replace(" ","")
 
     if item[4] == 'kg':
-        try: 
-            querry = f"UPDATE items SET nom = '{newnom}' uni = 'g', mass_nm = {item[5] * 1000} WHERE id LIKE {item[0]}"
-            # MySQLConnection.commit()
-            # print(f"   ==> Item '{item[1]}' updated success data: id> {item[0]} ")
-        except:
-            print(f"the id: {item[0]} item: '{item[1]}' has a problem to updated")
+        querry = f"UPDATE items SET nom = '{newnom}' uni = 'g', mass_nm = {item[5] * 1000} WHERE id LIKE {item[0]}"
+        
     else :
-        try: 
-            querry = f"UPDATE items SET nom = '{newnom}' WHERE id LIKE {item[0]}" 
-            # MySQLConnection.commit()
-            # print(f"        Item '{item[1]}' updated success data: id> {item[0]} ")
-        except:
-            print(f"the id: {item[0]} item: '{item[1]}' has a problem to updated")
+        querry = f"UPDATE items SET nom = '{newnom}' WHERE id LIKE {item[0]}" 
 
     if item[1][-2:] == '0*' or item[1][-3:] == '***' or item[1][-1] == 'B' or item[1][-1] == 'D':
         index = querry.find('nom')
-        querry = querry[:index] + f"id_camp = '{item[2]}*' " + querry[index:]
+        querry = querry[:index] + f"id_camp = '{item[2]}*', " + querry[index:]
 
-    print(querry)
-    # try: 
-    #     cursormysql.execute(f"UPDATE items SET uni = 'g', mass_nm = {item[5] * 1000} WHERE id LIKE {item[0]}")
-    #     MySQLConnection.commit()
-    #     print(f"        Item '{item[1]}' updated success data: id> {item[0]} ")
-    # except:
-    #     print(f"the id: {item[0]} item: '{item[1]}' has a problem to updated")
+    try:
+        cursormysql.execute(querry)
+        MySQLConnection.commit()
+        print(f"        Item '{item[1]}' updated success data: id> {item[0]} querry='{querry}'")
+    except:
+        print(f"the id: {item[0]} item: '{item[1]}' has a problem to updated")
 print("DATA MIGRATION COMPLETED SUCCESSFULLY")
 
 
