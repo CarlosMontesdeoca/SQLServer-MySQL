@@ -7,8 +7,8 @@ from datetime import datetime
 
 datenow = datetime.now()
 
-codPro = sys.argv[1]
-client = sys.argv[2]
+codPro = 230120
+client = 136
 
 today = date.today()
 

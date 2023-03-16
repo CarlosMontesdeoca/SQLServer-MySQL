@@ -38,7 +38,7 @@ cursormysql = MySQLConnection.cursor()
 
 print('SEARCHING PENDING DATA....')
 ## busca todos los proyectos pendientes de MySQL
-cursormysql.execute("SELECT DISTINCT P.codPro FROM projects P JOIN certificates C on P.id=C.project_id WHERE P.est LIKE 'P' AND C.est LIKE 'P' AND P.tip LIKE 'ICC'")
+cursormysql.execute("SELECT DISTINCT P.codPro FROM projects P JOIN certificates C on P.id=C.project_id WHERE P.est LIKE 'P' AND C.est LIKE 'P'")
 data1 = cursormysql.fetchall()
 print(data1, len(data1))
 
@@ -49,8 +49,6 @@ print('CHECKING.......')
 for codtb in data1:
     idPro = codtb[0]
     # cursorsqlsrv.execute(f"SELECT ClaBpr,DesBpr,identBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,IdeComBpr,UbiBpr,BalLimpBpr,AjuBpr,IRVBpr,ObsVBpr,CapCalBpr,RecPorCliBpr,fec_cal,fec_proxBpr FROM Balxpro WHERE IdeBpr LIKE {codPro} AND (est_esc LIKE 'PR' OR est_esc LIKE 'DS')")
-    print(f"SELECT IdeComBpr FROM Balxpro WHERE IdeBpr LIKE {idPro} AND (est_esc LIKE 'PR' OR est_esc LIKE 'PL' OR est_esc LIKE 'DS')")
-    
     cursorsqlsrv.execute(f"SELECT IdeComBpr FROM Balxpro WHERE IdeBpr LIKE {idPro} AND (est_esc LIKE 'PR' OR est_esc LIKE 'PL' OR est_esc LIKE 'DS')")
     certificates2 = cursorsqlsrv.fetchall()
 ## si el proyecto de MySql tiene varios certificados de SQLServer en cola  se concidera que ya recbio todos los datos y se puede migrar información    
