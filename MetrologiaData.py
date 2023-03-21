@@ -49,8 +49,7 @@ print('CHECKING.......')
 for codtb in data1:
     idPro = codtb[0]
     # cursorsqlsrv.execute(f"SELECT ClaBpr,DesBpr,identBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,IdeComBpr,UbiBpr,BalLimpBpr,AjuBpr,IRVBpr,ObsVBpr,CapCalBpr,RecPorCliBpr,fec_cal,fec_proxBpr FROM Balxpro WHERE IdeBpr LIKE {codPro} AND (est_esc LIKE 'PR' OR est_esc LIKE 'DS')")
-    print(f"SELECT IdeComBpr FROM Balxpro WHERE IdeBpr LIKE {idPro} AND (est_esc LIKE 'PR' OR est_esc LIKE 'PL' OR est_esc LIKE 'DS')")
-    
+    # print(f"SELECT IdeComBpr FROM Balxpro WHERE IdeBpr LIKE {idPro} AND (est_esc LIKE 'PR' OR est_esc LIKE 'PL' OR est_esc LIKE 'DS')")
     cursorsqlsrv.execute(f"SELECT IdeComBpr FROM Balxpro WHERE IdeBpr LIKE {idPro} AND (est_esc LIKE 'PR' OR est_esc LIKE 'PL' OR est_esc LIKE 'DS')")
     certificates2 = cursorsqlsrv.fetchall()
 ## si el proyecto de MySql tiene varios certificados de SQLServer en cola  se concidera que ya recbio todos los datos y se puede migrar información    
@@ -63,7 +62,7 @@ for codtb in data1:
         idPro = certificates1[0][1]
         for codPro in listCodPro:
             codPro = codPro[0]
-            cursorsqlsrv.execute(f"SELECT IdeComBpr,est_esc,ClaBpr,DesBpr,identBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,UbiBpr,BalLimpBpr,AjuBpr,IRVBpr,ObsVBpr,CapCalBpr,RecPorCliBpr,fec_cal,FechaRecepcion,UniDivEscBpr,lugcalBpr,RecPorCliBpr FROM Balxpro WHERE IdeComBpr LIKE '{codPro}' AND (est_esc LIKE 'PR' OR est_esc LIKE 'DS') ORDER BY IdeComBpr ASC")
+            cursorsqlsrv.execute(f"SELECT IdeComBpr,est_esc,ClaBpr,DesBpr,identBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,UbiBpr,BalLimpBpr,AjuBpr,IRVBpr,ObsVBpr,CapCalBpr,RecPorCliBpr,fec_cal,FechaRecepcion,UniDivEscBpr,lugcalBpr,RecPorCliBpr FROM Balxpro WHERE IdeComBpr LIKE '{codPro}' AND (est_esc LIKE 'PR' OR est_esc LIKE 'PL' OR est_esc LIKE 'DS') ORDER BY IdeComBpr ASC")
             data_cert = cursorsqlsrv.fetchone()
             e = str(float(round(data_cert[10],8))).split('.')[1]
             rd = len(e)
@@ -202,7 +201,7 @@ for codtb in data1:
     ## --------------------------- crear el querry para insertar los datos de pruebas de exentricidad
                 for pex in [0,1]:
                     if data_cert[2] == 'Camionera':
-                        querryInsertExc = querryInsertExc + f"('{data_cert[0]}{exectCad[pex][2]}',{codCert[0]},{exectCad[pex][1]},{exectCad[pex][2]},{round(exectDet[pex][6],rd)},{round(exectDet[pex][7],rd)},{round(exectDet[pex][1],rd)},{round(exectDet[pex][2],rd)},{round(exectDet[pex][3],rd)},{round(exectDet[pex][4],rd)},{round(exectDet[pex][5],rd)},{round(exectDet[pex][6],rd)},'{exectCad[pex][4]}' ),"
+                        querryInsertExc = querryInsertExc + f"('{data_cert[0]}{exectCad[pex][2]}',{codCert[0]},{exectCad[pex][1]},{exectCad[pex][2]},{round(exectDet[pex][7],rd)},{round(exectDet[pex][8],rd)},{round(exectDet[pex][1],rd)},{round(exectDet[pex][2],rd)},{round(exectDet[pex][3],rd)},{round(exectDet[pex][4],rd)},{round(exectDet[pex][5],rd)},{round(exectDet[pex][6],rd)},'{exectCad[pex][3]}' ),"
                     else :
                         querryInsertExc = querryInsertExc + f"('{data_cert[0]}{exectCad[pex][2]}',{codCert[0]},{exectCad[pex][1]},{exectCad[pex][2]},{round(exectDet[pex][6],rd)},{round(exectDet[pex][7],rd)},{round(exectDet[pex][1],rd)},{round(exectDet[pex][2],rd)},{round(exectDet[pex][3],rd)},{round(exectDet[pex][4],rd)},{round(exectDet[pex][5],rd)},'{exectCad[pex][4]}' ),"
                 
@@ -275,25 +274,32 @@ for codtb in data1:
                         except:
                             logs += f"==> ERROR IN FIND CERTITEMS ⚠ || {data_cert[0]}\n" 
                             print('        || ==> ERROR IN FIND CERTITEMS ⚠')
-                querryInsertPex = "INSERT INTO cargpesxes(codPro, cert_item_id, tip, keyJ, N1, N2, N2A, N5, N10, N20, N20A, N50, N100, N200, N200A, N500, N1000, N2000, N2000A, N5000, N10000, N20000, N500000, N1000000, CrgPxp1, CrgPxp2, CrgPxp3, CrgPxp4, CrgPxp5, CrgPxp6, AjsPxp) VALUES"
-                for pexs in range(0,len(pesxpro)):
-                    aux = pesxpro[pexs][1]
-                    if aux[0] == 'C':
-                        aux = aux[1:-1].rjust(3, '0')
-                    elif aux[0] == 'I':
-                        aux = '001'
-                    querryInsertPex = querryInsertPex + f"('{data_cert[0]}',{listCert[pesxpro[pexs][2]]},'{pesxpro[pexs][1]}','{aux}',{pesxpro[pexs][3]},{pesxpro[pexs][4]},{pesxpro[pexs][5]},{pesxpro[pexs][6]},{pesxpro[pexs][7]},{pesxpro[pexs][8]},{pesxpro[pexs][9]},{pesxpro[pexs][10]},{pesxpro[pexs][11]},{pesxpro[pexs][12]},{pesxpro[pexs][13]},{pesxpro[pexs][14]},{pesxpro[pexs][15]},{pesxpro[pexs][16]},{pesxpro[pexs][17]},{pesxpro[pexs][18]},{pesxpro[pexs][19]},{pesxpro[pexs][20]},{pesxpro[pexs][21]},{pesxpro[pexs][22]},{pesxpro[pexs][23]},{pesxpro[pexs][24]},{pesxpro[pexs][25]},{pesxpro[pexs][26]},{pesxpro[pexs][27]},{pesxpro[pexs][28]},{pesxpro[pexs][29]}),"
-                
-                print("     ==> UPLOADING PEXPROXS..")
-                try:
-                    # cursormysql.execute(f"DELETE cargpesxes WHERE codPro LIKE '{data_cert[0]}'")
-                    # MySQLConnection.commit()
-                    cursormysql.execute(querryInsertPex[:-1])
-                    MySQLConnection.commit()  
-                    print ("        ==> SUCCESSFULLY LOADED PESXPRO TEST DATA ✅")
-                except:
-                    logs += f"==> ERROR LADING PESXPRO TEST DATA ⚠ || {data_cert[0]}\n" 
-                    print ("        ==> ERROR LADING PESXPRO TEST DATA ⚠")
+                cursormysql.execute(f"SELECT COUNT(*) FROM cargpesxes WHERE codPro LIKE'{data_cert[0]}'")
+                pexesMy = cursormysql.fetchall()
+                if len(pexesMy[0]) == 0 :
+                    querryInsertPex = "INSERT INTO cargpesxes(codPro, cert_item_id, tip, keyJ, N1, N2, N2A, N5, N10, N20, N20A, N50, N100, N200, N200A, N500, N1000, N2000, N2000A, N5000, N10000, N20000, N500000, N1000000, CrgPxp1, CrgPxp2, CrgPxp3, CrgPxp4, CrgPxp5, CrgPxp6, AjsPxp) VALUES"
+                    for pexs in range(0,len(pesxpro)):
+                        aux = pesxpro[pexs][1]
+                        if aux[0] == 'C':
+                            aux = aux[1:-1].rjust(3, '0')
+                        elif aux[0] == 'I':
+                            aux = '001'
+                        querryInsertPex = querryInsertPex + f"('{data_cert[0]}',{listCert[pesxpro[pexs][2]]},'{pesxpro[pexs][1]}','{aux}',{pesxpro[pexs][3]},{pesxpro[pexs][4]},{pesxpro[pexs][5]},{pesxpro[pexs][6]},{pesxpro[pexs][7]},{pesxpro[pexs][8]},{pesxpro[pexs][9]},{pesxpro[pexs][10]},{pesxpro[pexs][11]},{pesxpro[pexs][12]},{pesxpro[pexs][13]},{pesxpro[pexs][14]},{pesxpro[pexs][15]},{pesxpro[pexs][16]},{pesxpro[pexs][17]},{pesxpro[pexs][18]},{pesxpro[pexs][19]},{pesxpro[pexs][20]},{pesxpro[pexs][21]},{pesxpro[pexs][22]},{pesxpro[pexs][23]},{pesxpro[pexs][24]},{pesxpro[pexs][25]},{pesxpro[pexs][26]},{pesxpro[pexs][27]},{pesxpro[pexs][28]},{pesxpro[pexs][29]}),"
+                    
+                    print("     ==> UPLOADING PEXPROXS..")
+                    try:
+                        # cursormysql.execute(f"DELETE cargpesxes WHERE codPro LIKE '{data_cert[0]}'")
+                        # MySQLConnection.commit()
+                        cursormysql.execute(querryInsertPex[:-1])
+                        MySQLConnection.commit()  
+                        print ("        ==> SUCCESSFULLY LOADED PESXPRO TEST DATA ✅")
+                    except:
+                        logs += f"==> ERROR LADING PESXPRO TEST DATA ⚠ || {data_cert[0]}\n" 
+                        print ("        ==> ERROR LADING PESXPRO TEST DATA ⚠")
+                else :
+                    logs += f"==> ALREADY EXIST PESXPRO TEST DATA ⚠ || {data_cert[0]}\n" 
+                    print (" ==> ALREADY EXIST PESXPRO TEST DATA ⚠    -----------")
+
         
         print("""\n♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠
             \n♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠
