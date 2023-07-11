@@ -1,4 +1,5 @@
-# CONEXION pyw
+#### CREACION DE UN PROYECTO EN SQL SERVER
+## LEE LOS DATOS DE MYSQL Y LOS MIGRA A SQL SERVER PARA ENVIO DE DATOS A LA TABLET 
 import pyodbc
 import pymysql
 from datetime import date
