@@ -38,7 +38,7 @@ cursormysql = MySQLConnection.cursor()
 
 print('SEARCHING PENDING DATA....')
 ## busca todos los proyectos pendientes de MySQL
-cursormysql.execute("SELECT DISTINCT P.codPro FROM projects P JOIN certificates C on P.id=C.project_id WHERE P.est LIKE 'P' AND C.est LIKE 'P'")
+cursormysql.execute("SELECT DISTINCT P.codPro FROM projects P JOIN certificates C on P.id=C.project_id WHERE P.est LIKE 'P' AND C.est LIKE 'P' AND P.tip LIKE 'ICC'")
 data1 = cursormysql.fetchall()
 print(data1, len(data1))
 
@@ -49,6 +49,7 @@ print('CHECKING.......')
 for codtb in data1:
     idPro = codtb[0]
     # cursorsqlsrv.execute(f"SELECT ClaBpr,DesBpr,identBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,IdeComBpr,UbiBpr,BalLimpBpr,AjuBpr,IRVBpr,ObsVBpr,CapCalBpr,RecPorCliBpr,fec_cal,fec_proxBpr FROM Balxpro WHERE IdeBpr LIKE {codPro} AND (est_esc LIKE 'PR' OR est_esc LIKE 'DS')")
+    # print(f"SELECT IdeComBpr FROM Balxpro WHERE IdeBpr LIKE {idPro} AND (est_esc LIKE 'PR' OR est_esc LIKE 'PL' OR est_esc LIKE 'DS')")
     cursorsqlsrv.execute(f"SELECT IdeComBpr FROM Balxpro WHERE IdeBpr LIKE {idPro} AND (est_esc LIKE 'PR' OR est_esc LIKE 'PL' OR est_esc LIKE 'DS')")
     certificates2 = cursorsqlsrv.fetchall()
 ## si el proyecto de MySql tiene varios certificados de SQLServer en cola  se concidera que ya recbio todos los datos y se puede migrar información    
@@ -61,9 +62,15 @@ for codtb in data1:
         idPro = certificates1[0][1]
         for codPro in listCodPro:
             codPro = codPro[0]
-            cursorsqlsrv.execute(f"SELECT IdeComBpr,est_esc,ClaBpr,DesBpr,identBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,UbiBpr,BalLimpBpr,AjuBpr,IRVBpr,ObsVBpr,CapCalBpr,RecPorCliBpr,fec_cal,FechaRecepcion,UniDivEscBpr,lugcalBpr,RecPorCliBpr FROM Balxpro WHERE IdeComBpr LIKE '{codPro}' AND (est_esc LIKE 'PR' OR est_esc LIKE 'DS') ORDER BY IdeComBpr ASC")
+            cursorsqlsrv.execute(f"SELECT IdeComBpr,est_esc,ClaBpr,DesBpr,identBpr,MarBpr,ModBpr,SerBpr,CapMaxBpr,CapUsoBpr,DivEscBpr,DivEsc_dBpr,RanBpr,UbiBpr,BalLimpBpr,AjuBpr,IRVBpr,ObsVBpr,CapCalBpr,RecPorCliBpr,fec_cal,FechaRecepcion,UniDivEscBpr,lugcalBpr,RecPorCliBpr FROM Balxpro WHERE IdeComBpr LIKE '{codPro}' AND (est_esc LIKE 'PR' OR est_esc LIKE 'PL' OR est_esc LIKE 'DS') ORDER BY IdeComBpr ASC")
             data_cert = cursorsqlsrv.fetchone()
             e = str(float(round(data_cert[10],8))).split('.')[1]
+            if data_cert[17] == None:
+                data_cert[17] = 'NULL'
+            else : 
+                data_cert[17] = f"'{data_cert[17]}'"
+            if data_cert[2] == 'Camionera':
+                data_cert[2] = 'CAM'
             rd = len(e)
             if (e == '0' or e == 0):
                 rd = 0
@@ -110,7 +117,7 @@ for codtb in data1:
                 isDiscard = False
                 querryCertificate = f"UPDATE certificates SET est='D' WHERE codPro LIKE '{data_cert[0]}'"
             else :
-                querryCertificate = f"UPDATE certificates SET ubi='{data_cert[13]}',luCal='{data_cert[23]}',est='RH',evlBal1='{data_cert[14]}',evlBal2='{data_cert[15]}',evlBal3='{data_cert[16]}',obs='{data_cert[17]}',uso='{data_cert[18]}',recPor='{data_cert[19]}',fecCal='{data_cert[20]}',fecRegDt='{data_cert[21]}',frmt=11,motr=11 WHERE codPro LIKE '{data_cert[0]}'"
+                querryCertificate = f"UPDATE certificates SET ubi='{data_cert[13]}',luCal='{data_cert[23]}',est='RH',evlBal1='{data_cert[14]}',evlBal2='{data_cert[15]}',evlBal3='{data_cert[16]}',obs={data_cert[17]},uso='{data_cert[18]}',recPor='{data_cert[19]}',fecCal='{data_cert[20]}',fecRegDt='{data_cert[21]}',frmt=11,motr=11 WHERE codPro LIKE '{data_cert[0]}'"
             print(f"   ==> UPDATING CERTIFICATE DATA: {data_cert[0]}..")
             try:
                 try: 
@@ -146,7 +153,6 @@ for codtb in data1:
                     print ("        ==> SUCCESSFULLY LOADED BALANCE DATA ✅")
 
                 except:
-                    print(querrySuplement)
                     logs += f"==> ERROR LADING BALANCE DATA || {data_cert[0]}\n" 
                     print ("        ==> ERROR LADING BALANCE DATA ⚠")
 
@@ -182,7 +188,7 @@ for codtb in data1:
                     querryInsertExc = "INSERT INTO excentests(codPro, certificate_id, intCarg, numPr, maxExec, maxErr, pos1, pos1_r, pos2, pos2_r, pos3, evl) VALUES "
                     ## consulta para ver las pruebas de repetibilidad
                     querryRepet = f"SELECT * FROM RepetII_Cab C JOIN RepetII_Det D ON C.IdeComBpr = D.CodRii_C WHERE C.IdeComBpr LIKE '{data_cert[0]}'"
-                elif data_cert[2] == 'Camionera':
+                elif data_cert[2] == 'Camionera' or data_cert[2] == 'CAM':
                     ## consulta para ver las pruebas de exentricidad
                     querryExcCad = f"SELECT * FROM ExecCam_Cab WHERE IdeComBpr LIKE '{data_cert[0]}' ORDER BY PrbCam_c ASC"
                     querryExcDet = f"SELECT * FROM ExecCam_Det WHERE CodCam_c LIKE '{data_cert[0]}%' ORDER BY RIGHT(CodCam_c,1) ASC"
@@ -199,8 +205,8 @@ for codtb in data1:
 
     ## --------------------------- crear el querry para insertar los datos de pruebas de exentricidad
                 for pex in [0,1]:
-                    if data_cert[2] == 'Camionera':
-                        querryInsertExc = querryInsertExc + f"('{data_cert[0]}{exectCad[pex][2]}',{codCert[0]},{exectCad[pex][1]},{exectCad[pex][2]},{round(exectDet[pex][6],rd)},{round(exectDet[pex][7],rd)},{round(exectDet[pex][1],rd)},{round(exectDet[pex][2],rd)},{round(exectDet[pex][3],rd)},{round(exectDet[pex][4],rd)},{round(exectDet[pex][5],rd)},{round(exectDet[pex][6],rd)},'{exectCad[pex][4]}' ),"
+                    if data_cert[2] == 'Camionera' or data_cert[2] == 'CAM':
+                        querryInsertExc = querryInsertExc + f"('{data_cert[0]}{exectCad[pex][2]}',{codCert[0]},{exectCad[pex][1]},{exectCad[pex][2]},{round(exectDet[pex][7],rd)},{round(exectDet[pex][8],rd)},{round(exectDet[pex][1],rd)},{round(exectDet[pex][2],rd)},{round(exectDet[pex][3],rd)},{round(exectDet[pex][4],rd)},{round(exectDet[pex][5],rd)},{round(exectDet[pex][6],rd)},'{exectCad[pex][3]}' ),"
                     else :
                         querryInsertExc = querryInsertExc + f"('{data_cert[0]}{exectCad[pex][2]}',{codCert[0]},{exectCad[pex][1]},{exectCad[pex][2]},{round(exectDet[pex][6],rd)},{round(exectDet[pex][7],rd)},{round(exectDet[pex][1],rd)},{round(exectDet[pex][2],rd)},{round(exectDet[pex][3],rd)},{round(exectDet[pex][4],rd)},{round(exectDet[pex][5],rd)},'{exectCad[pex][4]}' ),"
                 
@@ -240,7 +246,11 @@ for codtb in data1:
                 ## ------ Querry para pruebas de Carga
                 querryInsertCrg = "INSERT INTO cargtests(codPro, certificate_id, numPr, intCarg, lecAsc, lecDesc, errAsc, errDesc, maxErr, evl) VALUES "
                 for pcar in range(0,len(carg)):
-                    querryInsertCrg = querryInsertCrg + f"('{data_cert[0]}{carg[pcar][0]}',{codCert[0]},{carg[pcar][0]},{round(carg[pcar][1],rd)},{round(carg[pcar][2],rd)},{round(carg[pcar][3],rd)},{round(carg[pcar][4],rd)},{round(carg[pcar][5],rd)},{round(carg[pcar][6],rd)},'{carg[pcar][7]}'),"
+                    try:
+                        querryInsertCrg = querryInsertCrg + f"('{data_cert[0]}{carg[pcar][0]}',{codCert[0]},{carg[pcar][0]},{round(carg[pcar][1],rd)},{round(carg[pcar][2],rd)},{round(carg[pcar][3],rd)},{round(carg[pcar][4],rd)},{round(carg[pcar][5],rd)},{round(carg[pcar][6],rd)},'{carg[pcar][7]}'),"
+                    except:
+                        print ('errordata')
+                    
                 
                 ## ------ Insercion de pruebas de Carga
                 print("     ==> UPLOADING DATA WEIGTH TEST DATA..")
@@ -250,6 +260,7 @@ for codtb in data1:
                     print ("        ==> SUCCESSFULLY LOADED WEIGTH TEST DATA ✅")
                 except:
                     logs += f"==> ERROR LADING WEIGTH TEST DATA ⚠ || {data_cert[0]}\n" 
+                    print(querryInsertCrg[:-1])
                     print ("        ==> ERROR LADING WEIGTH TEST DATA ⚠")
 
     ## ------------------------------ Datos de pruebas de Pesas
@@ -273,25 +284,33 @@ for codtb in data1:
                         except:
                             logs += f"==> ERROR IN FIND CERTITEMS ⚠ || {data_cert[0]}\n" 
                             print('        || ==> ERROR IN FIND CERTITEMS ⚠')
-                querryInsertPex = "INSERT INTO cargpesxes(codPro, cert_item_id, tip, keyJ, N1, N2, N2A, N5, N10, N20, N20A, N50, N100, N200, N200A, N500, N1000, N2000, N2000A, N5000, N10000, N20000, N500000, N1000000, CrgPxp1, CrgPxp2, CrgPxp3, CrgPxp4, CrgPxp5, CrgPxp6, AjsPxp) VALUES"
-                for pexs in range(0,len(pesxpro)):
-                    aux = pesxpro[pexs][1]
-                    if aux[0] == 'C':
-                        aux = aux[1:-1].rjust(3, '0')
-                    elif aux[0] == 'I':
-                        aux = '001'
-                    querryInsertPex = querryInsertPex + f"('{data_cert[0]}',{listCert[pesxpro[pexs][2]]},'{pesxpro[pexs][1]}','{aux}',{pesxpro[pexs][3]},{pesxpro[pexs][4]},{pesxpro[pexs][5]},{pesxpro[pexs][6]},{pesxpro[pexs][7]},{pesxpro[pexs][8]},{pesxpro[pexs][9]},{pesxpro[pexs][10]},{pesxpro[pexs][11]},{pesxpro[pexs][12]},{pesxpro[pexs][13]},{pesxpro[pexs][14]},{pesxpro[pexs][15]},{pesxpro[pexs][16]},{pesxpro[pexs][17]},{pesxpro[pexs][18]},{pesxpro[pexs][19]},{pesxpro[pexs][20]},{pesxpro[pexs][21]},{pesxpro[pexs][22]},{pesxpro[pexs][23]},{pesxpro[pexs][24]},{pesxpro[pexs][25]},{pesxpro[pexs][26]},{pesxpro[pexs][27]},{pesxpro[pexs][28]},{pesxpro[pexs][29]}),"
-                
-                print("     ==> UPLOADING PEXPROXS..")
-                try:
-                    # cursormysql.execute(f"DELETE cargpesxes WHERE codPro LIKE '{data_cert[0]}'")
-                    # MySQLConnection.commit()
-                    cursormysql.execute(querryInsertPex[:-1])
-                    MySQLConnection.commit()  
-                    print ("        ==> SUCCESSFULLY LOADED PESXPRO TEST DATA ✅")
-                except:
-                    logs += f"==> ERROR LADING PESXPRO TEST DATA ⚠ || {data_cert[0]}\n" 
-                    print ("        ==> ERROR LADING PESXPRO TEST DATA ⚠")
+                cursormysql.execute(f"SELECT COUNT(*) FROM cargpesxes WHERE codPro LIKE '{data_cert[0]}'")
+                pexesMy = cursormysql.fetchone()
+                print(pexesMy[0])
+                if pexesMy[0] == 0 :
+                    querryInsertPex = "INSERT INTO cargpesxes(codPro, cert_item_id, tip, keyJ, N1, N2, N2A, N5, N10, N20, N20A, N50, N100, N200, N200A, N500, N1000, N2000, N2000A, N5000, N10000, N20000, N500000, N1000000, CrgPxp1, CrgPxp2, CrgPxp3, CrgPxp4, CrgPxp5, CrgPxp6, AjsPxp) VALUES"
+                    for pexs in range(0,len(pesxpro)):
+                        aux = pesxpro[pexs][1]
+                        if aux[0] == 'C':
+                            aux = aux[1:-1].rjust(3, '0')
+                        elif aux[0] == 'I':
+                            aux = '001'
+                        querryInsertPex = querryInsertPex + f"('{data_cert[0]}',{listCert[pesxpro[pexs][2]]},'{pesxpro[pexs][1]}','{aux}',{pesxpro[pexs][3]},{pesxpro[pexs][4]},{pesxpro[pexs][5]},{pesxpro[pexs][6]},{pesxpro[pexs][7]},{pesxpro[pexs][8]},{pesxpro[pexs][9]},{pesxpro[pexs][10]},{pesxpro[pexs][11]},{pesxpro[pexs][12]},{pesxpro[pexs][13]},{pesxpro[pexs][14]},{pesxpro[pexs][15]},{pesxpro[pexs][16]},{pesxpro[pexs][17]},{pesxpro[pexs][18]},{pesxpro[pexs][19]},{pesxpro[pexs][20]},{pesxpro[pexs][21]},{pesxpro[pexs][22]},{pesxpro[pexs][23]},{pesxpro[pexs][24]},{pesxpro[pexs][25]},{pesxpro[pexs][26]},{pesxpro[pexs][27]},{pesxpro[pexs][28]},{pesxpro[pexs][29]}),"
+                    
+                    print("     ==> UPLOADING PEXPROXS..")
+                    try:
+                        # cursormysql.execute(f"DELETE cargpesxes WHERE codPro LIKE '{data_cert[0]}'")
+                        # MySQLConnection.commit()
+                        cursormysql.execute(querryInsertPex[:-1])
+                        MySQLConnection.commit()  
+                        print ("        ==> SUCCESSFULLY LOADED PESXPRO TEST DATA ✅")
+                    except:
+                        logs += f"==> ERROR LADING PESXPRO TEST DATA ⚠ || {data_cert[0]}\n" 
+                        print ("        ==> ERROR LADING PESXPRO TEST DATA ⚠")
+                else :
+                    logs += f"==> ALREADY EXIST PESXPRO TEST DATA ⚠ || {data_cert[0]}\n" 
+                    print (" ==> ALREADY EXIST PESXPRO TEST DATA ⚠    -----------")
+
         
         print("""\n♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠
             \n♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠-♠
