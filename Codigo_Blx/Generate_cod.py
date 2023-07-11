@@ -32,12 +32,18 @@ print('GETING BALANCES DATA FROM DATA BASE....')
 ## busca todos los proyectos pendientes de MySQL
 cursormysql.execute("SELECT id FROM balances")
 data = cursormysql.fetchall()
-print(data, len(data))
 
 for blx in data:
-    print (generate_cod(blx[0]))
+    cod_hex = generate_cod(blx[0])
+    cod_prc = "BX-" + cod_hex.zfill(5)
+    
+    try:
+        cursormysql.execute(f"UPDATE balances SET codPrc = '{cod_prc}' WHERE id LIKE {blx[0]}")
+        print()
+        MySQLConnection.commit()
+        print(f"        ==> UPDATED BALANCE '{blx[0]}' SUCCESS ✅")
+    except:
+        print (F"        ==> ERROR UPDATED BALANCE '{blx[0]}' ⚠")
 
-# num = 4530
-# hex = generate_cod(num)
 
 print('=========================================================================')
