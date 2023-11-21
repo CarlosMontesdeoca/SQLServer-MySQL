@@ -6,9 +6,11 @@ from datetime import date
 
 today = date.today()
 
+logs = ''
+
 try:
     MySQLConnection = pymysql.connect(host="127.0.0.1",user="root",database="pruebas" )
-    print (" ==> CONNECCTION SUCCESS WITH MYSQL")
+    print (" ==> CONEXION EXITOSA CON MYSQL")
 except:
     print ('error to try connect the database MySQL')
 
@@ -20,7 +22,7 @@ print('=========================================================================
 cursormysql = MySQLConnection.cursor()
 ## ==============================================================
 
-print('READING PROJECTS DATA....')
+print('LEYENDO TODOS LOS PROYECTOS')
 ## busca todos los proyectos pendientes de MySQL
 cursormysql.execute("SELECT * FROM projects WHERE codPro IS NOT NULL")
 data = cursormysql.fetchall()
@@ -39,8 +41,30 @@ for dt in data:
     if ( dt[8] == 'F' ):
         aux_est = 'F'
     
-    print(f"CREATING ORDER ================> {offert}")
-    query_offert = f"INSERT INTO orders (N_offert, plant_id, contact_id, ases_id, fact, itms, est, com, created_at, updated_at) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-    valor_offet = (offert,dt[4],dt[5],dt[11],dt[9],dt[14],aux_est,dt[17],dt[18],dt[19])
+    print(f"INGRESANDO PROYECTO DEL PEDIDO ================> {offert}")
+
     
+    cursormysql.execute(f"SELECT * FROM orders WHERE N_offert LIKE '{offert}'")
+    order = cursormysql.fetchone()
+
+    # Se compara que el numero de orden no este registrado
+    # si esta registrado solo obtendremos el id de orden o lo crearemos para agregar los proyectos
+    if order :
+        order_id = order[0]
+    else :
+        print('   CREANDO PEDIDO..')
+        query_offert = f"INSERT INTO orders (N_offert, plant_id, contact_id, ases_id, fact, itms, est, com, created_at, updated_at) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+        valor_offet = (offert,dt[4],dt[5],dt[11],dt[9],dt[14],aux_est,dt[17],dt[18],dt[19])
+        # cursormysql.execute(query_offert, valor_offet)
+        # MySQLConnection.commit()
+        # order = cursormysql.fetchone()
+        # order_id = order[0]
+    
+
+
+    # try: 
+    #     cursormysql.execute(f"INSERT INTO balances (tip,marc,modl,ser,cls,maxCap,usCap,div_e,div_d,uni,plant_id) VALUES ('{data_cert[3]}','{data_cert[5]}','{data_cert[6]}','{data_cert[7]}','{clsBl}',{data_cert[8]},{data_cert[9]},{round(data_cert[10],6)},{round(data_cert[11],6)},'kg',{idPlant[0]})")
+    #     MySQLConnection.commit()
+    # except:
+    #     logs += f"==> ERROR TO CREATED NEW BALANCE FOR CERTIFICATE ⚠ \n" 
 MySQLConnection.close()
