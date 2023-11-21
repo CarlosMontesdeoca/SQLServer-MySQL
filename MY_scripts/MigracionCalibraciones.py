@@ -59,7 +59,11 @@ for dt in data:
         # MySQLConnection.commit()
         # order = cursormysql.fetchone()
         # order_id = order[0]
-    
+
+    # Crear proyecto y asignarlo al numero de orden
+    print('   CREANDO PROYECTO..')
+    query_calibrate = f"INSERT INTO calibrates (order_id, tip, codPro, metrologist_id, recPor, fecAsg, path, est, com, created_at, updated_at) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+    valor_calibrate = (order_id,dt[2],dt[3],dt[6],dt[7],dt[12],dt[15],dt[8],dt[-3],dt[-2],dt[-1])
 
 
     # try: 
