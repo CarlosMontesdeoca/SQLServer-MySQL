@@ -6,7 +6,7 @@ from datetime import date
 today = date.today()
 
 try:
-    MySQLConnection = pymysql.connect(host="127.0.0.1",user="root",passwd="",database="pruebas" )
+    MySQLConnection = pymysql.connect(host="192.168.9.221",user="root",passwd="AdminSistemas@",database="metrologia" )
     print (" ==> CONNECCTION SUCCESS WITH MYSQL")
 except:
     print ('error to try connect the database MySQL')
