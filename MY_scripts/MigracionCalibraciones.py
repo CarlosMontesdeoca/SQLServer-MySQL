@@ -62,6 +62,8 @@ for dt in data:
             cursormysql.execute(query_offert)
             MySQLConnection.commit()
             order_id = cursormysql.lastrowid
+            cursormysql.execute(f"""INSERT INTO services_apr (cant, service_id, order_id) VALUES (1,###,{order_id})""")
+            MySQLConnection.commit()
             print(f"       PEDIDO CREADO CORRECTAMENTE")
         except pymysql.connect.Error as err:
             print(f"Error de MySQL: {err}")
