@@ -9,7 +9,7 @@ today = date.today()
 logs = ''
 
 try:
-    MySQLConnection = pymysql.connect(host="127.0.0.1",user="root",database="pruebas" )
+    MySQLConnection = pymysql.connect(host="127.0.0.1",user="root",database="test" )
     print (" ==> CONEXION EXITOSA CON MYSQL")
 except:
     print ('error to try connect the database MySQL')
@@ -66,7 +66,7 @@ for dt in data:
             MySQLConnection.commit()
             print(f"       PEDIDO CREADO CORRECTAMENTE")
         except pymysql.connect.Error as err:
-            print(f"Error de MySQL: {err}")
+            print(f"linea 69, Error de MySQL: {err}")
 
     # Crear proyecto y asignarlo al numero de orden
     print('   CREANDO PROYECTO..')
@@ -77,7 +77,7 @@ for dt in data:
         project_id = cursormysql.lastrowid
         print(f"       PRYECTO CREADO CORRECTAMENTE")
     except pymysql.connect.Error as err:
-        print(f"Error de MySQL: {err}")
+        print(f"linea 80, Error de MySQL: {err}")
     
     print('   INDEXANDO CERTIFICADOS..')
     if dt[2] == 'ICC':
