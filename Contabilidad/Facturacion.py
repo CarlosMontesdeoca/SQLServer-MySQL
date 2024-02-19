@@ -49,21 +49,18 @@ cursormysql = MySQLConnection.cursor()
 # busca las facturas del año actual
 querryFindFactura = """SELECT
     Factura,
-	FACHIS.FHComent2 AS OFERTA,
-    FechaEmision AS EMISION
+	F.FHComent2 AS OFERTA
 FROM
     CXCHISFACTURASCUOTAS FC
     JOIN CXCHIS CH ON FC.CXCHISID = CH.CLHID
-    JOIN CXCDIR CD ON CD.codigoid = clhcdid
-	JOIN FACHIS ON CD.codigoid = FACHIS.FHClave
+	JOIN FACHIS F ON FC.Factura = F.FHFactura
     JOIN CXCPTRX CP ON CP.CTID = CH.CLTD
 WHERE
-	CP.CTCodigo like 'CA'
+	CP.CTCodigo not like 'FC'
 	AND YEAR(FechaEmision) = YEAR(GETDATE())
 GROUP BY 
 	Factura,
-	FACHIS.FHComent2,
-	FechaEmision
+	F.FHComent2
 ORDER BY
     Factura;"""
 
@@ -77,19 +74,22 @@ print(f"Se encontraron {len(facturasInfo)}")
 
 for fact in facturasInfo:
     # print(f"FACTURA #: {fact[0]}, ===> codigo de oferta: {fact[1]}")
-    if fact[0] != None :
-        if validate_order(fact[1]):
-            print(f"FACTURA #: {fact[0]}, ===> codigo de oferta: {fact[1]}")
-
-# querryFindOrders = """SELECT * FROM orders WHERE est LIKE 'F' and numFact is NULL;"""
-
-# try:
-#     cursormysql.execute(querryFindOrders)
-#     ordersInfo = cursormysql.fetchall()
-# except Exception as e:
-#     print(f'ERROR AL EXTRAER LAS FACTURAS: {str(e)}')
-
-# print(f"Se encontraron {len(querryFindOrders)} pedidos")
+    offert = fact[1]
+    if offert != None :
+        aux = offert.split()
+        if len(aux) > 0:
+            aux = aux[-1]
+            if validate_order(aux):
+                print (f"factura: {fact[0]}, oferta: {aux}")
+        #     print(offert)
+    #         print(f"FACTURA #: {fact[0]}, ===> codigo de oferta: {offert}")
+    # # busqueda de oferta especifica para realizar el registro de datos
+    #         querryFindOrder = f"SELECT * FROM orders WHERE N_offert LIKE '{offert}' AND est LIKE 'F' AND numFact is NULL;"
+    #         try:
+    #             cursormysql.execute(querryFindOrder)
+    #             ordersInfo = cursormysql.fetchone()
+    #         except Exception as e:
+    #             print(f'ERROR AL EXTRAER LAS FACTURAS: {str(e)}')
 
 MySQLConnection.close()
 SQLServerConnection.close()
