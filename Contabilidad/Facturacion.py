@@ -35,7 +35,7 @@ except:
     print ('error to try connect the database SQL Server')
 
 try:
-    MySQLConnection = pymysql.connect(host="127.0.0.1",user="root",passwd="",database="pruebas" )
+    MySQLConnection = pymysql.connect(host="127.0.0.1",user="root",passwd="",database="test-web" )
     print (" ==> CONNECCTION SUCCESS WITH MYSQL")
 except:
     logs += "==> error to try connect the database MySQL \n" 
@@ -80,6 +80,20 @@ for fact in facturasInfo:
         if len(aux) > 0:
             aux = aux[-1]
             if validate_order(aux):
+                
+                cursormysql.execute(f"SELECT * FROM orders WHERE N_offert LIKE '{aux}'")
+                order = cursormysql.fetchone()
+                if order : 
+                    if order[7] == None :
+                        try:
+                            cursormysql.execute(f"UPDATE orders set numFact = '{fact[0]}' WHERE N_offert LIKE '{aux}'")
+                            MySQLConnection.commit()
+                            print(f'✔️ Factura N°: {fact[0]}')
+                        except:
+                            print('❌ no existe la oferta registrada!!')
+                            
+                else :
+                    print('❌ no existe la oferta registrada!!')
                 print (f"factura: {fact[0]}, oferta: {aux}")
         #     print(offert)
     #         print(f"FACTURA #: {fact[0]}, ===> codigo de oferta: {offert}")
@@ -90,6 +104,7 @@ for fact in facturasInfo:
     #             ordersInfo = cursormysql.fetchone()
     #         except Exception as e:
     #             print(f'ERROR AL EXTRAER LAS FACTURAS: {str(e)}')
+                print('========================================================================')
 
 MySQLConnection.close()
 SQLServerConnection.close()
