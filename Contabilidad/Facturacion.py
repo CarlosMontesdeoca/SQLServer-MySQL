@@ -35,7 +35,7 @@ except:
     print ('error to try connect the database SQL Server')
 
 try:
-    MySQLConnection = pymysql.connect(host="127.0.0.1",user="root",passwd="",database="test-web" )
+    MySQLConnection = pymysql.connect(host="127.0.0.1",user="root",passwd="",database="pruebas" )
     print (" ==> CONNECCTION SUCCESS WITH MYSQL")
 except:
     logs += "==> error to try connect the database MySQL \n" 
@@ -49,18 +49,20 @@ cursormysql = MySQLConnection.cursor()
 # busca las facturas del año actual
 querryFindFactura = """SELECT
     Factura,
-	F.FHComent2 AS OFERTA
+	F.FHComent2 AS OFERTA,
+	CP.CTCodigo
 FROM
     CXCHISFACTURASCUOTAS FC
     JOIN CXCHIS CH ON FC.CXCHISID = CH.CLHID
 	JOIN FACHIS F ON FC.Factura = F.FHFactura
     JOIN CXCPTRX CP ON CP.CTID = CH.CLTD
 WHERE
-	CP.CTCodigo not like 'FC'
+	CP.CTCodigo  in ('RR', 'RI', 'CA')
 	AND YEAR(FechaEmision) = YEAR(GETDATE())
 GROUP BY 
 	Factura,
-	F.FHComent2
+	F.FHComent2,
+	CP.CTCodigo
 ORDER BY
     Factura;"""
 
@@ -83,28 +85,27 @@ for fact in facturasInfo:
                 
                 cursormysql.execute(f"SELECT * FROM orders WHERE N_offert LIKE '{aux}'")
                 order = cursormysql.fetchone()
-                if order : 
-                    if order[7] == None :
-                        try:
-                            cursormysql.execute(f"UPDATE orders set numFact = '{fact[0]}' WHERE N_offert LIKE '{aux}'")
-                            MySQLConnection.commit()
-                            print(f'✔️ Factura N°: {fact[0]}')
-                        except:
-                            print('❌ no existe la oferta registrada!!')
+                if order :
+                    if fact[2] == 'CA':
+                        if order[7] == None :
+                            querryOrder = f"UPDATE orders set numFact = '{fact[0]}', fecRegPag = '{today}', est = 'A' WHERE N_offert LIKE '{aux}'"
+                        if order[7] == fact[0] and order[11] == 'F':
+                            querryOrder = f"UPDATE orders set fecRegPag = '{today}', est = 'A' WHERE N_offert LIKE '{aux}'"
+                    else :
+                        querryOrder = f"UPDATE orders set numFact = '{fact[0]}', est = 'F' WHERE N_offert LIKE '{aux}'"
+
+                    try:
+                        cursormysql.execute(querryOrder)
+                        MySQLConnection.commit()
+                        print(f'✔️ Factura N°: {fact[0]}')
+                        print('========================================================================')
+                    except:
+                        print('❌ no existe la oferta registrada!!')
+                        print('========================================================================')
                             
                 else :
-                    print('❌ no existe la oferta registrada!!')
-                print (f"factura: {fact[0]}, oferta: {aux}")
-        #     print(offert)
-    #         print(f"FACTURA #: {fact[0]}, ===> codigo de oferta: {offert}")
-    # # busqueda de oferta especifica para realizar el registro de datos
-    #         querryFindOrder = f"SELECT * FROM orders WHERE N_offert LIKE '{offert}' AND est LIKE 'F' AND numFact is NULL;"
-    #         try:
-    #             cursormysql.execute(querryFindOrder)
-    #             ordersInfo = cursormysql.fetchone()
-    #         except Exception as e:
-    #             print(f'ERROR AL EXTRAER LAS FACTURAS: {str(e)}')
-                print('========================================================================')
+                    print('⚠️ no existe la oferta registrada!!')
+                    print('========================================================================')
 
 MySQLConnection.close()
 SQLServerConnection.close()
