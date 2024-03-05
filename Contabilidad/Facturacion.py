@@ -88,11 +88,14 @@ for fact in facturasInfo:
                 if order :
                     if fact[2] == 'CA':
                         if order[7] == None :
-                            querryOrder = f"UPDATE orders set numFact = '{fact[0]}', fecRegPag = '{today}', est = 'A' WHERE N_offert LIKE '{aux}'"
+                            querryOrder = f"UPDATE orders set numFact = '{fact[0]}', fecRegPag = '{today}', fecCom = '{today}', est = 'A' WHERE N_offert LIKE '{aux}'"
                         if order[7] == fact[0] and order[11] == 'F':
-                            querryOrder = f"UPDATE orders set fecRegPag = '{today}', est = 'A' WHERE N_offert LIKE '{aux}'"
+                            querryOrder = f"UPDATE orders set fecRegPag = '{today}', fecCom = '{today}', est = 'A' WHERE N_offert LIKE '{aux}'"
                     else :
-                        querryOrder = f"UPDATE orders set numFact = '{fact[0]}', est = 'F' WHERE N_offert LIKE '{aux}'"
+                        if order[11] != 'A':
+                            querryOrder = f"UPDATE orders set numFact = '{fact[0]}', est = 'F' WHERE N_offert LIKE '{aux}'"
+                        else :
+                            querryOrder = ''
 
                     try:
                         cursormysql.execute(querryOrder)
