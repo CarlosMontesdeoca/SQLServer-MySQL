@@ -1,4 +1,5 @@
 import openpyxl
+from openpyxl.styles import Protection
 import pymysql
 import pymongo
 
@@ -54,9 +55,11 @@ def getDisc(order_id, met_id):
     else:
         return n / d
 
-def insertInToExcel(start, data, sheet):
+def insertInToExcel(start, data, sheet, cos_prec):
     cursormongo = connectMongo()
+    i_prec = start - 1
     temp = {}
+    t_serv, t_cals, t_soft = 0,0,0
     for metrologist in data:
         cals, serv, soft, disc = 0,0,0,0
         print(metrologist[1])
@@ -82,20 +85,29 @@ def insertInToExcel(start, data, sheet):
             # print(cost)
             if commision[5]:
                 cals += cost
+                t_cals += cost
                 disc += getDisc(commision[4], metrologist[0])
             elif commision[6] == 'SOFTWARE':
                 soft += cost
+                t_soft += cost
             else:
-                soft += cost
+                serv += cost
+                t_serv += cost
+            # tols += cost * 0.1
         print('==============================================================')
         print(serv,cals,soft)
+        print('II ====', start)
         sheet[f"D{start}"] = metrologist[1]
         sheet[f"E{start}"] = f"{metrologist[7]}%"
-        sheet[f"F{start}"] = serv
+        sheet[f"F{start}"] = serv * 0.9
         sheet[f"H{start}"] = disc
-        sheet[f"I{start}"] = cals
-        sheet[f"K{start}"] = soft
+        sheet[f"I{start}"] = cals * 0.7
+        sheet[f"K{start}"] = soft * 0.9
         start += 1
+    if cos_prec:
+        sheet[f"F{i_prec}"] = t_serv * 0.1
+        sheet[f"I{i_prec}"] = t_cals * 0.3
+        sheet[f"K{i_prec}"] = t_soft * 0.1
     # print(temp)
 cursormysql = connectMySQL()
 
@@ -104,37 +116,25 @@ cursormysql = connectMySQL()
 work_sheet = openpyxl.load_workbook('Contabilidad/plantilla.xlsx')
 sheet = work_sheet.active
 
+sheet.protection.password = "P43C1T401"
+
 ## Ingresar tecnicos de Quito
 metrologistsList = getMetrologists('UIO')
 print('UIO', len(metrologistsList))
-insertInToExcel(7, metrologistsList, sheet)
+insertInToExcel(7, metrologistsList, sheet, True)
 
 ## Ingresar tecnicos de Guayaquil
 metrologistsList = getMetrologists('GYE')
 print('GYE', len(metrologistsList))
-insertInToExcel(20, metrologistsList, sheet)
+insertInToExcel(20, metrologistsList, sheet, True)
 
 ## Ingresar tecnicos de Manta
 metrologistsList = getMetrologists('MTA')
 print('MTA', len(metrologistsList))
-insertInToExcel(32, metrologistsList, sheet)
+insertInToExcel(32, metrologistsList, sheet, False)
+
+for row in sheet.iter_rows():
+    for cell in row:
+        cell.protection = Protection(locked=True)
 
 work_sheet.save(f"Reporte_{year}_{month}.xlsx")
-
-# print(metrologists)
-    
-# grab the active worksheet
-# ws = wb.active
-
-# # Data can be assigned directly to cells
-# ws['A1'] = 42
-
-# # Rows can also be appended
-# ws.append([1, 2, 3])
-
-# # Python types will automatically be converted
-# import datetime
-# ws['A2'] = datetime.datetime.now()
-
-# # Save the file
-# wb.save("sample.xlsx")
