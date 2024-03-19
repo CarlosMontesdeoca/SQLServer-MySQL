@@ -2,9 +2,11 @@ import openpyxl
 from openpyxl.styles import Protection
 import pymysql
 import pymongo
+import sys
 
-year = '2024'
-month = '03'
+
+year = sys.argv[1]
+month = sys.argv[2]
 
 def connectMySQL():
     try:
