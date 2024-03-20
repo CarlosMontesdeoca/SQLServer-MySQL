@@ -87,11 +87,14 @@ for fact in facturasInfo:
                 order = cursormysql.fetchone()
                 if order :
                     if fact[2] == 'CA':
+                        ## sin numero de oferta  y se registra como pagado
                         if order[7] == None :
                             querryOrder = f"UPDATE orders set numFact = '{fact[0]}', fecRegPag = '{today}', fecCom = '{today}', est = 'A' WHERE N_offert LIKE '{aux}'"
+                        ## si coinciden los numeros de oferta y esta en estado F(autorizado)
                         if order[7] == fact[0] and order[11] == 'F':
                             querryOrder = f"UPDATE orders set fecRegPag = '{today}', fecCom = '{today}', est = 'A' WHERE N_offert LIKE '{aux}'"
                     else :
+                        ## sin pago registrado
                         if order[11] != 'A':
                             querryOrder = f"UPDATE orders set numFact = '{fact[0]}', est = 'F' WHERE N_offert LIKE '{aux}'"
                         else :

@@ -3,10 +3,17 @@ from openpyxl.styles import Protection
 import pymysql
 import pymongo
 import sys
-
+import os
 
 year = sys.argv[1]
 month = sys.argv[2]
+
+if int(month) == 1 :
+    year_filter = int(year) - 1
+    month_filter = 12
+else :
+    year_filter = year
+    month_filter = int(month) - 1
 
 def connectMySQL():
     try:
@@ -69,8 +76,8 @@ def insertInToExcel(start, data, sheet, cos_prec):
             JOIN services_apr SA ON C.service_apr_id = SA.id
             JOIN orders O ON O.id = SA.order_id
             JOIN services S ON S.id = SA.service_id 
-            WHERE YEAR(C.created_at) = {year}
-            AND MONTH(C.created_at) = {month}
+            WHERE YEAR(C.created_at) = {year_filter}
+            AND MONTH(C.created_at) = {month_filter}
             AND O.est = 'A'
             AND C.metrologist_id = {metrologist[0]}
             AND S.com = true;""")
@@ -113,7 +120,6 @@ def insertInToExcel(start, data, sheet, cos_prec):
     # print(temp)
 cursormysql = connectMySQL()
 
-
 #     print(metrologist[1])
 work_sheet = openpyxl.load_workbook('Contabilidad/plantilla.xlsx')
 sheet = work_sheet.active
@@ -139,4 +145,8 @@ for row in sheet.iter_rows():
     for cell in row:
         cell.protection = Protection(locked=True)
 
-work_sheet.save(f"Reporte_{year}_{month}.xlsx")
+path = f"C:/archivos_contabilidad/Comisiones/{year}/"
+doc = f"Reporte_{year}_{month}"
+os.makedirs(path, exist_ok=True)
+
+work_sheet.save(f"{path}{doc}.xlsx")
