@@ -106,17 +106,17 @@ def insertInToExcel(start, data, sheet, cos_prec):
         print('==============================================================')
         print(serv,cals,soft)
         print('II ====', start)
-        sheet[f"D{start}"] = metrologist[1]
-        sheet[f"E{start}"] = f"{metrologist[7]}%"
-        sheet[f"F{start}"] = serv * 0.9
-        sheet[f"H{start}"] = disc
-        sheet[f"I{start}"] = cals * 0.7
-        sheet[f"K{start}"] = soft * 0.9
+        sheet[f"B{start}"] = metrologist[1]
+        sheet[f"C{start}"] = f"{metrologist[7]}%"
+        sheet[f"D{start}"] = serv * 0.9
+        sheet[f"F{start}"] = disc
+        sheet[f"G{start}"] = cals * 0.7
+        sheet[f"I{start}"] = soft * 0.9
         start += 1
     if cos_prec:
-        sheet[f"F{i_prec}"] = t_serv * 0.1
-        sheet[f"I{i_prec}"] = t_cals * 0.3
-        sheet[f"K{i_prec}"] = t_soft * 0.1
+        sheet[f"D{i_prec}"] = t_serv * 0.1
+        sheet[f"G{i_prec}"] = t_cals * 0.3
+        sheet[f"I{i_prec}"] = t_soft * 0.1
     # print(temp)
 cursormysql = connectMySQL()
 
