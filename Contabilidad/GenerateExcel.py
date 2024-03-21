@@ -47,13 +47,13 @@ def getMetrologists(loc):
         return False
     
 def getDisc(order_id, met_id):
-    cursormysql.execute(f"""SELECT C.dsc, COUNT(CE.id) FROM orders O
-	JOIN calibrates C ON O.id = C.order_id
+    cursormysql.execute(f"""SELECT C.dsc, COUNT(CE.id) FROM calibrates C
     JOIN certificates CE ON CE.calibrate_id = C.id
-    WHERE O.id LIKE {order_id}
+    WHERE C.order_id LIKE {order_id}
     AND C.metrologist_id LIKE {met_id}
     AND CE.est NOT IN ('C','D');""")
     disc_list = cursormysql.fetchall()
+    # print(disc_list)
     n, d = 0, 0
     for data in disc_list:
         if data[0]:
@@ -76,8 +76,8 @@ def insertInToExcel(start, data, sheet, cos_prec):
             JOIN services_apr SA ON C.service_apr_id = SA.id
             JOIN orders O ON O.id = SA.order_id
             JOIN services S ON S.id = SA.service_id 
-            WHERE YEAR(C.created_at) = {year_filter}
-            AND MONTH(C.created_at) = {month_filter}
+            WHERE YEAR(O.fecRegPag) = {year_filter}
+            AND MONTH(O.fecRegPag) = {month_filter}
             AND O.est = 'A'
             AND C.metrologist_id = {metrologist[0]}
             AND S.com = true;""")
@@ -87,25 +87,31 @@ def insertInToExcel(start, data, sheet, cos_prec):
             if commision[0] not in temp:
                 quote = cursormongo.find_one({"N_offert": commision[0]})
                 temp[commision[0]] = [quote['disc'], quote['services']]
-
+                
             result = next(item for item in temp[commision[0]][1] if item['service_id'] == commision[3])
             cost = result['cant'] * result['cost'] * ( 100 - temp[commision[0]][0]) / 100
-            # print(commision[0], temp[commision[0]])
-            # print(cost)
+
             if commision[5]:
+                tip = 'C'
                 cals += cost
                 t_cals += cost
-                disc += getDisc(commision[4], metrologist[0])
+                disc += getDisc(commision[4], metrologist[0]) * cost * commision[1] / 10000
             elif commision[6] == 'SOFTWARE':
+                tip = 'S'
                 soft += cost
                 t_soft += cost
             else:
+                tip = 'O'
                 serv += cost
                 t_serv += cost
+            
+            print(f"OFERTA_{tip}: {commision[0]}| Descuento: {temp[commision[0]][0]}| Participacion: {commision[1]}| Cantidad {result['cant']}|Costo {result['cost']}| Multa {disc} == {result['service_id']}")
             # tols += cost * 0.1
+        # print(temp)
+        print(f'TOTAL: C {cals} || S {soft} || O {serv}')
         print('==============================================================')
         print(serv,cals,soft)
-        print('II ====', start)
+        print('II ====', metrologist[7])
         sheet[f"B{start}"] = metrologist[1]
         sheet[f"C{start}"] = f"{metrologist[7]}%"
         sheet[f"D{start}"] = serv * 0.9
