@@ -89,7 +89,7 @@ def insertInToExcel(start, data, sheet, cos_prec):
                 temp[commision[0]] = [quote['disc'], quote['services']]
                 
             result = next(item for item in temp[commision[0]][1] if item['service_id'] == commision[3])
-            cost = result['cant'] * result['cost'] * ( 100 - temp[commision[0]][0]) / 100
+            cost = result['cant'] * result['cost'] * (( 100 - temp[commision[0]][0]) / 100) * commision[1] / 100
 
             if commision[5]:
                 tip = 'C'
