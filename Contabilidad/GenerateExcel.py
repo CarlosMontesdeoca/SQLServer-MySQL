@@ -68,6 +68,7 @@ def insertInToExcel(start, data, sheet, cos_prec):
     cursormongo = connectMongo()
     i_prec = start - 1
     temp = {}
+    cellJB = 0
     t_serv, t_cals, t_soft = 0,0,0
     for metrologist in data:
         cals, serv, soft, disc = 0,0,0,0
@@ -92,26 +93,16 @@ def insertInToExcel(start, data, sheet, cos_prec):
             cost = result['cant'] * result['cost'] * (( 100 - temp[commision[0]][0]) / 100) * commision[1] / 100
 
             if commision[5]:
-                tip = 'C'
                 cals += cost
                 t_cals += cost
-                disc += getDisc(commision[4], metrologist[0]) * cost * commision[1] / 10000
+                disc += getDisc(commision[4], metrologist[0]) * cost * commision[1] * metrologist[7] / 1000000
             elif commision[6] == 'SOFTWARE':
-                tip = 'S'
                 soft += cost
                 t_soft += cost
             else:
-                tip = 'O'
                 serv += cost
                 t_serv += cost
-            
-            print(f"OFERTA_{tip}: {commision[0]}| Descuento: {temp[commision[0]][0]}| Participacion: {commision[1]}| Cantidad {result['cant']}|Costo {result['cost']}| Multa {disc} == {result['service_id']}")
-            # tols += cost * 0.1
-        # print(temp)
-        print(f'TOTAL: C {cals} || S {soft} || O {serv}')
-        print('==============================================================')
-        print(serv,cals,soft)
-        print('II ====', metrologist[7])
+
         sheet[f"B{start}"] = metrologist[1]
         sheet[f"C{start}"] = f"{metrologist[7]}%"
         sheet[f"D{start}"] = serv * 0.9
@@ -119,11 +110,14 @@ def insertInToExcel(start, data, sheet, cos_prec):
         sheet[f"G{start}"] = cals * 0.7
         sheet[f"I{start}"] = soft * 0.9
         start += 1
+        if metrologist[4] == 'JB':
+            cellJB = start
+        print('==============================================================')
     if cos_prec:
         sheet[f"D{i_prec}"] = t_serv * 0.1
         sheet[f"G{i_prec}"] = t_cals * 0.3
         sheet[f"I{i_prec}"] = t_soft * 0.1
-    # print(temp)
+    return cellJB
 cursormysql = connectMySQL()
 
 #     print(metrologist[1])
@@ -140,12 +134,18 @@ insertInToExcel(7, metrologistsList, sheet, True)
 ## Ingresar tecnicos de Guayaquil
 metrologistsList = getMetrologists('GYE')
 print('GYE', len(metrologistsList))
-insertInToExcel(20, metrologistsList, sheet, True)
+verify = insertInToExcel(20, metrologistsList, sheet, True)
+
 
 ## Ingresar tecnicos de Manta
 metrologistsList = getMetrologists('MTA')
 print('MTA', len(metrologistsList))
 insertInToExcel(32, metrologistsList, sheet, False)
+
+# celda de jorge bastidas
+sheet[f"D45"] = f"=D29-D19-D{verify-1}"
+sheet[f"F45"] = f"=G29-G19-G{verify-1}"
+sheet[f"H45"] = f"=K29-K19"
 
 for row in sheet.iter_rows():
     for cell in row:
