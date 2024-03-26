@@ -75,28 +75,35 @@ except Exception as e:
 print(f"Se encontraron {len(facturasInfo)}")
 
 for fact in facturasInfo:
-    # print(f"FACTURA #: {fact[0]}, ===> codigo de oferta: {fact[1]}")
+    ## Obtener el numero de Factura
     offert = fact[1]
+    ## Solo trabajamos con las consultas que tengas número de oferta
     if offert != None :
+        ## en caso de encontrar mas contenido del necesario trabajamos solo con el ultimo string
         aux = offert.split()
         if len(aux) > 0:
             aux = aux[-1]
             if validate_order(aux):
-                
+                ## -- busca la oferta en el SGO
                 cursormysql.execute(f"SELECT * FROM orders WHERE N_offert LIKE '{aux}'")
                 order = cursormysql.fetchone()
                 if order :
+
+                    ## -- Facturas Pagadas
                     if fact[2] == 'CA':
-                        ## sin numero de oferta  y se registra como pagado
+                        ## -- sin numero de factura  y se registra como pagado
                         if order[7] == None :
-                            querryOrder = f"UPDATE orders set numFact = '{fact[0]}', fecRegPag = '{today}', fecCom = '{today}', est = 'A' WHERE N_offert LIKE '{aux}'"
-                        ## si coinciden los numeros de oferta y esta en estado F(autorizado)
+                            querryOrder = f"UPDATE orders set numFact = '{fact[0]}', fecRegPag = '{today}', fecCom = '{today}', est = 'A', com = 'AUTORIZADO SAFI' WHERE N_offert LIKE '{aux}'"
+
+                        ## -- si coinciden los numeros de oferta y esta en estado F(autorizado)
                         if order[7] == fact[0] and order[11] == 'F':
                             querryOrder = f"UPDATE orders set fecRegPag = '{today}', fecCom = '{today}', est = 'A' WHERE N_offert LIKE '{aux}'"
+
+                    ## -- Retencion registrada
                     else :
                         ## sin pago registrado
                         if order[11] != 'A':
-                            querryOrder = f"UPDATE orders set numFact = '{fact[0]}', est = 'F' WHERE N_offert LIKE '{aux}'"
+                            querryOrder = f"UPDATE orders set numFact = '{fact[0]}', est = 'F, com = 'AUTORIZADO SAFI' WHERE N_offert LIKE '{aux}' "
                         else :
                             querryOrder = ''
 
