@@ -35,7 +35,7 @@ except:
     print ('error to try connect the database SQL Server')
 
 try:
-    MySQLConnection = pymysql.connect(host="127.0.0.1",user="root",passwd="",database="pruebas" )
+    MySQLConnection = pymysql.connect(host="127.0.0.1",user="root",passwd="AdminSistemas@",database="metrologia" )
     print (" ==> CONNECCTION SUCCESS WITH MYSQL")
 except:
     logs += "==> error to try connect the database MySQL \n" 
@@ -83,6 +83,7 @@ for fact in facturasInfo:
         aux = offert.split()
         if len(aux) > 0:
             aux = aux[-1]
+        
             if validate_order(aux):
                 ## -- busca la oferta en el SGO
                 cursormysql.execute(f"SELECT * FROM orders WHERE N_offert LIKE '{aux}'")
@@ -103,7 +104,7 @@ for fact in facturasInfo:
                     else :
                         ## sin pago registrado
                         if order[11] != 'A':
-                            querryOrder = f"UPDATE orders set numFact = '{fact[0]}', est = 'F, com = 'AUTORIZADO SAFI' WHERE N_offert LIKE '{aux}' "
+                            querryOrder = f"UPDATE orders set numFact = '{fact[0]}', est = 'F', com = 'AUTORIZADO SAFI' WHERE N_offert LIKE '{aux}' "
                         else :
                             querryOrder = ''
 
@@ -113,6 +114,7 @@ for fact in facturasInfo:
                         print(f'✔️ Factura N°: {fact[0]}')
                         print('========================================================================')
                     except:
+                        print('t', querryOrder)
                         print('❌ no existe la oferta registrada!!')
                         print('========================================================================')
                             
