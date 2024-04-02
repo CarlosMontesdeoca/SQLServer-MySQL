@@ -58,7 +58,7 @@ FROM
     JOIN CXCPTRX CP ON CP.CTID = CH.CLTD
 WHERE
 	CP.CTCodigo  in ('RR', 'RI', 'CA')
-	AND YEAR(FechaEmision) = YEAR(GETDATE())
+	AND YEAR(F.FHFechaf) = YEAR(GETDATE())
 GROUP BY 
 	Factura,
 	F.FHComent2,
