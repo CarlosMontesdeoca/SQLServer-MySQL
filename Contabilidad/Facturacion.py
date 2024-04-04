@@ -94,7 +94,6 @@ for fact in facturasInfo:
                 cursormysql.execute(f"SELECT * FROM orders WHERE N_offert LIKE '{aux}'")
                 order = cursormysql.fetchone()
                 if order :
-
                     ## -- Facturas Pagadas
                     if fact[2] == 'CA':
                         ## -- sin numero de factura  y se registra como pagado
@@ -107,8 +106,8 @@ for fact in facturasInfo:
 
                     ## -- Retencion registrada
                     else :
-                        ## sin pago registrado
-                        if order[11] != 'A':
+                        ## sin pago registrado debe estar en pendiente
+                        if order[11] == 'P':
                             querryOrder = f"UPDATE orders set numFact = '{fact[0]}', est = 'F', com = 'AUTORIZADO SAFI' WHERE N_offert LIKE '{aux}' "
                         else :
                             querryOrder = ''
