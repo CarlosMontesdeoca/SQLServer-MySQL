@@ -35,7 +35,7 @@ except:
     print ('error to try connect the database SQL Server')
 
 try:
-    MySQLConnection = pymysql.connect(host="127.0.0.1",user="root",passwd="AdminSistemas@",database="metrologia" )
+    MySQLConnection = pymysql.connect(host="127.0.0.1",user="root",passwd="",database="pruebas" )
     print (" ==> CONNECCTION SUCCESS WITH MYSQL")
 except:
     logs += "==> error to try connect the database MySQL \n" 
@@ -47,24 +47,29 @@ cursorsqlsrv = SQLServerConnection.cursor()
 cursormysql = MySQLConnection.cursor()
 
 # busca las facturas del año actual
-querryFindFactura = """SELECT
-    Factura,
-	F.FHComent2 AS OFERTA,
-	CP.CTCodigo
-FROM
-    CXCHISFACTURASCUOTAS FC
-    JOIN CXCHIS CH ON FC.CXCHISID = CH.CLHID
-	JOIN FACHIS F ON FC.Factura = F.FHFactura
-    JOIN CXCPTRX CP ON CP.CTID = CH.CLTD
+querryFindFactura = f"""SELECT  
+	FACHIS.FHFactura AS Factura,
+	FACHIS.FHComent2 AS OFERTA, 
+	CP.CTCodigo,
+	CONVERT(char(10), MAX(CLHFEmision), 23) AS fechaEmisionUltimoPago
+FROM 
+	INVBOD 
+	INNER JOIN INVHIS ON INVBOD.IBID = INVHIS.IHBodega 
+	INNER JOIN INVMAE ON INVHIS.IHProducto = INVMAE.IMId 
+	INNER JOIN INVCAT ON INVMAE.IMGrupo = INVCAT.ICID  
+	INNER JOIN FACHIS ON INVHIS.IHFHID = FACHIS.FHID
+	INNER JOIN CXCHISFacturasCuotas FC ON FC.Factura = FACHIS.FHFactura
+	LEFT OUTER JOIN CXCDIR ON CXCDIR.CodigoID = FACHIS.FHClave
+    INNER JOIN CXCHIS CH ON FC.CXCHISID = CH.CLHID
+    INNER JOIN CXCPTRX CP ON CP.CTID = CH.CLTD
+	
 WHERE
-	CP.CTCodigo  in ('RR', 'RI', 'CA')
-	AND YEAR(F.FHFechaf) = YEAR(GETDATE())
+	CP.CTCodigo  IN ('RR', 'RI', 'CA')
+	AND YEAR(CH.CLHFEmision) BETWEEN {today.year - 1} AND {today.year}
 GROUP BY 
-	Factura,
-	F.FHComent2,
-	CP.CTCodigo
-ORDER BY
-    Factura;"""
+	FACHIS.FHFactura,
+	FACHIS.FHComent2,
+	CP.CTCodigo;"""
 
 try:
     cursorsqlsrv.execute(querryFindFactura)
@@ -94,11 +99,11 @@ for fact in facturasInfo:
                     if fact[2] == 'CA':
                         ## -- sin numero de factura  y se registra como pagado
                         if order[7] == None :
-                            querryOrder = f"UPDATE orders set numFact = '{fact[0]}', fecRegPag = '{today}', fecCom = '{today}', est = 'A', com = 'AUTORIZADO SAFI' WHERE N_offert LIKE '{aux}'"
+                            querryOrder = f"UPDATE orders set numFact = '{fact[0]}', fecRegPag = '{fact[3]}', fecCom = '{today}', est = 'A', com = 'AUTORIZADO SAFI' WHERE N_offert LIKE '{aux}'"
 
                         ## -- si coinciden los numeros de oferta y esta en estado F(autorizado)
                         if order[7] == fact[0] and order[11] == 'F':
-                            querryOrder = f"UPDATE orders set fecRegPag = '{today}', fecCom = '{today}', est = 'A' WHERE N_offert LIKE '{aux}'"
+                            querryOrder = f"UPDATE orders set fecRegPag = '{fact[3]}', fecCom = '{today}', est = 'A' WHERE N_offert LIKE '{aux}'"
 
                     ## -- Retencion registrada
                     else :
