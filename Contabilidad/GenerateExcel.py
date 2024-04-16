@@ -143,17 +143,17 @@ metrologistsList = getMetrologists('MTA')
 print('MTA', len(metrologistsList))
 insertInToExcel(32, metrologistsList, sheet, False)
 
-# celda de jorge bastidas
-sheet[f"D45"] = f"=D29-D19-D{verify-1}"
-sheet[f"F45"] = f"=G29-G19-G{verify-1}"
-sheet[f"H45"] = f"=K29-K19"
+# # celda de jorge bastidas
+# sheet[f"D45"] = f"=D29-D19-D{verify-1}"
+# sheet[f"F45"] = f"=G29-G19-G{verify-1}"
+# sheet[f"H45"] = f"=K29-K19"
 
 for row in sheet.iter_rows():
     for cell in row:
         cell.protection = Protection(locked=True)
 
 path = f"C:/archivos_contabilidad/Comisiones/{year}/"
-doc = f"Reporte_{year}_{month}"
+doc = f"Reporte_{year}_{str(month).rjust(2, '0')}"
 os.makedirs(path, exist_ok=True)
 
 work_sheet.save(f"{path}{doc}.xlsx")
