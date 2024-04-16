@@ -1,12 +1,13 @@
 import openpyxl
 from openpyxl.styles import Protection
+from datetime import datetime
 import pymysql
 import pymongo
-import sys
 import os
 
-year = sys.argv[1]
-month = sys.argv[2]
+now = datetime.now()
+year = now.year
+month = now.month
 
 if int(month) == 1 :
     year_filter = int(year) - 1
@@ -17,7 +18,7 @@ else :
 
 def connectMySQL():
     try:
-        MySQLConnection = pymysql.connect(host="127.0.0.1",user="root",passwd="",database="pruebas" )
+        MySQLConnection = pymysql.connect(host="127.0.0.1",user="root",passwd="AdminSistemas@",database="metrologia" )
         print (" ==> CONNECCTION SUCCESS WITH MYSQL")
         return MySQLConnection.cursor()
     
