@@ -117,10 +117,8 @@ for fact in facturasInfo:
                         MySQLConnection.commit()
                         print(f'✔️ Factura N°: {fact[0]}')
                         print('========================================================================')
-                    except:
-                        print('t', querryOrder)
-                        print('❌ no existe la oferta registrada!!')
-                        print('========================================================================')
+                    except: 
+                        continue
                             
                 else :
                     print('⚠️ no existe la oferta registrada!!')
