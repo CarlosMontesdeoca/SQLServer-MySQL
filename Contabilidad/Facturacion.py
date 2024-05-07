@@ -87,42 +87,41 @@ for fact in facturasInfo:
         ## en caso de encontrar mas contenido del necesario trabajamos solo con el ultimo string
         aux = offert.split()
         if len(aux) > 0:
-            aux = aux[0]
-        
-            if validate_order(aux):
-                ## -- busca la oferta en el SGO
-                cursormysql.execute(f"SELECT * FROM orders WHERE N_offert LIKE '{aux}'")
-                order = cursormysql.fetchone()
-                if order :
-                    ## -- Facturas Pagadas
-                    if fact[2] == 'CA':
-                        ## -- sin numero de factura  y se registra como pagado
-                        if order[7] == None :
-                            querryOrder = f"UPDATE orders set numFact = '{fact[0]}', fecRegPag = '{fact[3]}', fecCom = '{today}', autr = 1, est = 'A', com = 'AUTORIZADO SAFI' WHERE N_offert LIKE '{aux}'"
+            for temp_order in aux :
+                if validate_order(temp_order):
+                    ## -- busca la oferta en el SGO
+                    cursormysql.execute(f"SELECT * FROM orders WHERE N_offert LIKE '{temp_order}'")
+                    order = cursormysql.fetchone()
+                    if order :
+                        ## -- Facturas Pagadas
+                        if fact[2] == 'CA':
+                            ## -- sin numero de factura  y se registra como pagado
+                            if order[7] == None :
+                                querryOrder = f"UPDATE orders set numFact = '{fact[0]}', fecRegPag = '{fact[3]}', fecCom = '{today}', est = 'A', com = 'AUTORIZADO SAFI' WHERE N_offert LIKE '{temp_order}'"
 
-                        ## -- si coinciden los numeros de oferta y esta en estado F(autorizado)
-                        if order[7] == fact[0] and order[12] == 'F':
-                            querryOrder = f"UPDATE orders set fecRegPag = '{fact[3]}', fecCom = '{today}', autr = 1, est = 'A' WHERE N_offert LIKE '{aux}'"
+                            ## -- si coinciden los numeros de oferta y esta en estado F(autorizado)
+                            if order[7] == fact[0] and order[11] == 'F':
+                                querryOrder = f"UPDATE orders set fecRegPag = '{fact[3]}', fecCom = '{today}', est = 'A' WHERE N_offert LIKE '{temp_order}'"
 
-                    ## -- Retencion registrada
-                    else :
-                        ## sin pago registrado debe estar en pendiente
-                        if order[12] == 'P':
-                            querryOrder = f"UPDATE orders set numFact = '{fact[0]}', est = 'F', autr = 1, com = 'AUTORIZADO SAFI' WHERE N_offert LIKE '{aux}' "
+                        ## -- Retencion registrada
                         else :
-                            querryOrder = ''
+                            ## sin pago registrado debe estar en pendiente
+                            if order[11] == 'P':
+                                querryOrder = f"UPDATE orders set numFact = '{fact[0]}', est = 'F', com = 'AUTORIZADO SAFI' WHERE N_offert LIKE '{temp_order}' "
+                            else :
+                                querryOrder = ''
 
-                    try:
-                        cursormysql.execute(querryOrder)
-                        MySQLConnection.commit()
-                        print(f'✔️ Factura N°: {fact[0]}')
+                        try:
+                            cursormysql.execute(querryOrder)
+                            MySQLConnection.commit()
+                            print(f'✔️ Factura N°: {fact[0]}')
+                            print('========================================================================')
+                        except: 
+                            continue
+                                
+                    else :
+                        print('⚠️ no existe la oferta registrada!!')
                         print('========================================================================')
-                    except: 
-                        continue
-                            
-                else :
-                    print('⚠️ no existe la oferta registrada!!')
-                    print('========================================================================')
 
 MySQLConnection.close()
 SQLServerConnection.close()
