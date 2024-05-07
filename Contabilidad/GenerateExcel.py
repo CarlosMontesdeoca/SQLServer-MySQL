@@ -63,7 +63,7 @@ def getDisc(order_id, met_id):
     if d == 0 :
         return 0
     else:
-        return n / d
+        return (n / d) / 100
 
 def insertInToExcel(start, data, sheet, cos_prec):
     cursormongo = connectMongo()
@@ -96,7 +96,7 @@ def insertInToExcel(start, data, sheet, cos_prec):
             if commision[5]:
                 cals += cost
                 t_cals += cost
-                disc += getDisc(commision[4], metrologist[0]) * cost * commision[1] * metrologist[7] / 1000000
+                disc += getDisc(commision[4], metrologist[0]) * cost * 0.7 * metrologist[7] / 100
             elif commision[6] == 'SOFTWARE':
                 soft += cost
                 t_soft += cost

@@ -94,7 +94,6 @@ for fact in facturasInfo:
                 cursormysql.execute(f"SELECT * FROM orders WHERE N_offert LIKE '{aux}'")
                 order = cursormysql.fetchone()
                 if order :
-                    print(fact)
                     ## -- Facturas Pagadas
                     if fact[2] == 'CA':
                         ## -- sin numero de factura  y se registra como pagado
@@ -118,10 +117,8 @@ for fact in facturasInfo:
                         MySQLConnection.commit()
                         print(f'✔️ Factura N°: {fact[0]}')
                         print('========================================================================')
-                    except:
-                        print(aux, querryOrder)
-                        print('❌ no existe la oferta registrada!!')
-                        print('========================================================================')
+                    except: 
+                        continue
                             
                 else :
                     print('⚠️ no existe la oferta registrada!!')
