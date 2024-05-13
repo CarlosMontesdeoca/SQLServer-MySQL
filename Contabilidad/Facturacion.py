@@ -3,6 +3,7 @@
 import re
 import pyodbc
 import pymysql
+import pandas as pd
 from datetime import date
 
 ## esta funcion valida si el numero de oferta ingresado a la factura cumple con el formato correcto del Cotizador.
@@ -64,7 +65,7 @@ FROM
     INNER JOIN CXCPTRX CP ON CP.CTID = CH.CLTD
 	
 WHERE
-	CP.CTCodigo  IN ('RR', 'RI', 'CA')
+	CP.CTCodigo  IN ('RR', 'RI', 'CA', 'FC')
 	AND YEAR(CH.CLHFEmision) BETWEEN {today.year - 1} AND {today.year}
 GROUP BY 
 	FACHIS.FHFactura,
@@ -72,6 +73,8 @@ GROUP BY
 	CP.CTCodigo;"""
 
 try:
+    # df = pd.read_sql(querryFindFactura, SQLServerConnection)
+    # df.to_excel("facturas.xlsx", index = False, engine = 'openpyxl')
     cursorsqlsrv.execute(querryFindFactura)
     facturasInfo = cursorsqlsrv.fetchall()
 except Exception as e:
@@ -93,23 +96,37 @@ for fact in facturasInfo:
                     cursormysql.execute(f"SELECT * FROM orders WHERE N_offert LIKE '{temp_order}'")
                     order = cursormysql.fetchone()
                     if order :
+                        # print(fact[1])
                         ## -- Facturas Pagadas
                         if fact[2] == 'CA':
                             ## -- sin numero de factura  y se registra como pagado
+                            if 'LM-UIO2024-224' in fact[1] : print(f"{fact[1]} -- {'LM-UIO2024-224' in fact[1]}")
                             if order[7] == None :
-                                querryOrder = f"UPDATE orders set numFact = '{fact[0]}', fecRegPag = '{fact[3]}', fecCom = '{today}', est = 'A', com = 'AUTORIZADO SAFI' WHERE N_offert LIKE '{temp_order}'"
+                                if fact[1] == 'LM-UIO2024-224':
+                                    print(f"UPDATE orders set numFact = '{fact[0]}', fecRegPag = '{fact[3]}', fecCom = '{today}', est = 'A', com = 'AUTORIZADO SAFI' WHERE N_offert LIKE '{temp_order}'")
+                                querryOrder = f"UPDATE orders set numFact = '{fact[0]}', fecRegPag = '{fact[3]}', fecCom = '{today}', autr = 1,est = 'A', com = 'AUTORIZADO SAFI' WHERE N_offert LIKE '{temp_order}'"
 
                             ## -- si coinciden los numeros de oferta y esta en estado F(autorizado)
-                            if order[7] == fact[0] and order[11] == 'F':
-                                querryOrder = f"UPDATE orders set fecRegPag = '{fact[3]}', fecCom = '{today}', est = 'A' WHERE N_offert LIKE '{temp_order}'"
+                            if order[7] == fact[0] and order[13] == 'F':
+                                querryOrder = f"UPDATE orders set fecRegPag = '{fact[3]}', fecCom = '{today}', autr = 1,est = 'A' WHERE N_offert LIKE '{temp_order}'"
 
                         ## -- Retencion registrada
-                        else :
+                        if fact[2] == 'FC':
+                            if 'LM-UIO2024-224' in temp_order: print(fact[2])
+                            cursormysql.execute(f"SELECT C.entRpd, O.numFact FROM orders O JOIN plants P ON P.id = O.plant_id JOIN clients C ON P.client_id = C.id WHERE O.N_offert LIKE '{temp_order}'")
+                            validate = cursormysql.fetchone()
+                            if validate[0] and not validate[1] :
+                                querryOrder = f"UPDATE orders set numFact = '{fact[0]}', autr = 1, com = 'AUTORIZADO SAFI LB' WHERE N_offert LIKE '{temp_order}' "
+                        if  fact[2] == 'RI' or fact[2] == 'RR':
+
+                            # if 'LM-UIO2024-224' in temp_order: print(f"{fact[2]}--{order[11]}")
                             ## sin pago registrado debe estar en pendiente
-                            if order[11] == 'P':
-                                querryOrder = f"UPDATE orders set numFact = '{fact[0]}', est = 'F', com = 'AUTORIZADO SAFI' WHERE N_offert LIKE '{temp_order}' "
+                            if order[13] == 'P':
+                                querryOrder = f"UPDATE orders set numFact = '{fact[0]}', autr = 1, est = 'F', com = 'AUTORIZADO SAFI' WHERE N_offert LIKE '{temp_order}' "
                             else :
                                 querryOrder = ''
+                        else :
+                            querryOrder = ''
 
                         try:
                             cursormysql.execute(querryOrder)
