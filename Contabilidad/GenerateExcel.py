@@ -18,7 +18,7 @@ else :
 
 def connectMySQL():
     try:
-        MySQLConnection = pymysql.connect(host="127.0.0.1",user="root",passwd="",database="pruebas" )
+        MySQLConnection = pymysql.connect(host="127.0.0.1",user="root",passwd="AdminSistemas@",database="metrologia" )
         print (" ==> CONNECCTION SUCCESS WITH MYSQL")
         return MySQLConnection.cursor()
     

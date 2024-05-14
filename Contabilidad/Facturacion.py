@@ -87,7 +87,6 @@ for fact in facturasInfo:
         ## en caso de encontrar mas contenido del necesario trabajamos solo con el ultimo string
         aux = offert.split()
         if len(aux) > 0:
-            aux = aux[-1]
             for temp_order in aux :
                 if validate_order(temp_order):
                     ## -- busca la oferta en el SGO
