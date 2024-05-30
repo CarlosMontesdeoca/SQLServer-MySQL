@@ -98,12 +98,10 @@ for fact in facturasInfo:
                     if order :
                         # print(fact[1])
                         ## -- Facturas Pagadas
-                        if fact[2] == 'CA':
+                        if fact[2] == 'CA' and order[13] != 'A':
                             ## -- sin numero de factura  y se registra como pagado
                             if 'LM-UIO2024-224' in fact[1] : print(f"{fact[1]} -- {'LM-UIO2024-224' in fact[1]}")
                             if order[7] == None :
-                                if fact[1] == 'LM-UIO2024-224':
-                                    print(f"UPDATE orders set numFact = '{fact[0]}', fecRegPag = '{fact[3]}', fecCom = '{today}', est = 'A', com = 'AUTORIZADO SAFI' WHERE N_offert LIKE '{temp_order}'")
                                 querryOrder = f"UPDATE orders set numFact = '{fact[0]}', fecRegPag = '{fact[3]}', fecCom = '{today}', autr = 1,est = 'A', com = 'AUTORIZADO SAFI' WHERE N_offert LIKE '{temp_order}'"
 
                             ## -- si coinciden los numeros de oferta y esta en estado F(autorizado)
@@ -111,13 +109,15 @@ for fact in facturasInfo:
                                 querryOrder = f"UPDATE orders set fecRegPag = '{fact[3]}', fecCom = '{today}', autr = 1,est = 'A' WHERE N_offert LIKE '{temp_order}'"
 
                         ## -- Retencion registrada
-                        if fact[2] == 'FC':
-                            if 'LM-UIO2024-224' in temp_order: print(fact[2])
+                        if fact[2] == 'FC' and order[13] == 'P' and order[7] is None:
+                            # if 'LM-UIO2024-224' in temp_order: print(fact[2])
                             cursormysql.execute(f"SELECT C.entRpd, O.numFact FROM orders O JOIN plants P ON P.id = O.plant_id JOIN clients C ON P.client_id = C.id WHERE O.N_offert LIKE '{temp_order}'")
                             validate = cursormysql.fetchone()
                             if validate[0] and not validate[1] :
                                 querryOrder = f"UPDATE orders set numFact = '{fact[0]}', autr = 1, com = 'AUTORIZADO SAFI LB' WHERE N_offert LIKE '{temp_order}' "
-                        if  fact[2] == 'RI' or fact[2] == 'RR':
+                            else :
+                                querryOrder = f"UPDATE orders set numFact = '{fact[0]}' WHERE N_offert LIKE '{temp_order}' "
+                        if  (fact[2] == 'RI' or fact[2] == 'RR') and order[13] == 'P':
 
                             # if 'LM-UIO2024-224' in temp_order: print(f"{fact[2]}--{order[11]}")
                             ## sin pago registrado debe estar en pendiente
