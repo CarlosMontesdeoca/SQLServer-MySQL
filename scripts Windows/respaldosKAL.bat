@@ -1,1 +1,3 @@
-vboxmanage export "KALKULMOTORO 2024-003" -o C:\archivos_sistemas\Respaldos_KAL\KALK_%Date:~6,4%_%Date:~3,2%_%Date:~0,2%.ova
+
+For /f "tokens=2-4 delims=/ " %%a in ('date /t') do (set mydate=%%c-%%a-%%b)
+vboxmanage export "pruebas-lx" -o C:\archivos_sistemas\Respaldos_KAL\KALK_%mydate%.ova
