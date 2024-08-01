@@ -28,9 +28,10 @@ def connectMySQL():
 
 def connectMongo():
     try:
-        client = pymongo.MongoClient("mongodb://192.168.9.221:27017/")
+        # client = pymongo.MongoClient("mongodb://192.168.9.221:27017/")
+        client = pymongo.MongoClient("mongodb+srv://Administrador:AdminSistemas%40@precitrol.3tkjgah.mongodb.net/")
         db = client["operaciones"]
-        collection = db["quoters"]
+        collection = db["quotes"]
         print (" ==> CONNECCTION SUCCESS WITH MONGODB")
         return collection
     
@@ -88,10 +89,14 @@ def insertInToExcel(start, data, sheet, cos_prec):
         for commision in comissions:
             if commision[0] not in temp:
                 quote = cursormongo.find_one({"N_offert": commision[0]})
+                # print(list(cursormongo.find()))
                 temp[commision[0]] = [quote['disc'], quote['services']]
                 
             result = next(item for item in temp[commision[0]][1] if item['service_id'] == commision[3])
-            cost = result['cant'] * result['cost'] * (( 100 - temp[commision[0]][0]) / 100) * commision[1] / 100
+            try:
+                cost = result['cant'] * result['cost'] * (( 100 - temp[commision[0]][0]) / 100) * commision[1] / 100
+            except:
+                cost = result['cant'] * result['cost']  * commision[1] / 100
 
             if commision[5]:
                 cals += cost

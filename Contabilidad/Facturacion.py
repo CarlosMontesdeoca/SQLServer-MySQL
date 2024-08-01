@@ -8,9 +8,12 @@ from datetime import date
 
 ## esta funcion valida si el numero de oferta ingresado a la factura cumple con el formato correcto del Cotizador.
 def validate_order(val):
+    
     try:
-        aux = re.compile(r'^[A-Za-z]{2,3}-(PMP-)?(UIO|GYE)\d{4}-\d{3}$')
-        if aux.match(val):
+        # aux = re.compile(r'^[A-Za-z]{2,3}-(PMP-)?(UIO|GYE)\d{4}-\d{3}$')
+        
+        if len(val) > 13:
+        # if aux.match(val):
             return True
         else : 
             return False
@@ -36,7 +39,7 @@ except:
     print ('error to try connect the database SQL Server')
 
 try:
-    MySQLConnection = pymysql.connect(host="127.0.0.1",user="root",passwd="",database="pruebas" )
+    MySQLConnection = pymysql.connect(host="192.168.9.221",user="root",passwd="AdminSistemas@",database="metrologia" )
     print (" ==> CONNECCTION SUCCESS WITH MYSQL")
 except:
     logs += "==> error to try connect the database MySQL \n" 
@@ -67,6 +70,8 @@ FROM
 WHERE
 	CP.CTCodigo  IN ('RR', 'RI', 'CA', 'FC')
 	AND YEAR(CH.CLHFEmision) BETWEEN {today.year - 1} AND {today.year}
+    AND LEN(FACHIS.FHComent2) > 13
+    AND FACHIS.FHComent2 NOT LIKE '%PLANT%'
 GROUP BY 
 	FACHIS.FHFactura,
 	FACHIS.FHComent2,
@@ -92,32 +97,40 @@ for fact in facturasInfo:
         if len(aux) > 0:
             for temp_order in aux :
                 if validate_order(temp_order):
+                    # print(temp_order)
                     ## -- busca la oferta en el SGO
                     cursormysql.execute(f"SELECT * FROM orders WHERE N_offert LIKE '{temp_order}'")
                     order = cursormysql.fetchone()
                     if order :
-                        # print(fact[1])
+                        
+                        if temp_order == 'LM-UIO2024-086' : print(f'{temp_order} {fact[0]} {fact[1]} {fact[2]} || {order[7]} {order[13]}')
                         ## -- Facturas Pagadas
+                        key = False
                         if fact[2] == 'CA' and order[13] != 'A':
                             ## -- sin numero de factura  y se registra como pagado
-                            if 'LM-UIO2024-224' in fact[1] : print(f"{fact[1]} -- {'LM-UIO2024-224' in fact[1]}")
-                            if order[7] == None :
+                            # if 'LM-UIO2024-224' in fact[1] : print(f"{fact[1]} -- {'LM-UIO2024-224' in fact[1]}")
+                            if order[7] == None or order[7] == '' or order[7] == ' ':
                                 querryOrder = f"UPDATE orders set numFact = '{fact[0]}', fecRegPag = '{fact[3]}', fecCom = '{today}', autr = 1,est = 'A', com = 'AUTORIZADO SAFI' WHERE N_offert LIKE '{temp_order}'"
+                                key = True
 
                             ## -- si coinciden los numeros de oferta y esta en estado F(autorizado)
                             if order[7] == fact[0] and order[13] == 'F':
+                                if temp_order == 'LM-UIO2024-086' : print(f"UPDATE orders set fecRegPag = '{fact[3]}', fecCom = '{today}', autr = 1,est = 'A' WHERE N_offert LIKE '{temp_order}'")
                                 querryOrder = f"UPDATE orders set fecRegPag = '{fact[3]}', fecCom = '{today}', autr = 1,est = 'A' WHERE N_offert LIKE '{temp_order}'"
+                                key = True
 
                         ## -- Retencion registrada
-                        if fact[2] == 'FC' and order[13] == 'P' and order[7] is None:
+                        if fact[2] == 'FC' and order[13] == 'P' and not key:
                             # if 'LM-UIO2024-224' in temp_order: print(fact[2])
                             cursormysql.execute(f"SELECT C.entRpd, O.numFact FROM orders O JOIN plants P ON P.id = O.plant_id JOIN clients C ON P.client_id = C.id WHERE O.N_offert LIKE '{temp_order}'")
                             validate = cursormysql.fetchone()
                             if validate[0] and not validate[1] :
                                 querryOrder = f"UPDATE orders set numFact = '{fact[0]}', autr = 1, com = 'AUTORIZADO SAFI LB' WHERE N_offert LIKE '{temp_order}' "
+                                key = True
                             else :
                                 querryOrder = f"UPDATE orders set numFact = '{fact[0]}' WHERE N_offert LIKE '{temp_order}' "
-                        if  (fact[2] == 'RI' or fact[2] == 'RR') and order[13] == 'P':
+                                key = True
+                        if  (fact[2] == 'RI' or fact[2] == 'RR') and order[13] == 'P' and not key:
 
                             # if 'LM-UIO2024-224' in temp_order: print(f"{fact[2]}--{order[11]}")
                             ## sin pago registrado debe estar en pendiente
@@ -125,10 +138,11 @@ for fact in facturasInfo:
                                 querryOrder = f"UPDATE orders set numFact = '{fact[0]}', autr = 1, est = 'F', com = 'AUTORIZADO SAFI' WHERE N_offert LIKE '{temp_order}' "
                             else :
                                 querryOrder = ''
-                        else :
-                            querryOrder = ''
+                        # else :
+                        #     querryOrder = ''
 
                         try:
+                            if temp_order == 'LM-UIO2024-086' : print(querryOrder)
                             cursormysql.execute(querryOrder)
                             MySQLConnection.commit()
                             print(f'✔️ Factura N°: {fact[0]}')
@@ -137,9 +151,8 @@ for fact in facturasInfo:
                             continue
                                 
                     else :
-                        print('⚠️ no existe la oferta registrada!!')
+                        print(f'⚠️ no existe la oferta registrada!! {temp_order} || {len(temp_order)}')
                         print('========================================================================')
 
 MySQLConnection.close()
-SQLServerConnection.close()
 
